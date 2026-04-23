@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Reports</p>
+            <h1>Floor reports</h1>
+            <p class="report-hub-subtitle">Floor-wise room health and overdue visibility ke liye report selector.</p>
+        </div>
+        <div class="report-hub-badges">
+            <span class="report-hub-badge">{{ floors|length }} floors</span>
+        </div>
+    </div>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Find floor</h2>
+                <p>Hostel, block, ya floor name se floor report open karo.</p>
+            </div>
+        </div>
+        <form method="get" class="report-hub-toolbar">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search hostel, block or floor">
+            <button type="submit" class="report-hub-primary-btn">Apply</button>
+            <a href="{{ url_for('reports.floor_selector') }}" class="report-hub-secondary-btn">Reset</a>
+        </form>
+    </section>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Floor register</h2>
+                <p>Quick entry points for floor-level report pages.</p>
+            </div>
+        </div>
+        {% if floors %}
+        <div class="report-hub-table-wrap">
+            <table class="report-hub-table">
+                <thead>
+                    <tr>
+                        <th>Hostel</th>
+                        <th>Block</th>
+                        <th>Floor</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in floors %}
+                    <tr>
+                        <td>{{ f.hostel_name }}</td>
+                        <td>{{ f.block_name }}</td>
+                        <td><strong>{{ f.floor_no }}</strong></td>
+                        <td><a href="{{ url_for('reports.floor_report', floor_id=f.id) }}" class="report-hub-link-btn">View heatmap</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No floors found</h3>
+            <p>Current search me koi floor match nahi mila.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

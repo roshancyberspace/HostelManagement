@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🕒 Student Timeline</h2>
+<h3>{{ student.full_name }}</h3>
+
+<ul>
+{% for e in timeline %}
+    <li><b>{{ e.date }}</b> – {{ e.title }} ({{ e.type }})</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

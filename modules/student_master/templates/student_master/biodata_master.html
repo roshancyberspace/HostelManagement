@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="intake-shell biodata-page-shell">
+    <section class="intake-card compact-card biodata-workspace-hero biodata-workspace-hero-simple">
+        <div class="biodata-workspace-copy">
+            <span class="section-kicker">Admissions Workspace</span>
+            <h1>Student Master Biodata</h1>
+            <p>Student identity, admission details, family information, and photo capture ko ek clean form me complete karo.</p>
+            <div class="biodata-hero-tags">
+                <span class="biodata-hero-tag">Structured Form</span>
+                <span class="biodata-hero-tag">Live Photo</span>
+                <span class="biodata-hero-tag">Family Records</span>
+            </div>
+        </div>
+        <div class="biodata-workspace-aside biodata-workspace-aside-simple">
+            <div class="biodata-head-pills">
+                <div class="biodata-head-pill">
+                    <span>Current Ledger</span>
+                    <strong>{{ ledger or 'New record' }}</strong>
+                </div>
+                <div class="biodata-head-pill">
+                    <span>Record State</span>
+                    <strong>{% if data %}Loaded{% else %}Waiting{% endif %}</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="intake-card compact-card biodata-command-bar premium-command-bar">
+        <form method="get" class="registry-toolbar slim-toolbar biodata-load-toolbar">
+            <div class="toolbar-search compact-field">
+                <label for="ledger-search">Load Student Record</label>
+                <input id="ledger-search" name="ledger_no" placeholder="Enter ledger number" value="{{ ledger or '' }}" required>
+            </div>
+            <div class="toolbar-button-row">
+                <button type="submit">Load Biodata</button>
+            </div>
+        </form>
+        <div class="biodata-download-row">
+            <a href="/students/download/basic-bulk-excel" class="ghost-btn btn small">Basic Student Excel</a>
+            <a href="/students/download/biodata-excel" class="ghost-btn btn small">Full Biodata Excel</a>
+        </div>
+    </section>
+
+    <section class="biodata-progress-strip">
+        <article class="biodata-progress-card">
+            <span>Student Record</span>
+            <strong>{% if data %}Loaded{% else %}Pending{% endif %}</strong>
+        </article>
+        <article class="biodata-progress-card">
+            <span>Student Photo</span>
+            <strong>{% if data and data.biodata and data.biodata.student_photo %}Available{% else %}Pending{% endif %}</strong>
+        </article>
+        <article class="biodata-progress-card">
+            <span>Parent Details</span>
+            <strong>{% if data and data.parents and (data.parents.father_name or data.parents.mother_name) %}Available{% else %}Pending{% endif %}</strong>
+        </article>
+        <article class="biodata-progress-card">
+            <span>Guardians</span>
+            <strong>{{ data.guardians|length if data and data.guardians else 0 }}</strong>
+        </article>
+    </section>
+
+    <form method="post" enctype="multipart/form-data" class="admin-form-grid intake-form intake-card biodata-master-form premium-biodata-form">
+        <section class="full-span biodata-split-stage">
+            <section class="biodata-section biodata-section-premium biodata-core-panel">
+                <div class="intake-card-head biodata-section-head">
+                    <h3>Student Identification</h3>
+                    <span class="status-chip">Basic details</span>
+                </div>
+                <div class="biodata-grid">
+                    <div>
+                        <label>Ledger Number</label>
+                        <input name="ledger_no" value="{{ data.student.ledger_no if data else (ledger or '') }}" required {% if data %}readonly{% endif %}>
+                    </div>
+                    <div>
+                        <label>Student Name</label>
+                        <input name="student_name" value="{{ data.student.student_name if data else '' }}" required>
+                    </div>
+                    <div>
+                        <label>Class</label>
+                        <input name="class" value="{{ data.student.class if data else '' }}" required>
+                    </div>
+                    <div>
+                        <label>Section</label>
+                        <input name="section" value="{{ data.student.section if data else '' }}">
+                    </div>
+                </div>
+                <div class="intake-card-head biodata-section-head biodata-inner-head">
+                    <h3>Admission and Hostel Details</h3>
+                    <span class="status-chip">Dates</span>
+                </div>
+                <div class="biodata-grid">
+                    <div><label>Date of Birth</label><input type="date" name="dob" value="{{ data.student.dob if data else '' }}"></div>
+                    <div><label>Class of Admission</label><input name="class_of_admission" value="{{ data.student.class_of_admission if data else '' }}"></div>
+                    <div><label>Date of Admission</label><input type="date" name="date_of_admission" value="{{ data.student.date_of_admission if data else '' }}"></div>
+                    <div><label>Hostel Reporting Date</label><input type="date" name="hostel_reporting_date" value="{{ data.student.hostel_reporting_date if data else '' }}"></div>
+                </div>
+            </section>
+
+            <section class="biodata-section biodata-section-premium biodata-photo-panel biodata-photo-panel-simple">
+                <input type="hidden" name="captured_student_photo" id="captured-student-photo" value="">
+                <div class="student-photo-capture-panel student-photo-clean-panel">
+                    <div class="intake-card-head biodata-section-head student-photo-clean-head">
+                        <div>
+                            <span class="section-kicker">Student Photo</span>
+                            <h3>Student Live Photo</h3>
+                            <p>Capture or upload one clear front-facing student photo.</p>
+                        </div>
+                    </div>
+
+                    <div class="student-photo-single-stage">
+                        <canvas id="student-camera-canvas" class="hidden-photo-canvas"></canvas>
+                        <div class="student-photo-box">
+                            <div class="student-photo-box-title">Student Photo</div>
+                            <div id="student-photo-preview" class="student-photo-preview student-photo-preview-clean student-photo-single-box {% if data and data.biodata and data.biodata.student_photo %}has-image photo-mode-captured{% else %}photo-mode-live{% endif %}">
+                                <video id="student-camera" autoplay muted playsinline {% if data and data.biodata and data.biodata.student_photo %}hidden{% endif %}></video>
+                                <div class="student-photo-camera-overlay"></div>
+                                {% if data and data.biodata and data.biodata.student_photo %}
+                                <img src="{% if data.biodata.student_photo.startswith('instance_uploads/') %}{{ url_for('student_master.student_media', filename=data.biodata.student_photo.replace('instance_uploads/', '', 1)) }}{% else %}{{ url_for('static', filename=data.biodata.student_photo) }}{% endif %}" alt="" id="student-photo-preview-image" onerror="this.hidden=true; document.getElementById('student-photo-preview').classList.remove('has-image','photo-mode-captured'); document.getElementById('student-photo-preview').classList.add('photo-mode-live'); document.getElementById('student-camera').hidden=false; document.getElementById('student-photo-placeholder').hidden=false;">
+                                <div class="student-photo-placeholder" id="student-photo-placeholder" hidden></div>
+                                {% else %}
+                                <img src="" alt="" id="student-photo-preview-image" hidden>
+                                <div class="student-photo-placeholder" id="student-photo-placeholder"></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="student-photo-toolbar student-photo-toolbar-simple">
+                        <div class="student-photo-actions student-photo-actions-simple">
+                            <button type="button" class="ghost-btn btn small" id="start-camera-btn">Start Camera</button>
+                            <button type="button" class="btn small" id="capture-photo-btn" disabled>Capture Photo</button>
+                            <button type="button" class="ghost-btn btn small" id="retake-photo-btn">Clear</button>
+                            <label for="student-photo-upload-input" class="ghost-btn btn small student-photo-upload-trigger">Upload Photo</label>
+                        </div>
+                        <div class="student-photo-mini-note">Only one face, plain background, and clear light recommended.</div>
+                    </div>
+
+                    <div id="student-camera-status" class="camera-status-note status-idle">Camera not started yet.</div>
+                    <input type="file" name="student_photo" id="student-photo-upload-input" class="student-photo-upload-input" accept="image/*">
+                </div>
+            </section>
+        </section>
+
+        <section class="full-span biodata-section biodata-section-premium">
+            <div class="intake-card-head biodata-section-head"><h3>Parent Details</h3><span class="status-chip">Family</span></div>
+            <div class="biodata-subgrid">
+                <div class="biodata-subcard">
+                    <div class="biodata-subcard-head">
+                        <strong>Father Details</strong>
+                        <span>Primary contact</span>
+                    </div>
+                    <div class="biodata-grid single biodata-grid-tight">
+                        <div><label>Father Name</label><input name="father_name" value="{{ data.parents.father_name if data and data.parents else '' }}"></div>
+                        <div><label>Father Mobile</label><input name="father_mobile_1" value="{{ data.parents.father_mobile_1 if data and data.parents else '' }}"></div>
+                        <div><label>Father Photograph</label><input type="file" name="father_photo"></div>
+                    </div>
+                </div>
+                <div class="biodata-subcard">
+                    <div class="biodata-subcard-head">
+                        <strong>Mother Details</strong>
+                        <span>Secondary contact</span>
+                    </div>
+                    <div class="biodata-grid single biodata-grid-tight">
+                        <div><label>Mother Name</label><input name="mother_name" value="{{ data.parents.mother_name if data and data.parents else '' }}"></div>
+                        <div><label>Mother Mobile</label><input name="mother_mobile_1" value="{{ data.parents.mother_mobile_1 if data and data.parents else '' }}"></div>
+                        <div><label>Mother Photograph</label><input type="file" name="mother_photo"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="full-span biodata-section biodata-section-premium">
+            <div class="intake-card-head biodata-section-head biodata-section-head-split">
+                <div>
+                    <h3>Guardian Details</h3>
+                    <p class="biodata-section-note">Emergency or local guardian records yahan maintain karo.</p>
+                </div>
+                <div class="biodata-guardian-toolbar">
+                    <span class="status-chip">{{ data.guardians|length if data and data.guardians else 0 }} records</span>
+                    <button type="button" class="ghost-btn btn small" onclick="addGuardian()">Add Another Guardian</button>
+                </div>
+            </div>
+            <div class="guardian-stack enhanced" id="guardians">
+            {% if data and data.guardians %}
+                {% for g in data.guardians %}
+                <div class="guardian-block">
+                    <div><label>Guardian Name</label><input name="guardian_name[]" value="{{ g.name }}" required></div>
+                    <div><label>Relation with Student</label><input name="guardian_relation[]" value="{{ g.relation }}" required></div>
+                    <div><label>Mobile Number</label><input name="guardian_mobile[]" value="{{ g.mobile_1 }}" required></div>
+                    <div class="full-span"><label>Address</label><textarea name="guardian_address[]">{{ g.address }}</textarea></div>
+                    <div><label>Guardian Photograph</label><input type="file" name="guardian_photo[]"></div>
+                </div>
+                {% endfor %}
+            {% endif %}
+            </div>
+        </section>
+
+        <section class="full-span biodata-section biodata-section-premium">
+            <div class="intake-card-head biodata-section-head"><h3>Address and Other Details</h3><span class="status-chip">Notes</span></div>
+            <div class="biodata-grid single">
+                <div class="full-span"><label>Permanent Address</label><textarea name="permanent_address">{{ data.student.permanent_address if data else '' }}</textarea></div>
+                <div class="full-span"><label>Remarks / Identification Marks</label><textarea name="remarks">{{ data.student.remarks if data else '' }}</textarea></div>
+            </div>
+        </section>
+
+        <div class="form-action-row full-span biodata-master-actions">
+            <button type="submit">Save Biodata</button>
+            {% if data %}
+            <a href="{{ url_for('student_master.student_profile', ledger_no=data.student.ledger_no) }}" class="ghost-btn btn">Open Student Profile</a>
+            {% endif %}
+        </div>
+    </form>
+</section>
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+function addGuardian() {
+    const g = document.createElement("div");
+    g.className = "guardian-block";
+    g.innerHTML = `
+        <div><label>Guardian Name</label><input name="guardian_name[]" required></div>
+        <div><label>Relation with Student</label><input name="guardian_relation[]" required></div>
+        <div><label>Mobile Number</label><input name="guardian_mobile[]" required></div>
+        <div class="full-span"><label>Address</label><textarea name="guardian_address[]"></textarea></div>
+        <div><label>Guardian Photograph</label><input type="file" name="guardian_photo[]"></div>
+    `;
+    document.getElementById("guardians").appendChild(g);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    const FACE_MODEL_URL = "https://justadudewhohacks.github.io/face-api.js/models";
+    const videoElement = document.getElementById("student-camera");
+    const canvasElement = document.getElementById("student-camera-canvas");
+    const captureButton = document.getElementById("capture-photo-btn");
+    const startCameraButton = document.getElementById("start-camera-btn");
+    const hiddenPhotoInput = document.getElementById("captured-student-photo");
+    const previewWrap = document.getElementById("student-photo-preview");
+    const previewImage = document.getElementById("student-photo-preview-image");
+    const previewPlaceholder = document.getElementById("student-photo-placeholder");
+    const cameraStatus = document.getElementById("student-camera-status");
+    const retakeButton = document.getElementById("retake-photo-btn");
+    const uploadInput = document.getElementById("student-photo-upload-input");
+    let cameraStream = null;
+    let faceModelReady = false;
+    let captureLocked = false;
+    let cameraReady = false;
+    let captureInProgress = false;
+
+    function setCameraStatus(message, variant = "idle") {
+        cameraStatus.textContent = message;
+        cameraStatus.className = `camera-status-note status-${variant}`;
+    }
+
+    function syncCaptureState() {
+        captureButton.disabled = captureLocked || !cameraStream || !cameraReady || captureInProgress;
+    }
+
+    function markCameraReady() {
+        if (!cameraStream) {
+            return;
+        }
+        cameraReady = true;
+        syncCaptureState();
+        if (!captureLocked) {
+            setCameraStatus(faceModelReady
+                ? "Camera ready. Capture the student photo when the face is centered."
+                : "Camera ready. You can capture now even if face detection is still loading.", "idle");
+        }
+    }
+
+    async function waitForCameraFrame() {
+        if (videoElement.videoWidth && videoElement.videoHeight) {
+            cameraReady = true;
+            syncCaptureState();
+            return true;
+        }
+
+        return new Promise((resolve) => {
+            let settled = false;
+            const finish = (result) => {
+                if (settled) {
+                    return;
+                }
+                settled = true;
+                resolve(result);
+            };
+
+            const onReady = () => {
+                videoElement.removeEventListener("loadeddata", onReady);
+                videoElement.removeEventListener("loadedmetadata", onReady);
+                markCameraReady();
+                finish(true);
+            };
+
+            videoElement.addEventListener("loadeddata", onReady, { once: true });
+            videoElement.addEventListener("loadedmetadata", onReady, { once: true });
+
+            window.setTimeout(() => {
+                videoElement.removeEventListener("loadeddata", onReady);
+                videoElement.removeEventListener("loadedmetadata", onReady);
+                finish(Boolean(videoElement.videoWidth && videoElement.videoHeight));
+            }, 1800);
+        });
+    }
+
+    async function detectSingleFaceSafely() {
+        if (!faceModelReady || !window.faceapi) {
+            return { ok: true };
+        }
+
+        try {
+            const detectionPromise = faceapi.detectAllFaces(
+                videoElement,
+                new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 })
+            );
+            const timeoutPromise = new Promise((_, reject) => {
+                window.setTimeout(() => reject(new Error("face-detection-timeout")), 1800);
+            });
+            const detections = await Promise.race([detectionPromise, timeoutPromise]);
+
+            if (!detections.length) {
+                return { ok: false, message: "No face was detected. Please ensure the student's face is clearly visible and try again.", variant: "error" };
+            }
+            if (detections.length > 1) {
+                return { ok: false, message: "Multiple faces were detected. Please keep only one student in the frame and capture again.", variant: "error" };
+            }
+
+            return { ok: true };
+        } catch (error) {
+            return {
+                ok: true,
+                warning: "Face detection was slow or unavailable, but the photo was still captured."
+            };
+        }
+    }
+
+    async function loadFaceModel() {
+        if (!window.faceapi) {
+            setCameraStatus("Face detection service is not available right now. You may continue with manual photo upload.", "error");
+            return;
+        }
+        try {
+            await faceapi.nets.tinyFaceDetector.loadFromUri(FACE_MODEL_URL);
+            faceModelReady = true;
+            setCameraStatus("Face detection is ready. Start the camera and capture the student photo.", "success");
+        } catch (error) {
+            setCameraStatus("Face detection could not be initialized. Please check connectivity or use manual photo upload.", "warning");
+        }
+    }
+
+    async function startStudentCamera() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            setCameraStatus("Camera access is not supported in this browser.", "error");
+            return;
+        }
+        try {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+            }
+            cameraReady = false;
+            captureInProgress = false;
+            syncCaptureState();
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+                audio: false
+            });
+            videoElement.srcObject = cameraStream;
+            await videoElement.play();
+            waitForCameraFrame().then((ready) => {
+                if (!ready && !captureLocked) {
+                    setCameraStatus("Camera started, but preview is still preparing. Wait a moment and try capture again.", "warning");
+                }
+            });
+            previewWrap.classList.remove("photo-mode-captured");
+            previewWrap.classList.add("photo-mode-live");
+            previewImage.hidden = true;
+            videoElement.hidden = false;
+            if (previewPlaceholder) {
+                previewPlaceholder.hidden = true;
+            }
+            syncCaptureState();
+            setCameraStatus(faceModelReady
+                ? "Starting camera preview. Hold steady for capture."
+                : "Camera started. Face detection will begin as soon as the model is ready.", "idle");
+        } catch (error) {
+            setCameraStatus("Camera access was denied. Please allow camera permission and try again.", "error");
+        }
+    }
+
+    async function captureStudentPhoto() {
+        if (captureLocked) {
+            setCameraStatus("A photo has already been captured. Select Retake Photo to capture a new image.", "warning");
+            return;
+        }
+
+        if (captureInProgress) {
+            return;
+        }
+
+        captureInProgress = true;
+        syncCaptureState();
+
+        try {
+            const previewReady = await waitForCameraFrame();
+            if (!previewReady || !videoElement.videoWidth || !videoElement.videoHeight) {
+                setCameraStatus("Camera preview is still loading. Please wait a moment and try again.", "warning");
+                return;
+            }
+
+            const faceCheck = await detectSingleFaceSafely();
+            if (!faceCheck.ok) {
+                setCameraStatus(faceCheck.message, faceCheck.variant || "warning");
+                return;
+            }
+
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+            const ctx = canvasElement.getContext("2d");
+            ctx.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+            const imageData = canvasElement.toDataURL("image/jpeg", 0.92);
+            hiddenPhotoInput.value = imageData;
+            previewWrap.classList.remove("photo-mode-live");
+            previewWrap.classList.add("photo-mode-captured");
+            previewImage.src = imageData;
+            previewImage.hidden = false;
+            videoElement.hidden = true;
+            if (previewPlaceholder) {
+                previewPlaceholder.hidden = true;
+            }
+            previewWrap.classList.add("has-image");
+            captureLocked = true;
+            syncCaptureState();
+            setCameraStatus(faceCheck.warning || "Student photo captured successfully. You can now save the biodata form.", faceCheck.warning ? "warning" : "success");
+        } finally {
+            captureInProgress = false;
+            syncCaptureState();
+        }
+    }
+
+    function resetCapturedPhoto() {
+        hiddenPhotoInput.value = "";
+        captureLocked = false;
+        captureInProgress = false;
+        previewWrap.classList.remove("has-image");
+        previewWrap.classList.remove("photo-mode-captured");
+        previewWrap.classList.add("photo-mode-live");
+        previewImage.src = "";
+        previewImage.hidden = true;
+        videoElement.hidden = false;
+        if (uploadInput) {
+            uploadInput.value = "";
+        }
+        if (previewPlaceholder) {
+            previewPlaceholder.hidden = !cameraStream;
+        }
+        syncCaptureState();
+        setCameraStatus(cameraReady
+            ? "Retake mode is enabled. Capture the student photo again when ready."
+            : "Retake mode is enabled. Start the camera preview again if needed.", "idle");
+    }
+
+    function handleUploadedPhoto(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) {
+            return;
+        }
+        hiddenPhotoInput.value = "";
+        captureLocked = true;
+        previewWrap.classList.add("has-image");
+        previewWrap.classList.remove("photo-mode-live");
+        previewWrap.classList.add("photo-mode-captured");
+        previewImage.src = URL.createObjectURL(file);
+        previewImage.hidden = false;
+        videoElement.hidden = true;
+        if (previewPlaceholder) {
+            previewPlaceholder.hidden = true;
+        }
+        syncCaptureState();
+        setCameraStatus("Uploaded photo loaded successfully. Review the same preview panel and save the form.", "success");
+    }
+
+    captureLocked = Boolean(hiddenPhotoInput.value);
+    cameraReady = Boolean(videoElement.videoWidth && videoElement.videoHeight);
+    if (!captureLocked && previewPlaceholder) {
+        previewPlaceholder.hidden = false;
+    }
+    videoElement.addEventListener("loadedmetadata", markCameraReady);
+    videoElement.addEventListener("loadeddata", markCameraReady);
+    startCameraButton.addEventListener("click", startStudentCamera);
+    captureButton.addEventListener("click", captureStudentPhoto);
+    retakeButton.addEventListener("click", resetCapturedPhoto);
+    uploadInput.addEventListener("change", handleUploadedPhoto);
+    window.addEventListener("beforeunload", () => {
+        if (cameraStream) {
+            cameraStream.getTracks().forEach(track => track.stop());
+        }
+    });
+    syncCaptureState();
+    loadFaceModel();
+});
+</script>
+
+{% endblock %}

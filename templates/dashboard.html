@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>🏨 Hostel Dashboard</h1>
+
+<!-- ================= SUMMARY CARDS ================= -->
+<div class="cards">
+
+    <div class="card"
+         onclick="location.href='/structure/room'"
+         style="cursor:pointer;">
+        <h3>Total Rooms</h3>
+        <div class="value">{{ total }}</div>
+        <small class="muted">Click to view all rooms</small>
+    </div>
+
+    <div class="card"
+         onclick="location.href='/structure/room'"
+         style="cursor:pointer;">
+        <h3>Vacant Rooms</h3>
+        <div class="value green">{{ vacant }}</div>
+        <small class="muted">Available for allotment</small>
+    </div>
+
+    <div class="card"
+         onclick="location.href='/structure/bed'"
+         style="cursor:pointer;">
+        <h3>Occupied Rooms</h3>
+        <div class="value amber">{{ total - vacant }}</div>
+        <small class="muted">Beds currently allotted</small>
+    </div>
+
+    <div class="card"
+         onclick="location.href='{{ url_for("room_inspection.inspection_dashboard") }}'"
+         style="cursor:pointer;">
+        <h3>🧾 Room Inspection</h3>
+        <div class="value red">OPEN</div>
+        <small class="muted">Click to open Room Inspection Report</small>
+    </div>
+
+</div>
+
+
+<!-- ================= QUICK ACTIONS ================= -->
+<div class="cards">
+
+    <div class="card"
+         onclick="location.href='{{ url_for("room_inspection.room_entry") }}'"
+         style="cursor:pointer;">
+        <h3>✅ Room Inspection Entry</h3>
+        <p>
+            Take inspection for AC student rooms <br>
+            Mark items as GOOD / DAMAGED / MISSING
+        </p>
+        <small class="muted">Click to open inspection entry</small>
+    </div>
+
+    <div class="card"
+         onclick="location.href='{{ url_for("room_inspection.inspection_dashboard") }}'"
+         style="cursor:pointer;">
+        <h3>🧾 Room Inspection Report</h3>
+        <p>
+            View latest DAMAGED / MISSING issues<br>
+            Filter & track problems room-wise
+        </p>
+        <small class="muted">Click to open inspection report</small>
+    </div>
+
+</div>
+
+
+<!-- ================= GOVERNANCE (ROLE BASED) ================= -->
+{% if session.user_role in ["Superintendent", "Warden"] %}
+<div class="cards">
+
+    <div class="card governance"
+         onclick="location.href='{{ url_for("hostel_governance.dashboard") }}'"
+         style="cursor:pointer;">
+        <h3>
+            🏛️ Hostel Governance
+            {% if session.user_role == "Superintendent" %}
+                <span class="role-badge role-superintendent">SUPERINTENDENT</span>
+            {% elif session.user_role == "Warden" %}
+                <span class="role-badge role-warden">WARDEN</span>
+            {% endif %}
+        </h3>
+        <p>
+            • Notices & Circulars<br>
+            • Student Acknowledgements<br>
+            • Decision & Escalation Register
+        </p>
+        <small class="muted">
+            Authority & compliance control layer
+        </small>
+    </div>
+
+</div>
+{% endif %}
+
+
+<!-- ================= STUDENT SNAPSHOT ================= -->
+<div class="cards">
+
+    <div class="card"
+         onclick="location.href='/students/list'"
+         style="cursor:pointer;">
+        <h3>🎓 Student Strength</h3>
+        <p>
+            <b>Total Students:</b> {{ student_total }}<br>
+            <b>Active (Hostel):</b> {{ student_active }}<br>
+            <b>Non-Active:</b> {{ student_total - student_active }}
+        </p>
+        <small class="muted">
+            Click to open Student Registry
+        </small>
+    </div>
+
+    <div class="card"
+         onclick="location.href='/structure/bed'"
+         style="cursor:pointer;">
+        <h3>🛏️ Bed Allocation Health</h3>
+        <p>
+            <b>Allotted Beds:</b> {{ beds_allotted }}<br>
+            <b>Vacant Beds:</b> {{ beds_vacant }}
+        </p>
+        <small class="muted">
+            Click to manage Bed Inventory
+        </small>
+    </div>
+
+</div>
+
+
+<!-- ================= STATUS & FOCUS ================= -->
+<div class="cards">
+
+    <div class="card">
+        <h3>🎯 Current Focus</h3>
+        <p>
+            ✔ Maintain room & common area discipline<br>
+            ✔ Record PRE and POST inspections properly<br>
+            ✔ Ensure recovery for damages beyond normal wear<br>
+            ✔ Keep hostel infrastructure audit-ready
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>📢 System Health</h3>
+        <p>
+            🟢 Student Master stable<br>
+            🟢 Bed automation active<br>
+            🟢 Permission auto-revoke active<br>
+            🟢 Excel intake operational
+        </p>
+    </div>
+
+</div>
+
+
+<!-- ================= CHARTS ================= -->
+<div class="cards">
+
+    <div class="card">
+        <h3>🛏️ Room Occupancy Overview</h3>
+        <canvas id="roomChart" height="200"></canvas>
+    </div>
+
+    <div class="card">
+        <h3>📝 Inspection Activity</h3>
+        <canvas id="inspectionChart" height="200"></canvas>
+    </div>
+
+</div>
+
+
+<!-- ================= CHARTS SCRIPT ================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+if (typeof Chart !== "undefined") {
+
+    new Chart(document.getElementById("roomChart"), {
+        type: "doughnut",
+        data: {
+            labels: ["Vacant", "Occupied"],
+            datasets: [{
+                data: [{{ vacant }}, {{ total - vacant }}],
+                backgroundColor: ["#16a34a", "#f59e0b"],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { position: "bottom" }
+            }
+        }
+    });
+
+    new Chart(document.getElementById("inspectionChart"), {
+        type: "bar",
+        data: {
+            labels: ["PRE Inspections", "POST Inspections"],
+            datasets: [{
+                label: "Count",
+                data: [5, 8],
+                backgroundColor: ["#2563eb", "#dc2626"]
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+
+}
+</script>
+
+{% endblock %}

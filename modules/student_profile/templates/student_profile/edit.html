@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-shell">
+    <section class="profile-hero">
+        <div class="profile-hero-card">
+            <span class="section-kicker">Student Profile</span>
+            <h1>Edit Student Record</h1>
+            <p>Update the same core fields used in Student Records and Biodata.</p>
+        </div>
+        <div class="profile-summary">
+            <div class="metric-pill">
+                <span>Ledger</span>
+                <strong>{{ student.ledger_no }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Status</span>
+                <strong>{{ student.status }}</strong>
+            </div>
+            <a href="/student-profile/{{ student.ledger_no }}" class="btn btn-outline-primary">View Profile</a>
+        </div>
+    </section>
+
+    <form method="post" class="intake-card profile-form-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Update Student Profile</h2>
+                <p>Changes here update the real Student Records source used across the portal.</p>
+            </div>
+            <span class="soft-badge">Ledger {{ student.ledger_no }}</span>
+        </div>
+
+        <section class="biodata-section">
+            <h3>Core Details</h3>
+            <div class="biodata-grid">
+                <div>
+                    <label><b>Full Name</b></label>
+                    <input name="full_name" class="form-control" value="{{ student.full_name }}" required>
+                </div>
+                <div>
+                    <label><b>Class</b></label>
+                    <input name="class" class="form-control" value="{{ student['class'] }}" required>
+                </div>
+                <div>
+                    <label><b>Section</b></label>
+                    <input name="section" class="form-control" value="{{ student.section }}" required>
+                </div>
+                <div>
+                    <label><b>Status</b></label>
+                    <select name="status" class="form-control">
+                        <option value="ACTIVE" {% if student.status == 'ACTIVE' %}selected{% endif %}>ACTIVE</option>
+                        <option value="INACTIVE" {% if student.status == 'INACTIVE' %}selected{% endif %}>INACTIVE</option>
+                        <option value="LEFT" {% if student.status == 'LEFT' %}selected{% endif %}>LEFT</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="biodata-section">
+            <h3>Family and Biodata</h3>
+            <div class="biodata-grid">
+                <div>
+                    <label><b>Father Name</b></label>
+                    <input name="father_name" class="form-control" value="{{ student.father_name }}">
+                </div>
+                <div>
+                    <label><b>Mother Name</b></label>
+                    <input name="mother_name" class="form-control" value="{{ student.mother_name }}">
+                </div>
+                <div>
+                    <label><b>Primary Contact</b></label>
+                    <input name="guardian_contact" class="form-control" value="{{ student.guardian_contact }}">
+                </div>
+                <div>
+                    <label><b>Date of Birth</b></label>
+                    <input type="date" name="dob" class="form-control" value="{{ student.dob }}">
+                </div>
+                <div>
+                    <label><b>Date of Admission</b></label>
+                    <input type="date" name="date_of_admission" class="form-control" value="{{ student.date_of_admission }}">
+                </div>
+                <div>
+                    <label><b>Hostel Reporting Date</b></label>
+                    <input type="date" name="hostel_reporting_date" class="form-control" value="{{ student.hostel_reporting_date }}">
+                </div>
+                <div class="biodata-grid-span">
+                    <label><b>Permanent Address</b></label>
+                    <textarea name="permanent_address" class="form-control" rows="4">{{ student.permanent_address }}</textarea>
+                </div>
+                <div class="biodata-grid-span">
+                    <label><b>Remarks</b></label>
+                    <textarea name="remarks" class="form-control" rows="3">{{ student.remarks }}</textarea>
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <a href="/student-profile/{{ student.ledger_no }}" class="btn btn-outline-primary">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

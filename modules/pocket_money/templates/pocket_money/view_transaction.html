@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="wallet-shell">
+    <section class="wallet-hero wallet-hero--single">
+        <div class="wallet-hero-card">
+            <span class="section-kicker">Pocket Money</span>
+            <h1>Transaction Details</h1>
+            <p>Review the complete transaction record and any bill attachment saved with it.</p>
+        </div>
+    </section>
+
+    <section class="intake-card wallet-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Transaction Snapshot</h2>
+                <p>Detailed wallet transaction information.</p>
+            </div>
+            <span class="soft-badge">{{ txn.txn_type }}</span>
+        </div>
+        <div class="profile-detail-list">
+            <div class="profile-detail-item"><span>Ledger No</span><strong>{{ txn.ledger_no }}</strong></div>
+            <div class="profile-detail-item"><span>Type</span><strong>{{ txn.txn_type }}</strong></div>
+            <div class="profile-detail-item"><span>Category</span><strong>{{ txn.category or '-' }}</strong></div>
+            <div class="profile-detail-item"><span>Amount</span><strong>Rs. {{ txn.amount }}</strong></div>
+            <div class="profile-detail-item"><span>Description</span><strong>{{ txn.description or '-' }}</strong></div>
+            <div class="profile-detail-item"><span>Date</span><strong>{{ txn.created_at }}</strong></div>
+            <div class="profile-detail-item"><span>Bill</span><strong>{% if txn.bill_path %}<a href="/{{ txn.bill_path }}" target="_blank">View Bill</a>{% else %}Not attached{% endif %}</strong></div>
+        </div>
+        <div class="form-actions">
+            <a href="{{ url_for('pocket_money.ledger', ledger_no=txn.ledger_no) }}" class="btn btn-primary">Back to Ledger</a>
+        </div>
+    </section>
+</section>
+{% endblock %}

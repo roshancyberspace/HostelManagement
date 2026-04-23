@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="structure-shell">
+    <div class="structure-hero">
+        <div>
+            <p class="structure-kicker">Structure</p>
+            <h1>Common area management</h1>
+            <p class="structure-subtitle">Shared spaces jaise bathroom, study room, dining hall ya utility areas ko floor-wise map karo.</p>
+        </div>
+        <div class="structure-chip-row">
+            <span class="structure-chip">{{ areas|length }} areas</span>
+            <span class="structure-chip">{{ floors|length }} floors</span>
+        </div>
+    </div>
+
+    <div class="structure-grid structure-grid-2">
+        <div class="structure-panel">
+            <div class="structure-panel-head">
+                <div>
+                    <h2>Add common area</h2>
+                    <p>Selected floor ke andar naya shared space create karo.</p>
+                </div>
+            </div>
+
+            <form method="post" class="structure-form-grid">
+                <label class="structure-field">
+                    <span>Floor</span>
+                    <select name="floor_id" required>
+                        <option value="">Select floor</option>
+                        {% for f in floors %}
+                            <option value="{{ f.id }}">{{ f.hostel_name }} - {{ f.block_name }} - Floor {{ f.floor_no }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="structure-field">
+                    <span>Common Area Name</span>
+                    <input name="name" placeholder="Bathroom, Study Room, Dining Hall" required>
+                </label>
+
+                <div class="structure-form-actions">
+                    <button class="structure-primary-btn" type="submit">Add common area</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="structure-panel">
+            <div class="structure-panel-head">
+                <div>
+                    <h2>Area registry</h2>
+                    <p>Shared spaces with status and item management shortcuts.</p>
+                </div>
+            </div>
+
+            {% if areas %}
+            <div class="structure-record-list">
+                {% for a in areas %}
+                <article class="structure-record-card">
+                    <div class="structure-record-head">
+                        <div>
+                            <strong>{{ a.area_name }}</strong>
+                            <span>{{ a.hostel_name }} - {{ a.block_name }} - Floor {{ a.floor_no }}</span>
+                        </div>
+                        <span class="structure-status {{ a.status|lower }}">{{ a.status }}</span>
+                    </div>
+
+                    <div class="structure-action-row">
+                        <a href="/structure/common-area-items/{{ a.id }}" class="structure-link-btn">Items</a>
+                        <form method="post" action="/structure/common-area/delete/{{ a.id }}" onsubmit="return confirm('Delete this common area?');">
+                            <button class="structure-danger-btn" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No common areas defined yet</h3>
+                <p>First common area create karne ke baad yahan shared spaces show hongi.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

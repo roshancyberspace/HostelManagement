@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="intake-shell">
+    <div class="intake-hero">
+        <div>
+            <span class="section-kicker">Admission Workflow</span>
+            <h1>Student Intake and Management</h1>
+            <p>Handle student onboarding from basic strength upload to full biodata completion and verification.</p>
+        </div>
+        <div class="intake-hero-card">
+            <span class="status-chip">Intake flow</span>
+            <strong>4 key steps</strong>
+            <p>Upload, enrich, verify, and manage records from one intake workspace.</p>
+        </div>
+    </div>
+
+    <div class="intake-summary">
+        <div class="summary-pill"><span class="summary-label">Step 1</span><strong>Basic List Upload</strong></div>
+        <div class="summary-pill"><span class="summary-label">Step 2</span><strong>Full Biodata</strong></div>
+        <div class="summary-pill"><span class="summary-label">Step 3</span><strong>Manual Entry</strong></div>
+        <div class="summary-pill"><span class="summary-label">Step 4</span><strong>Registry Review</strong></div>
+    </div>
+
+    <div class="intake-grid">
+        <section class="intake-card">
+            <div class="intake-card-head"><h3>Phase 1: Student Strength</h3><span class="status-chip">Bulk import</span></div>
+            <p>Upload the basic student list with ledger number, name, class, and section.</p>
+            <div class="intake-actions">
+                <a href="/students/bulk" class="btn">Open CSV Upload</a>
+                <a href="/students/upload/basic-bulk-excel" class="ghost-btn btn">Open Excel Upload</a>
+            </div>
+        </section>
+        <section class="intake-card">
+            <div class="intake-card-head"><h3>Phase 2: Full Biodata</h3><span class="status-chip">Excel or manual</span></div>
+            <p>Populate detailed student biodata either through full Excel upload or individual ledger-based editing.</p>
+            <div class="intake-actions">
+                <a href="/students/upload/biodata-excel" class="btn">Upload Full Biodata</a>
+                <a href="/students/master-biodata" class="ghost-btn btn">Open Master Biodata</a>
+            </div>
+        </section>
+        <section class="intake-card featured">
+            <div class="intake-card-head"><h3>Downloads and Templates</h3><span class="status-chip">Templates</span></div>
+            <div class="intake-link-list">
+                <a href="/students/download/basic-bulk-excel">Download Bulk Upload Template</a>
+                <a href="/students/download/basic-excel">Download Basic Student Excel</a>
+                <a href="/students/download/biodata-excel">Download Full Biodata Excel</a>
+            </div>
+        </section>
+        <section class="intake-card">
+            <div class="intake-card-head"><h3>Verification and Search</h3><span class="status-chip">Review</span></div>
+            <p>Open the student registry to search records, review biodata status, and perform management actions.</p>
+            <div class="intake-actions"><a href="/students/list" class="btn">Open Student Registry</a></div>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

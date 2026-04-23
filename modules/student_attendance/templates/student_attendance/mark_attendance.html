@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="attendance-shell">
+    <div class="attendance-hero">
+        <div>
+            <p class="attendance-kicker">Daily Attendance</p>
+            <h1>Mark slot attendance</h1>
+            <p class="attendance-subtitle">{{ attendance_date }} for {{ slot.replace('_', ' ') }}{% if class_filter %} · Class {{ class_filter }}{% endif %}</p>
+        </div>
+        <div class="attendance-hero-actions">
+            <button type="button" class="attendance-pill-link" onclick="setAllStatus('PRESENT')">Mark all present</button>
+            <button type="button" class="attendance-pill-link" onclick="setAllStatus('')">Clear all</button>
+        </div>
+    </div>
+
+    <div class="attendance-panel attendance-camera-panel camera-panel-shell camera-theme-attendance">
+        <div class="attendance-panel-head">
+            <div>
+                <h2>Attendance Face Capture</h2>
+                <p>Select a student from the table, then capture one clear face as attendance evidence.</p>
+            </div>
+            <span class="attendance-chip" id="attendanceSelectedStudent">No student selected</span>
+        </div>
+        <div class="camera-guidance-strip">
+            <span>One face only</span>
+            <span>Use clear lighting</span>
+            <span>Capture after selecting a student</span>
+        </div>
+        <div class="attendance-camera-stage camera-stage-grid">
+            <div class="camera-frame-card camera-frame-live">
+                <div class="camera-frame-label">Live Camera</div>
+                <video id="attendance-camera" autoplay muted playsinline></video>
+            </div>
+            <canvas id="attendance-camera-canvas" class="hidden-photo-canvas"></canvas>
+            <div class="attendance-camera-preview camera-frame-card camera-frame-preview">
+                <div class="camera-frame-label">Evidence Preview</div>
+                <img id="attendance-captured-preview" src="" alt="Attendance capture preview" hidden>
+                <div id="attendance-preview-placeholder" class="student-photo-placeholder">Captured attendance evidence will appear here</div>
+            </div>
+        </div>
+        <div class="attendance-hero-actions camera-actions-bar">
+            <button type="button" class="attendance-pill-link" id="attendanceStartCamera">Start Camera</button>
+            <button type="button" class="attendance-primary-btn" id="attendanceCapturePhoto">Capture for Selected Student</button>
+            <button type="button" class="attendance-pill-link" id="attendanceClearPhoto">Clear Selected Evidence</button>
+        </div>
+        <div id="attendanceCameraStatus" class="camera-status-note status-idle">Camera is not active yet.</div>
+    </div>
+
+    <div class="attendance-panel">
+        <div class="attendance-panel-head">
+            <div>
+                <h2>Attendance sheet</h2>
+                <p>Default status is present. Update only the exceptions and attach face evidence where required.</p>
+            </div>
+            <span class="attendance-chip">{{ students|length }} students</span>
+        </div>
+
+        {% if students %}
+        <form method="post" action="{{ url_for('student_attendance.mark') }}">
+            <input type="hidden" name="attendance_date" value="{{ attendance_date }}">
+            <input type="hidden" name="slot" value="{{ slot }}">
+
+            <div class="attendance-table-wrap">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Ledger</th>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                            <th>Face Evidence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr>
+                            <td>
+                                <strong>{{ s.ledger_no }}</strong>
+                                <input type="hidden" name="ledger_no" value="{{ s.ledger_no }}">
+                            </td>
+                            <td>
+                                <div class="attendance-student-cell">
+                                    {% if s.student_photo %}
+                                        <img class="attendance-student-avatar" src="{% if s.student_photo.startswith('instance_uploads/') %}{{ url_for('student_master.student_media', filename=s.student_photo.replace('instance_uploads/', '', 1)) }}{% else %}{{ url_for('static', filename=s.student_photo) }}{% endif %}" alt="{{ s.student_name }}">
+                                    {% else %}
+                                        <div class="attendance-student-avatar attendance-student-fallback">{{ (s.student_name or 'S')[0]|upper }}</div>
+                                    {% endif %}
+                                    <div>
+                                        <div><strong>{{ s.student_name }}</strong></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ s.class or 'Unassigned' }}</td>
+                            <td>
+                                <select name="status_{{ s.ledger_no }}" class="attendance-status-select">
+                                    <option value="">Skip</option>
+                                    <option value="PRESENT" selected>Present</option>
+                                    <option value="ABSENT">Absent</option>
+                                    <option value="LEAVE">Leave</option>
+                                    <option value="MEDICAL">Medical</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="remarks_{{ s.ledger_no }}" placeholder="Leave / medical remarks">
+                            </td>
+                            <td>
+                                <input type="hidden" name="captured_photo_{{ s.ledger_no }}" id="captured_photo_{{ s.ledger_no }}">
+                                <div class="attendance-evidence-cell">
+                                    <div class="attendance-evidence-preview">
+                                        <img id="attendance_preview_{{ s.ledger_no }}" src="" alt="Evidence preview for {{ s.student_name }}" hidden>
+                                        <div id="attendance_placeholder_{{ s.ledger_no }}" class="attendance-evidence-placeholder">No evidence captured</div>
+                                    </div>
+                                    <div class="attendance-evidence-actions">
+                                        <button type="button" class="attendance-pill-link attendance-row-btn" onclick='selectAttendanceStudent({{ s.ledger_no|tojson }}, {{ s.student_name|tojson }})'>Select</button>
+                                        <button type="button" class="attendance-pill-link attendance-row-btn" onclick="clearAttendanceEvidence('{{ s.ledger_no }}')">Clear</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="attendance-form-actions attendance-inline-actions">
+                <button class="attendance-primary-btn" type="submit">Save attendance</button>
+                <a class="attendance-secondary-btn" href="{{ url_for('student_attendance.select_session') }}">Back</a>
+            </div>
+        </form>
+        {% else %}
+        <div class="attendance-empty">
+            <h3>No active students found</h3>
+            <p>No active students matched the selected filter. Please review the selected class or status.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+let activeLedger = "";
+let activeStudentName = "";
+let attendanceStream = null;
+let attendanceFaceModelReady = false;
+
+const attendanceVideo = document.getElementById("attendance-camera");
+const attendanceCanvas = document.getElementById("attendance-camera-canvas");
+const attendanceStatus = document.getElementById("attendanceCameraStatus");
+const attendanceSelectedStudent = document.getElementById("attendanceSelectedStudent");
+const attendancePreview = document.getElementById("attendance-captured-preview");
+const attendancePreviewPlaceholder = document.getElementById("attendance-preview-placeholder");
+
+function setAllStatus(value) {
+    document.querySelectorAll(".attendance-status-select").forEach((select) => {
+        select.value = value;
+    });
+}
+
+function setAttendanceStatus(message, variant = "idle") {
+    attendanceStatus.textContent = message;
+    attendanceStatus.className = `camera-status-note status-${variant}`;
+}
+
+function selectAttendanceStudent(ledger, name) {
+    activeLedger = ledger;
+    activeStudentName = name;
+    attendanceSelectedStudent.textContent = `${name} (${ledger}) selected`;
+    const rowPreview = document.getElementById(`attendance_preview_${ledger}`);
+    if (rowPreview && !rowPreview.hidden) {
+        attendancePreview.src = rowPreview.src;
+        attendancePreview.hidden = false;
+        attendancePreviewPlaceholder.hidden = true;
+    } else {
+        attendancePreview.src = "";
+        attendancePreview.hidden = true;
+        attendancePreviewPlaceholder.hidden = false;
+    }
+    setAttendanceStatus("Selected student is ready. Start the camera and capture attendance evidence.", "idle");
+}
+
+function clearAttendanceEvidence(ledger) {
+    const hidden = document.getElementById(`captured_photo_${ledger}`);
+    const image = document.getElementById(`attendance_preview_${ledger}`);
+    const placeholder = document.getElementById(`attendance_placeholder_${ledger}`);
+    hidden.value = "";
+    image.src = "";
+    image.hidden = true;
+    placeholder.hidden = false;
+    if (activeLedger === ledger) {
+        attendancePreview.src = "";
+        attendancePreview.hidden = true;
+        attendancePreviewPlaceholder.hidden = false;
+        setAttendanceStatus("Captured evidence has been cleared for the selected student.", "idle");
+    }
+}
+
+async function loadAttendanceFaceModel() {
+    if (!window.faceapi) {
+        setAttendanceStatus("Face detection is unavailable. Attendance can still be saved without photo evidence.", "warning");
+        return;
+    }
+    try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri("https://justadudewhohacks.github.io/face-api.js/models");
+        attendanceFaceModelReady = true;
+        setAttendanceStatus("Face detection is ready. Select a student and capture evidence.", "success");
+    } catch (error) {
+        setAttendanceStatus("Face detection could not be initialized. You may continue without photo evidence.", "warning");
+    }
+}
+
+async function startAttendanceCamera() {
+    try {
+        if (attendanceStream) {
+            attendanceStream.getTracks().forEach((track) => track.stop());
+        }
+        attendanceStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: false
+        });
+        attendanceVideo.srcObject = attendanceStream;
+        await attendanceVideo.play();
+        setAttendanceStatus("Camera started. Keep one clear face in frame before capturing attendance evidence.", "idle");
+    } catch (error) {
+        setAttendanceStatus("Camera access was denied. Please allow camera permission and try again.", "error");
+    }
+}
+
+async function captureAttendancePhoto() {
+    if (!activeLedger) {
+        setAttendanceStatus("Please select a student before capturing attendance evidence.", "warning");
+        return;
+    }
+    if (!attendanceVideo.videoWidth || !attendanceVideo.videoHeight) {
+        setAttendanceStatus("Camera preview is still loading. Please wait and try again.", "warning");
+        return;
+    }
+    if (attendanceFaceModelReady) {
+        const detections = await faceapi.detectAllFaces(
+            attendanceVideo,
+            new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 })
+        );
+        if (!detections.length) {
+            setAttendanceStatus("No face was detected. Please ensure the student's face is clearly visible.", "error");
+            return;
+        }
+        if (detections.length > 1) {
+            setAttendanceStatus("Multiple faces were detected. Please keep only one student in the frame.", "error");
+            return;
+        }
+    }
+
+    attendanceCanvas.width = attendanceVideo.videoWidth;
+    attendanceCanvas.height = attendanceVideo.videoHeight;
+    const ctx = attendanceCanvas.getContext("2d");
+    ctx.drawImage(attendanceVideo, 0, 0, attendanceCanvas.width, attendanceCanvas.height);
+    const imageData = attendanceCanvas.toDataURL("image/jpeg", 0.92);
+
+    document.getElementById(`captured_photo_${activeLedger}`).value = imageData;
+    const rowPreview = document.getElementById(`attendance_preview_${activeLedger}`);
+    const rowPlaceholder = document.getElementById(`attendance_placeholder_${activeLedger}`);
+    rowPreview.src = imageData;
+    rowPreview.hidden = false;
+    rowPlaceholder.hidden = true;
+
+    attendancePreview.src = imageData;
+    attendancePreview.hidden = false;
+    attendancePreviewPlaceholder.hidden = true;
+
+    setAttendanceStatus(`Attendance evidence captured successfully for ${activeStudentName}.`, "success");
+}
+
+document.getElementById("attendanceStartCamera").addEventListener("click", startAttendanceCamera);
+document.getElementById("attendanceCapturePhoto").addEventListener("click", captureAttendancePhoto);
+document.getElementById("attendanceClearPhoto").addEventListener("click", () => {
+    if (!activeLedger) {
+        setAttendanceStatus("Please select a student before clearing evidence.", "warning");
+        return;
+    }
+    clearAttendanceEvidence(activeLedger);
+});
+
+window.addEventListener("beforeunload", () => {
+    if (attendanceStream) {
+        attendanceStream.getTracks().forEach((track) => track.stop());
+    }
+});
+
+loadAttendanceFaceModel();
+</script>
+{% endblock %}

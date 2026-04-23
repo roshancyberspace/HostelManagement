@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="inspect-shell">
+    <div class="inspect-hero">
+        <div>
+            <p class="inspect-kicker">Inspection</p>
+            <h1>Room inspection</h1>
+            <p class="inspect-subtitle">Direct room-wise inspection save karo, items ke condition update ke saath.</p>
+        </div>
+        <div class="inspect-chip-row">
+            <span class="inspect-chip">{{ rooms|length }} rooms</span>
+            <span class="inspect-chip">{{ items|length }} room items</span>
+        </div>
+    </div>
+
+    <form method="get" class="inspect-panel">
+        <div class="inspect-panel-head">
+            <div>
+                <h2>Select room</h2>
+                <p>Room choose karte hi us room ke current items load honge.</p>
+            </div>
+        </div>
+        <div class="inspect-toolbar">
+            <select name="room_id" onchange="this.form.submit()">
+                <option value="">Select room</option>
+                {% for room in rooms %}
+                <option value="{{ room.id }}" {% if selected_room_id and selected_room_id|string == room.id|string %}selected{% endif %}>
+                    {{ room.hostel_name }} - {{ room.floor_no }} - Room {{ room.room_no }}
+                </option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit" class="inspect-primary-btn">Load</button></noscript>
+        </div>
+    </form>
+
+    <form method="post" class="inspect-form-stack">
+        <input type="hidden" name="room_id" value="{{ selected_room_id or '' }}">
+
+        <div class="inspect-grid inspect-grid-2">
+            <section class="inspect-panel">
+                <div class="inspect-panel-head">
+                    <div>
+                        <h2>Inspection details</h2>
+                        <p>PRE, POST, ya ROUTINE type ke saath remarks save karo.</p>
+                    </div>
+                </div>
+                <div class="inspect-form-grid">
+                    <label class="inspect-field">
+                        <span>Selected Room</span>
+                        <input type="text" value="{% if selected_room %}{{ selected_room.hostel_name }} - {{ selected_room.floor_no }} - Room {{ selected_room.room_no }}{% else %}No room selected{% endif %}" readonly>
+                    </label>
+                    <label class="inspect-field">
+                        <span>Inspection Type</span>
+                        <select name="inspection_type" required>
+                            <option value="PRE">PRE</option>
+                            <option value="POST">POST</option>
+                            <option value="ROUTINE">ROUTINE</option>
+                        </select>
+                    </label>
+                    <label class="inspect-field inspect-field-wide">
+                        <span>General Remarks</span>
+                        <textarea name="remarks" placeholder="Overall room condition"></textarea>
+                    </label>
+                    <label class="inspect-field">
+                        <span>Damage Summary</span>
+                        <textarea name="damage" placeholder="Damage details if any"></textarea>
+                    </label>
+                    <label class="inspect-field">
+                        <span>Fine Amount</span>
+                        <input type="number" name="fine" min="0" value="0">
+                    </label>
+                </div>
+            </section>
+
+            <section class="inspect-panel">
+                <div class="inspect-panel-head">
+                    <div>
+                        <h2>Item condition update</h2>
+                        <p>Item status bhi isi screen se update hoga.</p>
+                    </div>
+                </div>
+                {% if items %}
+                <div class="inspect-list">
+                    {% for item in items %}
+                    <div class="inspect-list-item">
+                        <strong>{{ item.item_name }}</strong>
+                        <span>Qty {{ item.quantity }} - Current {{ item.status }}</span>
+                        <select name="item_{{ item.id }}">
+                            <option value="PRESENT" {% if item.status == 'PRESENT' %}selected{% endif %}>PRESENT</option>
+                            <option value="DAMAGED" {% if item.status == 'DAMAGED' %}selected{% endif %}>DAMAGED</option>
+                            <option value="MISSING" {% if item.status == 'MISSING' %}selected{% endif %}>MISSING</option>
+                            <option value="NEEDS_REPAIR" {% if item.status == 'NEEDS_REPAIR' %}selected{% endif %}>NEEDS REPAIR</option>
+                        </select>
+                        <input type="text" name="remark_{{ item.id }}" value="{{ item.remarks or '' }}" placeholder="Item remark">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="schedule-empty compact">
+                    <h3>No items loaded</h3>
+                    <p>Room choose karne ke baad item list yahan dikhegi.</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+
+        {% if selected_room_id %}
+        <div class="inspect-actions">
+            <button type="submit" class="inspect-primary-btn">Save inspection</button>
+            <a href="{{ url_for('inspection.recovery_ledger') }}" class="inspect-secondary-btn">View recovery ledger</a>
+        </div>
+        {% endif %}
+    </form>
+</section>
+{% endblock %}

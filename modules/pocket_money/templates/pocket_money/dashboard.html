@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="wallet-shell">
+    <section class="wallet-hero">
+        <div class="wallet-hero-card">
+            <span class="section-kicker">Pocket Money</span>
+            <h1>Wallet Dashboard</h1>
+            <p>Monitor wallet balances, spot low-balance students, and jump straight into collection or expense actions.</p>
+        </div>
+        <div class="wallet-summary-grid">
+            <div class="metric-pill">
+                <span>Total Wallets</span>
+                <strong>{{ total_wallets }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Total Balance</span>
+                <strong>Rs. {{ total_balance }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Low Balance</span>
+                <strong>{{ low_balance_count }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="intake-card wallet-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Wallet Controls</h2>
+                <p>Create wallets and search ledger numbers from one clean control strip.</p>
+            </div>
+            <span class="soft-badge">Operations</span>
+        </div>
+        <div class="wallet-control-grid">
+            <form method="post" action="{{ url_for('pocket_money.create_wallet') }}" class="wallet-inline-form">
+                <div class="compact-field">
+                    <label>Create Wallet</label>
+                    <input name="ledger_no" class="form-control" placeholder="Ledger No" required>
+                </div>
+                <button class="btn btn-primary">Create Wallet</button>
+            </form>
+            <form method="get" class="wallet-inline-form">
+                <div class="compact-field">
+                    <label>Search Wallet</label>
+                    <input name="q" class="form-control" placeholder="Search ledger number" value="{{ request.args.get('q','') }}">
+                </div>
+                <button class="btn btn-outline-primary">Search</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="intake-card wallet-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Wallet Registry</h2>
+                <p>Open the student ledger, collect money, or review balances from the main registry.</p>
+            </div>
+            <span class="soft-badge">{{ wallets|length }} wallets</span>
+        </div>
+        {% if wallets %}
+        <div class="wallet-card-grid">
+            {% for w in wallets %}
+            <article class="wallet-student-card {% if (w.current_balance or 0) < 200 %}wallet-student-card--alert{% endif %}">
+                <div class="profile-student-top">
+                    <div>
+                        <span class="soft-badge">{{ w.ledger_no }}</span>
+                        <h3>{{ w.student_name or 'Student not linked' }}</h3>
+                    </div>
+                    <span class="status-badge {% if (w.current_balance or 0) < 200 %}status-neutral{% else %}status-good{% endif %}">
+                        Rs. {{ w.current_balance or 0 }}
+                    </span>
+                </div>
+                <div class="profile-student-meta">
+                    <span><strong>Class:</strong> {{ w['class'] or '-' }}</span>
+                    <span><strong>Section:</strong> {{ w.section or '-' }}</span>
+                    <span><strong>Status:</strong> {{ w.student_status or w.status or 'ACTIVE' }}</span>
+                </div>
+                <div class="wallet-student-actions">
+                    <a href="{{ url_for('pocket_money.ledger', ledger_no=w.ledger_no) }}" class="btn btn-primary">Open Ledger</a>
+                    <a href="{{ url_for('pocket_money.collect', ledger_no=w.ledger_no) }}" class="btn btn-outline-primary">Collect</a>
+                    <a href="{{ url_for('pocket_money.expense', ledger_no=w.ledger_no) }}" class="btn btn-outline-primary">Expense</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No wallets found</h3>
+            <p>Create the first wallet or change the search filter.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

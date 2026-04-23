@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="laundry-shell">
+    <div class="laundry-hero">
+        <div>
+            <p class="laundry-kicker">Laundry</p>
+            <h1>Issue and return</h1>
+            <p class="laundry-subtitle">Student-wise laundry issue aur return entries ko one cleaner register me manage karo.</p>
+        </div>
+        <span class="laundry-chip">{{ total_count }} visible records</span>
+    </div>
+
+    <div class="laundry-stat-grid">
+        <article class="laundry-stat-card">
+            <span>Total</span>
+            <strong>{{ total_count }}</strong>
+        </article>
+        <article class="laundry-stat-card">
+            <span>Pending</span>
+            <strong>{{ pending_count }}</strong>
+        </article>
+        <article class="laundry-stat-card">
+            <span>Returned</span>
+            <strong>{{ returned_count }}</strong>
+        </article>
+    </div>
+
+    <div class="laundry-grid">
+        <div class="laundry-panel">
+            <div class="laundry-panel-head">
+                <div>
+                    <h2>Issue laundry</h2>
+                    <p>Ledger number se student auto-load hoga, phir issued items save kar do.</p>
+                </div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" id="issueForm" class="laundry-issue-grid">
+                <label class="laundry-field">
+                    <span>Ledger Number</span>
+                    <input name="ledger_no" id="ledger_no" placeholder="Enter ledger number" required>
+                </label>
+                <label class="laundry-field">
+                    <span>Student Name</span>
+                    <input id="student_name" placeholder="Auto-filled student name" readonly>
+                </label>
+                <label class="laundry-field">
+                    <span>Class / Section</span>
+                    <input id="class_section" placeholder="Auto-filled class" readonly>
+                </label>
+                <label class="laundry-field laundry-field-wide">
+                    <span>Items Given</span>
+                    <input name="items_given" placeholder="Shirt 2, Pant 2, Bedsheet 1" required>
+                </label>
+                <div class="laundry-student-preview" id="laundryStudentPreview">
+                    <img id="laundryStudentPhoto" src="" alt="Student preview" hidden>
+                    <div class="laundry-student-placeholder" id="laundryStudentPlaceholder">Student photo preview will appear here after ledger lookup.</div>
+                </div>
+                <label class="laundry-field">
+                    <span>Issue Photo</span>
+                    <input type="file" name="issue_photo" accept="image/*" capture="environment">
+                </label>
+                <div class="laundry-form-actions">
+                    <button class="laundry-primary-btn" type="submit">Issue laundry</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="laundry-panel">
+            <div class="laundry-panel-head">
+                <div>
+                    <h2>Search register</h2>
+                    <p>Name, ledger, class, ya issued items se records filter karo.</p>
+                </div>
+            </div>
+
+            <form method="get" class="laundry-filter-grid">
+                <label class="laundry-field laundry-field-wide">
+                    <span>Search</span>
+                    <input name="search" value="{{ search }}" placeholder="Search by ledger, name, class, or items">
+                </label>
+                <label class="laundry-field">
+                    <span>Status</span>
+                    <select name="status">
+                        <option value="ALL" {% if status == 'ALL' %}selected{% endif %}>All</option>
+                        <option value="GIVEN" {% if status == 'GIVEN' %}selected{% endif %}>Pending</option>
+                        <option value="RETURNED" {% if status == 'RETURNED' %}selected{% endif %}>Returned</option>
+                    </select>
+                </label>
+                <div class="laundry-form-actions">
+                    <button class="laundry-primary-btn" type="submit">Apply filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="laundry-panel">
+        <div class="laundry-panel-head">
+            <div>
+                <h2>Laundry register</h2>
+                <p>Latest issue and return records.</p>
+            </div>
+        </div>
+
+        {% if records %}
+        <div class="laundry-record-list">
+            {% for r in records %}
+            <article class="laundry-record-card">
+                <div class="laundry-record-head">
+                    <div>
+                        <strong>{{ r.student_name }}</strong>
+                        <span>{{ r.ledger_no }} - {{ r.class_section }}</span>
+                    </div>
+                    <span class="laundry-status {% if r.status == 'RETURNED' %}returned{% else %}pending{% endif %}">
+                        {% if r.status == 'RETURNED' %}Returned{% else %}Pending{% endif %}
+                    </span>
+                </div>
+                <div class="laundry-record-grid">
+                    <div>
+                        <span>Items Given</span>
+                        <p>{{ r.items_given }}</p>
+                    </div>
+                    <div>
+                        <span>Date Given</span>
+                        <p>{{ r.date_given }}</p>
+                    </div>
+                    <div>
+                        <span>Items Returned</span>
+                        <p>{{ r.items_returned or 'Not returned yet' }}</p>
+                    </div>
+                    <div>
+                        <span>Remarks</span>
+                        <p>{{ r.remarks or 'No remarks' }}</p>
+                    </div>
+                    <div>
+                        <span>Issue Photo</span>
+                        <p>{% if r.issue_photo_path %}<a href="/{{ r.issue_photo_path }}" target="_blank">View issue photo</a>{% else %}Not attached{% endif %}</p>
+                    </div>
+                    <div>
+                        <span>Return Photo</span>
+                        <p>{% if r.return_photo_path %}<a href="/{{ r.return_photo_path }}" target="_blank">View return photo</a>{% else %}Not attached{% endif %}</p>
+                    </div>
+                </div>
+
+                {% if r.status != 'RETURNED' %}
+                <form method="post" enctype="multipart/form-data" action="{{ url_for('laundry_register.return_laundry', record_id=r.id) }}" class="laundry-return-grid">
+                    <label class="laundry-field">
+                        <span>Items Returned</span>
+                        <input name="items_returned" placeholder="Returned items" required>
+                    </label>
+                    <label class="laundry-field">
+                        <span>Remarks</span>
+                        <input name="remarks" placeholder="Optional remarks">
+                    </label>
+                    <label class="laundry-field">
+                        <span>Return Photo</span>
+                        <input type="file" name="return_photo" accept="image/*" capture="environment">
+                    </label>
+                    <div class="laundry-form-actions">
+                        <button class="laundry-primary-btn" type="submit">Mark returned</button>
+                    </div>
+                </form>
+                {% else %}
+                <div class="laundry-return-note">Returned on {{ r.date_returned }}</div>
+                {% endif %}
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No laundry records found</h3>
+            <p>Issue new laundry ya filter reset karke records dekho.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+const ledgerInput = document.getElementById("ledger_no");
+const studentNameInput = document.getElementById("student_name");
+const classSectionInput = document.getElementById("class_section");
+const studentPhoto = document.getElementById("laundryStudentPhoto");
+const studentPlaceholder = document.getElementById("laundryStudentPlaceholder");
+
+function loadStudentByLedger() {
+    const ledger = ledgerInput.value.trim();
+    if (!ledger) {
+        studentNameInput.value = "";
+        classSectionInput.value = "";
+        return;
+    }
+
+    fetch(`/laundry-register/api/student/${ledger}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                studentNameInput.value = "";
+                classSectionInput.value = "";
+                studentPhoto.hidden = true;
+                studentPhoto.src = "";
+                studentPlaceholder.hidden = false;
+                return;
+            }
+            studentNameInput.value = data.student_name || "";
+            classSectionInput.value = data.class_section || "";
+            if (data.photo_url) {
+                studentPhoto.src = data.photo_url;
+                studentPhoto.hidden = false;
+                studentPlaceholder.hidden = true;
+            } else {
+                studentPhoto.hidden = true;
+                studentPhoto.src = "";
+                studentPlaceholder.hidden = false;
+            }
+        })
+        .catch(() => {
+            studentNameInput.value = "";
+            classSectionInput.value = "";
+            studentPhoto.hidden = true;
+            studentPhoto.src = "";
+            studentPlaceholder.hidden = false;
+        });
+}
+
+ledgerInput.addEventListener("blur", loadStudentByLedger);
+ledgerInput.addEventListener("change", loadStudentByLedger);
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="session-admin-shell">
+    <div class="session-admin-hero">
+        <div>
+            <p class="session-admin-kicker">Student Intake</p>
+            <h1>Change student status</h1>
+            <p class="session-admin-subtitle">Student lifecycle status ko controlled way me update karo with mandatory reason.</p>
+        </div>
+        <div class="session-admin-badges">
+            <span class="session-admin-badge">Ledger {{ student.ledger_no }}</span>
+            <span class="session-admin-badge">{{ student.status }}</span>
+        </div>
+    </div>
+
+    <div class="session-admin-grid">
+        <section class="session-admin-panel">
+            <div class="session-admin-panel-head">
+                <div>
+                    <h2>Student snapshot</h2>
+                    <p>Current identity and active status before update.</p>
+                </div>
+            </div>
+            <div class="student-view-detail-list">
+                <div><span>Ledger</span><strong>{{ student.ledger_no }}</strong></div>
+                <div><span>Name</span><strong>{{ student.student_name }}</strong></div>
+                <div><span>Current Status</span><strong>{{ student.status }}</strong></div>
+            </div>
+        </section>
+
+        <section class="session-admin-panel">
+            <div class="session-admin-panel-head">
+                <div>
+                    <h2>Update status</h2>
+                    <p>Reason audit trail ke liye required hai.</p>
+                </div>
+            </div>
+            <form method="post" class="session-admin-form single-column">
+                <label class="session-admin-field">
+                    <span>New Status</span>
+                    <select name="status" required>
+                        <option value="ACTIVE">ACTIVE (Hostel)</option>
+                        <option value="DAY_SCHOLAR">DAY SCHOLAR</option>
+                        <option value="TC">TC ISSUED</option>
+                        <option value="LEFT">LEFT</option>
+                        <option value="TERMINATED">TERMINATED</option>
+                    </select>
+                </label>
+                <label class="session-admin-field">
+                    <span>Reason / Remarks</span>
+                    <textarea name="reason" rows="4" placeholder="Mandatory for audit / discipline / orders" required></textarea>
+                </label>
+                <div class="session-admin-actions">
+                    <button type="submit" class="session-admin-primary-btn">Update Status</button>
+                    <a href="/students/list" class="session-admin-link-btn">Cancel</a>
+                </div>
+            </form>
+        </section>
+    </div>
+</section>
+{% endblock %}

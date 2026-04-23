@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="system-check-shell">
+    <div class="system-check-hero">
+        <div>
+            <span class="section-kicker">Superintendent Tools</span>
+            <h1>System Check</h1>
+            <p>Use this verification board to quickly open key modules and confirm the full hostel workflow is working correctly.</p>
+        </div>
+        <div class="system-check-hero-card">
+            <span class="status-chip">Visual validation</span>
+            <strong>7 module groups</strong>
+            <p>Open links in a new tab and confirm each screen loads without errors.</p>
+        </div>
+    </div>
+
+    <div class="system-check-summary">
+        <div class="summary-pill">
+            <span class="summary-label">Access Level</span>
+            <strong>Superintendent</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Check Type</span>
+            <strong>UI + Route Review</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Priority</span>
+            <strong>Core Modules</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Mode</span>
+            <strong>Quick Launch</strong>
+        </div>
+    </div>
+
+    <div class="system-check-grid">
+        <section class="system-card">
+            <div class="system-card-head">
+                <h3>Student Master</h3>
+                <span class="status-chip">5 checks</span>
+            </div>
+            <p>Admission, bulk upload, and Excel flows.</p>
+            <div class="system-link-list">
+                <a href="/students/master-biodata" target="_blank">Student Biodata</a>
+                <a href="/students/bulk" target="_blank">Bulk Student Upload</a>
+                <a href="/students/download/basic-excel" target="_blank">Download Basic Student Excel</a>
+                <a href="/students/download/biodata-excel" target="_blank">Download Full Biodata Excel</a>
+                <a href="/students/upload/biodata-excel" target="_blank">Upload Full Biodata Excel</a>
+            </div>
+        </section>
+
+        <section class="system-card">
+            <div class="system-card-head">
+                <h3>Academic and Calendar</h3>
+                <span class="status-chip">2 checks</span>
+            </div>
+            <p>Session setup and working-day configuration.</p>
+            <div class="system-link-list">
+                <a href="/academic-session/" target="_blank">Academic Session</a>
+                <a href="/calendar-rules/" target="_blank">Calendar Rules</a>
+            </div>
+        </section>
+
+        <section class="system-card">
+            <div class="system-card-head">
+                <h3>Timings and Schedules</h3>
+                <span class="status-chip">3 checks</span>
+            </div>
+            <p>School, hostel, and daily planning screens.</p>
+            <div class="system-link-list">
+                <a href="/school-timings/" target="_blank">School Timings</a>
+                <a href="/hostel-timetable/" target="_blank">Hostel Timetable</a>
+                <a href="/daily-schedule/" target="_blank">Daily Schedule</a>
+            </div>
+        </section>
+
+        <section class="system-card">
+            <div class="system-card-head">
+                <h3>Mess and Laundry</h3>
+                <span class="status-chip">4 checks</span>
+            </div>
+            <p>Food menu and laundry operation pages.</p>
+            <div class="system-link-list">
+                <a href="/mess-menu/?day_type=WORKING" target="_blank">Mess Menu for Working Day</a>
+                <a href="/mess-menu/?day_type=HOLIDAY" target="_blank">Mess Menu for Holiday</a>
+                <a href="/laundry-routine/" target="_blank">Laundry Routine</a>
+                <a href="/laundry-register/" target="_blank">Laundry Register</a>
+            </div>
+        </section>
+
+        <section class="system-card">
+            <div class="system-card-head">
+                <h3>Structure and Inspection</h3>
+                <span class="status-chip">3 checks</span>
+            </div>
+            <p>Hostel structure and inspection workflows.</p>
+            <div class="system-link-list">
+                <a href="/structure/hostel" target="_blank">Hostel Structure</a>
+                <a href="/inspection/room" target="_blank">Room Inspection</a>
+                <a href="/inspection/recovery-ledger" target="_blank">Recovery Ledger</a>
+            </div>
+        </section>
+
+        <section class="system-card">
+            <div class="system-card-head">
+                <h3>Stock and Reports</h3>
+                <span class="status-chip">2 checks</span>
+            </div>
+            <p>Inventory oversight and consolidated reporting.</p>
+            <div class="system-link-list">
+                <a href="/stock/" target="_blank">Stock Dashboard</a>
+                <a href="/reports/hostel" target="_blank">Hostel Report</a>
+            </div>
+        </section>
+
+        <section class="system-card system-card-wide">
+            <div class="system-card-head">
+                <h3>Verification Note</h3>
+                <span class="status-chip">Ready</span>
+            </div>
+            <p class="system-success-note">If all links open without errors, the main system wiring is working correctly.</p>
+            <ul class="focus-list compact">
+                <li>
+                    <strong>Open in sequence</strong>
+                    Start with Student Master, then structure, then reports.
+                </li>
+                <li>
+                    <strong>Check layout</strong>
+                    Verify forms, tables, and navigation render correctly.
+                </li>
+                <li>
+                    <strong>Confirm actions</strong>
+                    Watch for blank pages, missing data, or broken buttons.
+                </li>
+            </ul>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

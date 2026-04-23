@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Hostel Management</h2>
+
+<form method="post">
+    <input name="name" placeholder="Hostel Name" required>
+    <button>Add Hostel</button>
+</form>
+
+<hr>
+
+<table>
+<tr>
+    <th>Hostel</th>
+    <th>Action</th>
+</tr>
+
+{% for h in hostels %}
+<tr>
+    <td>{{ h.name }}</td>
+    <td>
+        <form method="post"
+              action="/structure/hostel/delete/{{ h.id }}"
+              onsubmit="return confirm('Delete hostel?');">
+            <button>🗑 Delete</button>
+        </form>
+    </td>
+</tr>
+{% else %}
+<tr><td colspan="2">No hostels created</td></tr>
+{% endfor %}
+</table>
+
+{% endblock %}

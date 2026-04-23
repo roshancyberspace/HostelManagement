@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="inspect-shell">
+    <div class="inspect-hero">
+        <div>
+            <p class="inspect-kicker">Inspection</p>
+            <h1>Recovery ledger</h1>
+            <p class="inspect-subtitle">Damage aur fine recovery ka searchable ledger yahan visible rahega.</p>
+        </div>
+        <div class="inspect-chip-row">
+            <span class="inspect-chip">{{ records|length }} records</span>
+        </div>
+    </div>
+
+    <section class="inspect-panel">
+        <div class="inspect-panel-head">
+            <div>
+                <h2>Filter ledger</h2>
+                <p>Target type ya search keyword se records filter karo.</p>
+            </div>
+        </div>
+        <form method="get" class="inspect-toolbar">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search by id, room, area, floor or reason">
+            <select name="type">
+                <option value="">All target types</option>
+                <option value="ROOM" {% if target_type == 'ROOM' %}selected{% endif %}>Room</option>
+                <option value="COMMON" {% if target_type == 'COMMON' %}selected{% endif %}>Common Area</option>
+            </select>
+            <button type="submit" class="inspect-primary-btn">Apply</button>
+            <a href="{{ url_for('inspection.recovery_ledger') }}" class="inspect-secondary-btn">Reset</a>
+        </form>
+    </section>
+
+    <section class="inspect-panel">
+        <div class="inspect-panel-head">
+            <div>
+                <h2>Recovery register</h2>
+                <p>All recorded fine and damage recovery entries.</p>
+            </div>
+        </div>
+
+        {% if records %}
+        <div class="inspect-table-wrap">
+            <table class="inspect-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Target Type</th>
+                        <th>Target</th>
+                        <th>Hostel</th>
+                        <th>Floor</th>
+                        <th>Amount</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td>{{ r.created_on }}</td>
+                        <td>{{ r.target_type }}</td>
+                        <td>{{ r.target_name }}</td>
+                        <td>{{ r.hostel_name }}</td>
+                        <td>{{ r.floor_name }}</td>
+                        <td>Rs. {{ r.amount }}</td>
+                        <td>{{ r.reason or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No recovery records found</h3>
+            <p>Current filter ke andar koi recovery entry available nahi hai.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

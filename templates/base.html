@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HostelERP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="light">
+{% set role = current_user.role if current_user else '' %}
+<div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-mark">H</div>
+            <div>
+                <div class="brand-name">HostelERP</div>
+                <div class="brand-meta">Operations command center</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            {% if can("dashboard.view") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Dashboard</div>
+            <div class="submenu">
+                <a href="/" class="nav-link">Overview</a>
+                <a href="/inspection-alerts" class="nav-link">
+                    Inspection Alerts
+                    {% if notify.overdue > 0 %}
+                        <span class="badge">{{ notify.overdue }}</span>
+                    {% endif %}
+                </a>
+            </div>
+            {% endif %}
+
+            {% if can("system.view") %}
+            <div class="menu-group" onclick="toggleMenu(this)">System</div>
+            <div class="submenu">
+                <a href="/system-check" class="nav-link">System Check</a>
+            </div>
+            {% endif %}
+
+            {% if can("master_feed.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Master Feed</div>
+            <div class="submenu">
+                <a href="{{ url_for('master_feed.master_feed_dashboard') }}" class="nav-link">Routine and Forms</a>
+                <a href="/master-feed/routines" class="nav-link">Routines</a>
+                <a href="/master-feed/forms" class="nav-link">Forms</a>
+                <a href="/master-feed/routine-logs" class="nav-link">Routine Logs</a>
+            </div>
+            {% endif %}
+
+            {% if can("coaching.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Coaching</div>
+            <div class="submenu">
+                <a href="/coaching/master" class="nav-link">Coaching Master Control</a>
+                <a href="/coaching/daily" class="nav-link">Coaching and Self Study</a>
+            </div>
+            {% endif %}
+
+            {% if can("academic_session.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Academic Session</div>
+            <div class="submenu">
+                <a href="/academic-session/" class="nav-link">Manage Sessions</a>
+            </div>
+            {% endif %}
+
+            {% if can("students.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Student Intake</div>
+            <div class="submenu intake-submenu">
+                <a href="/students/master-biodata" class="nav-link nav-link-rich">
+                    <span class="nav-copy">
+                        <strong>New Admission</strong>
+                        <small>Single student entry</small>
+                    </span>
+                </a>
+                <a href="/students/bulk" class="nav-link nav-link-rich">
+                    <span class="nav-copy">
+                        <strong>Bulk Upload CSV</strong>
+                        <small>Legacy intake import</small>
+                    </span>
+                </a>
+                <a href="/students/upload/basic-bulk-excel" class="nav-link nav-link-rich">
+                    <span class="nav-copy">
+                        <strong>Bulk Upload Excel</strong>
+                        <small>Recommended template flow</small>
+                    </span>
+                </a>
+                <a href="/students/upload/biodata-excel" class="nav-link nav-link-rich">
+                    <span class="nav-copy">
+                        <strong>Full Biodata Upload</strong>
+                        <small>Detailed record import</small>
+                    </span>
+                </a>
+                <a href="/students/list" class="nav-link nav-link-rich">
+                    <span class="nav-copy">
+                        <strong>Student Registry</strong>
+                        <small>Search and manage students</small>
+                    </span>
+                </a>
+            </div>
+            {% endif %}
+
+            {% if can("staff.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Staff and Members</div>
+            <div class="submenu">
+                <a href="/staff" class="nav-link">Staff Registry</a>
+                <a href="/staff/create" class="nav-link">Add Staff</a>
+            </div>
+            {% endif %}
+
+            {% if can("student_profile.view") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Student Profile</div>
+            <div class="submenu">
+                <a href="/student-profile" class="nav-link">Student Profiles</a>
+                <a href="/student-profile/create" class="nav-link">Create Student Profile</a>
+            </div>
+            {% endif %}
+
+            {% if can("parent_portal.view") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Parent Portal</div>
+            <div class="submenu">
+                <a href="/parent-portal/wallet" class="nav-link">Parent Wallet View</a>
+            </div>
+            {% endif %}
+
+            {% if can("pocket_money.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Pocket Money</div>
+            <div class="submenu">
+                <a href="{{ url_for('pocket_money.dashboard') }}" class="nav-link">Wallet Dashboard</a>
+                <a href="/pocket-money/collect" class="nav-link">Collect Money</a>
+                <a href="/pocket-money/expense" class="nav-link">Expense Entry</a>
+                <a href="/pocket-money/ledger" class="nav-link">Student Ledger</a>
+            </div>
+            {% endif %}
+
+            {% if can("attendance.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Student Attendance</div>
+            <div class="submenu">
+                <a href="{{ url_for('student_attendance.select_session') }}" class="nav-link">Daily Attendance</a>
+                <a href="{{ url_for('student_attendance.management_report') }}" class="nav-link">Management Report</a>
+                <a href="{{ url_for('student_attendance.analytics') }}" class="nav-link">Attendance Analytics</a>
+                <a href="{{ url_for('student_attendance.monthly_report') }}" class="nav-link">Monthly Report</a>
+                <a href="{{ url_for('student_attendance.export_daily_pdf') }}" class="nav-link">Download Daily PDF</a>
+                <a href="{{ url_for('student_attendance.export_monthly_pdf') }}" class="nav-link">Download Monthly PDF</a>
+                <a href="{{ url_for('student_attendance.export_yearly_pdf') }}" class="nav-link">Download Yearly PDF</a>
+            </div>
+            {% endif %}
+
+            {% if can("student_permissions.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Student Permissions</div>
+            <div class="submenu">
+                <a href="/student-permissions/" class="nav-link">Permission Dashboard</a>
+                <a href="/student-permissions/self-going" class="nav-link">Self Going</a>
+                <a href="/student-permissions/device" class="nav-link">Device Permission</a>
+                <a href="/student-permissions/history" class="nav-link">Permission History</a>
+            </div>
+            {% endif %}
+
+            {% if can("gate_pass.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">
+                Gate Pass
+                {% if notify.gate_pass_pending > 0 %}
+                    <span class="badge">{{ notify.gate_pass_pending }}</span>
+                {% endif %}
+            </div>
+            <div class="submenu">
+                <a href="/gate-pass/create" class="nav-link">New Gate Pass</a>
+                <a href="/gate-pass" class="nav-link">
+                    Gate Pass Register
+                    {% if notify.gate_pass_violations > 0 %}
+                        <span class="badge">{{ notify.gate_pass_violations }}</span>
+                    {% endif %}
+                </a>
+            </div>
+            {% endif %}
+
+            {% if can("calendar_rules.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Calendar Rules</div>
+            <div class="submenu">
+                <a href="/calendar-rules/" class="nav-link">Working Days and Holidays</a>
+            </div>
+            {% endif %}
+
+            {% if can("school_timings.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">School Timings</div>
+            <div class="submenu">
+                <a href="/school-timings/" class="nav-link">Reporting and Dispersal</a>
+            </div>
+            {% endif %}
+
+            {% if can("hostel_timetable.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Hostel Timetable</div>
+            <div class="submenu">
+                <a href="/hostel-timetable/" class="nav-link">Daily Schedule</a>
+            </div>
+            {% endif %}
+
+            {% if can("daily_schedule.view") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Daily Schedule</div>
+            <div class="submenu">
+                <a href="/daily-schedule/" class="nav-link">Time and Menu View</a>
+            </div>
+            {% endif %}
+
+            {% if can("laundry.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Laundry</div>
+            <div class="submenu">
+                <a href="/laundry-routine/" class="nav-link">Routine Chart</a>
+                <a href="/laundry-register/" class="nav-link">Issue and Return</a>
+            </div>
+            {% endif %}
+
+            {% if can("barber.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Barber and Grooming</div>
+            <div class="submenu">
+                <a href="/barber" class="nav-link">Haircut Dashboard</a>
+                <a href="/barber/record" class="nav-link">New Haircut Entry</a>
+                <a href="/barber/defaulters" class="nav-link">Defaulters</a>
+            </div>
+            {% endif %}
+
+            {% if can("mess_menu.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Mess and Menu</div>
+            <div class="submenu">
+                <a href="/mess-menu/?day_type=WORKING" class="nav-link">Weekly Mess Menu</a>
+            </div>
+            {% endif %}
+
+            {% if can("hostel_structure.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Hostel Structure</div>
+            <div class="submenu">
+                <a href="/structure/hostel" class="nav-link">Hostel</a>
+                <a href="/structure/block" class="nav-link">Block</a>
+                <a href="/structure/floor" class="nav-link">Floor</a>
+                <a href="/structure/room" class="nav-link">Room</a>
+                <a href="/structure/bed" class="nav-link">Bed</a>
+                <a href="/structure/common-area" class="nav-link">Common Area</a>
+            </div>
+            {% endif %}
+
+            {% if can("bed_allotment.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Bed Allotment</div>
+            <div class="submenu">
+                <a href="/bed-allotment/allot" class="nav-link">Allot and Vacate Beds</a>
+                <a href="/bed-allotment/inventory" class="nav-link">Bed Inventory</a>
+                <a href="/bed-allotment/occupancy" class="nav-link">Bed Occupancy</a>
+                <a href="/bed-allotment/history/1234" class="nav-link">Bed History</a>
+            </div>
+            {% endif %}
+
+            {% if can("inspection.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">
+                Inspection
+                {% if notify.overdue > 0 %}
+                    <span class="badge">{{ notify.overdue }}</span>
+                {% endif %}
+            </div>
+            <div class="submenu">
+                <a href="{{ url_for('room_inspection.inspection_dashboard') }}" class="nav-link">Room Inspection Report</a>
+                <a href="{{ url_for('room_inspection.room_entry') }}" class="nav-link">Room Inspection Entry</a>
+                <a href="/inspection/common" class="nav-link">Common Inspection</a>
+                <a href="/inspection/recovery-ledger" class="nav-link">Recovery Ledger</a>
+            </div>
+            {% endif %}
+
+            {% if can("stock.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Stock and Assets</div>
+            <div class="submenu">
+                <a href="/stock/" class="nav-link">Stock Dashboard</a>
+                <a href="/stock/master" class="nav-link">Stock Master</a>
+            </div>
+            {% endif %}
+
+            {% if can("reports.view") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Reports</div>
+            <div class="submenu">
+                <a href="/reports/rooms" class="nav-link">Room Reports</a>
+                <a href="/reports/floor-heatmap" class="nav-link">Floor Heatmap</a>
+                <a href="/reports/hostel" class="nav-link">Hostel Report</a>
+            </div>
+            {% endif %}
+
+            {% if can("rbac.manage") %}
+            <div class="menu-group" onclick="toggleMenu(this)">Roles and Permissions</div>
+            <div class="submenu">
+                <a href="{{ url_for('rbac.users') }}" class="nav-link">Users</a>
+                <a href="{{ url_for('rbac.roles') }}" class="nav-link">Roles</a>
+                <a href="{{ url_for('rbac.roles') }}#permissions" class="nav-link">Permissions</a>
+            </div>
+            {% endif %}
+        </nav>
+    </aside>
+
+    <div class="page-shell">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" type="button" onclick="toggleSidebar()">Menu</button>
+                <div>
+                    <div class="eyebrow">Residential Operations</div>
+                    <div class="page-title">HostelERP Control Panel</div>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <button class="theme-toggle" type="button" onclick="toggleTheme()">Theme</button>
+
+                <div class="top-notice-cluster compact notice-dropdown">
+                    <button class="notice-toggle" type="button" onclick="toggleNoticePanel()">
+                        Notifications
+                        <span class="top-notice-count">{% if global_bed_mismatch and global_bed_mismatch > 0 %}2{% else %}1{% endif %}</span>
+                    </button>
+                    <div class="top-notice-compact blur-white" id="noticePanel">
+                        <div class="top-notice-compact-head">
+                            <span class="top-notice-head">Notifications</span>
+                            <span class="top-notice-count">{% if global_bed_mismatch and global_bed_mismatch > 0 %}2{% else %}1{% endif %}</span>
+                        </div>
+                        <div class="top-notice-item">
+                            <span class="notice-dot"></span>
+                            <span>Live Ops active for inspections and gate-pass tracking.</span>
+                        </div>
+                        {% if global_bed_mismatch and global_bed_mismatch > 0 %}
+                        <div class="top-notice-item critical">
+                            <span class="notice-dot"></span>
+                            <span>{{ global_bed_mismatch }} students have no bed allotted.</span>
+                            <a href="/mismatch-active-without-bed" class="top-notice-link">Review</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="user-menu">
+                    <button class="user-trigger" type="button" onclick="toggleUserMenu()">
+                        {% if current_user and current_user.profile_image %}
+                        <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.name }}" class="user-avatar user-avatar-image">
+                        {% else %}
+                        <span class="user-avatar">{{ current_user.name[:1] if current_user else 'U' }}</span>
+                        {% endif %}
+                        <span>{{ current_user.name if current_user else 'User' }}</span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div><b>User ID:</b> {{ current_user.user_id if current_user else '' }}</div>
+                        <div><b>Role:</b> {{ current_user.role_label if current_user else '' }}</div>
+                        <hr>
+                        <a href="{{ url_for('auth.profile') }}">Profile</a>
+                        {% if can("rbac.manage") %}
+                        <a href="{{ url_for('rbac.users') }}">User Access</a>
+                        {% endif %}
+                        <a href="{{ url_for('auth.logout') }}">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true">
+            {% if messages %}
+            {% for category, msg in messages %}
+                <div class="toast toast-{{ category }}" data-toast>
+                    <div class="toast-copy">
+                        <strong class="toast-title">
+                            {% if category == "success" %}Success
+                            {% elif category == "warning" %}Warning
+                            {% elif category in ["danger", "error"] %}Action Needed
+                            {% else %}Notice
+                            {% endif %}
+                        </strong>
+                        <span class="toast-message">{{ msg }}</span>
+                    </div>
+                    <button class="toast-close" type="button" aria-label="Close notification" onclick="dismissToast(this)">×</button>
+                </div>
+            {% endfor %}
+            {% endif %}
+            </div>
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<script>
+function toggleMenu(clicked) {
+    const sub = clicked.nextElementSibling;
+    if (!sub || !sub.classList.contains("submenu")) {
+        return;
+    }
+
+    const isOpen = sub.style.display === "block";
+
+    document.querySelectorAll(".submenu").forEach((menu) => {
+        if (menu !== sub) {
+            menu.style.display = "none";
+            const trigger = menu.previousElementSibling;
+            if (trigger && trigger.classList.contains("menu-group")) {
+                trigger.classList.remove("open");
+            }
+        }
+    });
+
+    sub.style.display = isOpen ? "none" : "block";
+    clicked.classList.toggle("open", !isOpen);
+}
+
+document.querySelectorAll(".nav-link").forEach((link) => {
+    if (link.href === window.location.href) {
+        link.classList.add("active");
+        const parent = link.closest(".submenu");
+        if (parent) {
+            parent.style.display = "block";
+            const trigger = parent.previousElementSibling;
+            if (trigger && trigger.classList.contains("menu-group")) {
+                trigger.classList.add("open");
+            }
+        }
+    }
+});
+
+function toggleUserMenu() {
+    document.getElementById("userDropdown").classList.toggle("show");
+}
+
+function toggleNoticePanel() {
+    document.getElementById("noticePanel").classList.toggle("show");
+}
+
+function toggleTheme() {
+    document.body.classList.toggle("dark");
+    document.body.classList.toggle("light");
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark") ? "dark" : "light"
+    );
+}
+
+function toggleSidebar() {
+    document.body.classList.toggle("sidebar-open");
+}
+
+function dismissToast(trigger) {
+    const toast = trigger.closest("[data-toast]");
+    if (!toast) {
+        return;
+    }
+    toast.classList.add("closing");
+    window.setTimeout(() => toast.remove(), 220);
+}
+
+function initToasts() {
+    document.querySelectorAll("[data-toast]").forEach((toast, index) => {
+        window.setTimeout(() => {
+            if (toast && toast.isConnected) {
+                toast.classList.add("show");
+            }
+        }, 80 * (index + 1));
+
+        window.setTimeout(() => {
+            if (toast && toast.isConnected) {
+                toast.classList.add("closing");
+                window.setTimeout(() => toast.remove(), 220);
+            }
+        }, 4200 + (index * 250));
+    });
+}
+
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+    document.body.classList.remove("light");
+    document.body.classList.add("dark");
+}
+
+initToasts();
+
+window.addEventListener("click", (event) => {
+    const menu = document.querySelector(".user-menu");
+    const dropdown = document.getElementById("userDropdown");
+    const noticeMenu = document.querySelector(".notice-dropdown");
+    const noticePanel = document.getElementById("noticePanel");
+    if (menu && dropdown && !menu.contains(event.target)) {
+        dropdown.classList.remove("show");
+    }
+    if (noticeMenu && noticePanel && !noticeMenu.contains(event.target)) {
+        noticePanel.classList.remove("show");
+    }
+});
+</script>
+</body>
+</html>

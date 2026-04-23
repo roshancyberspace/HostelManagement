@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="staff-shell">
+    <section class="staff-hero">
+        <div class="staff-hero-card">
+            <span class="section-kicker">Staff and Members</span>
+            <h1>Add Staff</h1>
+            <p>Create clean profiles for hostel wardens, tutors, guards, kitchen team, and support staff.</p>
+        </div>
+        <div class="staff-summary">
+            <div class="metric-pill">
+                <span>Profile Type</span>
+                <strong>Staff Record</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Recommended</span>
+                <strong>Basic + Contact</strong>
+            </div>
+            <a class="btn btn-outline-primary" href="/staff">Back to Registry</a>
+        </div>
+    </section>
+
+    <form method="post" class="intake-card staff-form-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Staff Profile Details</h2>
+                <p>Fill the core identity and contact information to create a ready-to-manage staff record.</p>
+            </div>
+        </div>
+
+        <section class="biodata-section">
+            <h3>Basic Information</h3>
+            <div class="biodata-grid">
+                <div>
+                    <label><b>Full Name *</b></label>
+                    <input type="text" name="full_name" class="form-control" required>
+                </div>
+                <div>
+                    <label><b>Designation *</b></label>
+                    <input type="text" name="designation" class="form-control" required placeholder="Hostel Warden / Cook / Guard / Tutor">
+                </div>
+                <div>
+                    <label><b>Department</b></label>
+                    <input type="text" name="department" class="form-control" value="HOSTEL">
+                </div>
+                <div>
+                    <label><b>Joining Date</b></label>
+                    <input type="date" name="joining_date" class="form-control">
+                </div>
+            </div>
+        </section>
+
+        <section class="biodata-section">
+            <h3>Contact and Employment</h3>
+            <div class="biodata-grid">
+                <div>
+                    <label><b>Phone</b></label>
+                    <input type="text" name="phone" class="form-control">
+                </div>
+                <div>
+                    <label><b>Alternate Phone</b></label>
+                    <input type="text" name="alternate_phone" class="form-control">
+                </div>
+                <div>
+                    <label><b>Email</b></label>
+                    <input type="email" name="email" class="form-control">
+                </div>
+                <div>
+                    <label><b>Monthly Salary</b></label>
+                    <input type="number" name="salary_monthly" class="form-control" value="0">
+                </div>
+                <div class="biodata-grid-span">
+                    <label><b>Address</b></label>
+                    <textarea name="address" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="biodata-grid-span">
+                    <label><b>Remarks</b></label>
+                    <input type="text" name="remarks" class="form-control" placeholder="Shift, duty notes, hostel wing, or any extra note">
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button class="btn btn-primary">Save Staff</button>
+            <a class="btn btn-outline-primary" href="/staff">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

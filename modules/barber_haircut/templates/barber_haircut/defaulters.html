@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="grooming-shell">
+    <div class="grooming-hero">
+        <div>
+            <p class="grooming-kicker">Barber and Grooming</p>
+            <h1>Defaulters</h1>
+            <p class="grooming-subtitle">Selected month ke active students jinka haircut abhi mark nahi hua.</p>
+        </div>
+        <form method="get" class="grooming-month-form">
+            <label class="grooming-field">
+                <span>Month</span>
+                <input type="month" name="month" value="{{ month_key }}">
+            </label>
+            <button class="grooming-primary-btn" type="submit">Load month</button>
+        </form>
+    </div>
+
+    {% if not cutoff_active %}
+    <div class="grooming-panel">
+        <div class="schedule-empty compact">
+            <h3>Defaulter list locked for now</h3>
+            <p>Ye list {{ cutoff_day }}th ke baad visible hoti hai. Abhi system waiting mode me hai.</p>
+        </div>
+    </div>
+    {% else %}
+    <div class="grooming-panel">
+        <div class="grooming-panel-head">
+            <div>
+                <h2>Pending haircut students</h2>
+                <p>{{ defaulters|length }} active students need haircut marking for {{ month_key }}.</p>
+            </div>
+            <span class="grooming-chip-link">{{ defaulters|length }} defaulters</span>
+        </div>
+
+        {% if defaulters %}
+        <div class="grooming-record-list">
+            {% for s in defaulters %}
+            <article class="grooming-record-card">
+                <div class="grooming-record-head">
+                    <div>
+                        <strong>{{ s["student_name"] }}</strong>
+                        <span>{{ s["ledger_no"] }} - {{ s["class_name"] }} {{ s["section"] }}</span>
+                    </div>
+                    <a class="grooming-chip-link" href="{{ url_for('barber_haircut.barber_record', ledger_no=s['ledger_no']) }}">Mark now</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No defaulters found</h3>
+            <p>Selected month me sab active students ke haircut records available hain.</p>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

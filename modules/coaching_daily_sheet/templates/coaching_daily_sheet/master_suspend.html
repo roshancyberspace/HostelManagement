@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>⛔ Suspend Master Routine (Day Wise)</h3>
+
+<form method="post" class="card p-3" style="max-width:500px;">
+    <label><b>Select Routine Type</b></label>
+    <select name="routine_type" class="form-select mb-3" required>
+        <option value="COACHING">COACHING</option>
+        <option value="STUDY">SELF STUDY</option>
+    </select>
+
+    <label><b>Select Day</b></label>
+    <select name="day_name" class="form-select mb-3" required>
+        <option>Mon</option>
+        <option>Tue</option>
+        <option>Wed</option>
+        <option>Thu</option>
+        <option>Fri</option>
+        <option>Sat</option>
+        <option>Sun</option>
+    </select>
+
+    <label><b>Reason (Mandatory)</b></label>
+    <input type="text" name="reason" class="form-control mb-3" required placeholder="Teacher absent / Exam / Meeting etc.">
+
+    <button class="btn btn-danger">Suspend This Day</button>
+</form>
+
+{% endblock %}

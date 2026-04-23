@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Reports</p>
+            <h1>Hostel report</h1>
+            <p class="report-hub-subtitle">Rooms, floors, inspections, recovery, aur common areas ka overall management snapshot.</p>
+        </div>
+    </div>
+
+    <section class="report-hub-stat-grid">
+        <article class="report-hub-stat-card">
+            <span>Total Rooms</span>
+            <strong>{{ data.total_rooms }}</strong>
+        </article>
+        <article class="report-hub-stat-card danger">
+            <span>Damaged Rooms</span>
+            <strong>{{ data.damaged_rooms }}</strong>
+        </article>
+        <article class="report-hub-stat-card success">
+            <span>Total Recovery</span>
+            <strong>Rs. {{ data.recovery_total }}</strong>
+        </article>
+        <article class="report-hub-stat-card">
+            <span>Total Inspections</span>
+            <strong>{{ data.inspection_count }}</strong>
+        </article>
+        <article class="report-hub-stat-card">
+            <span>Total Floors</span>
+            <strong>{{ data.total_floors }}</strong>
+        </article>
+        <article class="report-hub-stat-card">
+            <span>Common Areas</span>
+            <strong>{{ data.total_common }}</strong>
+        </article>
+    </section>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Hostel breakdown</h2>
+                <p>Per-hostel management summary for reporting review.</p>
+            </div>
+        </div>
+
+        {% if data.hostel_breakdown %}
+        <div class="report-hub-table-wrap">
+            <table class="report-hub-table">
+                <thead>
+                    <tr>
+                        <th>Hostel</th>
+                        <th>Floors</th>
+                        <th>Rooms</th>
+                        <th>Damaged</th>
+                        <th>Inspections</th>
+                        <th>Recovery</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in data.hostel_breakdown %}
+                    <tr>
+                        <td><strong>{{ row.name }}</strong></td>
+                        <td>{{ row.total_floors }}</td>
+                        <td>{{ row.total_rooms }}</td>
+                        <td>{{ row.damaged_rooms }}</td>
+                        <td>{{ row.inspections }}</td>
+                        <td>Rs. {{ row.recovery_total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No hostel summary found</h3>
+            <p>Hostel-level report data available nahi hai.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

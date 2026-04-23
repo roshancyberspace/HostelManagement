@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="schedule-shell">
+    <div class="schedule-hero">
+        <div>
+            <p class="schedule-kicker">School Timings</p>
+            <h1>Reporting and dispersal</h1>
+            <p class="schedule-subtitle">School-linked timings ko clean control board me manage karo so hostel timetable aur daily schedule dono aligned rahen.</p>
+        </div>
+        {% if active_session %}
+        <div class="schedule-chip-row">
+            <span class="schedule-chip">{{ active_session["name"] }}</span>
+            <span class="schedule-chip">{{ timings|length }} timing blocks</span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not active_session %}
+    <div class="schedule-empty">
+        <h3>No active academic session</h3>
+        <p>School timings set karne se pehle active academic session select hona chahiye.</p>
+    </div>
+    {% else %}
+    <div class="schedule-grid schedule-grid-2">
+        <div class="schedule-panel">
+            <div class="schedule-panel-head">
+                <div>
+                    <h2>Add timing block</h2>
+                    <p>Working, exam, ya special day ke reporting aur dispersal timings set karo.</p>
+                </div>
+                <span class="schedule-chip">New timing</span>
+            </div>
+            <form method="post" action="{{ url_for('school_timings.create') }}" class="schedule-form-grid">
+                <label class="schedule-field">
+                    <span>Day Type</span>
+                    <select name="day_type" required>
+                        <option value="WORKING">Working Day</option>
+                        <option value="EXAM">Exam Day</option>
+                        <option value="SPECIAL">Special Day</option>
+                    </select>
+                </label>
+                <label class="schedule-field">
+                    <span>Reporting</span>
+                    <input type="time" name="reporting_time" required>
+                </label>
+                <label class="schedule-field">
+                    <span>Recess / Brunch</span>
+                    <input type="time" name="recess_time" required>
+                </label>
+                <label class="schedule-field">
+                    <span>Dispersal XI-XII</span>
+                    <input type="time" name="dispersal_senior" required>
+                </label>
+                <label class="schedule-field">
+                    <span>Dispersal I-X</span>
+                    <input type="time" name="dispersal_junior" required>
+                </label>
+                <div class="schedule-form-actions">
+                    <button class="schedule-primary-btn" type="submit">Save timing</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="schedule-panel">
+            <div class="schedule-panel-head">
+                <div>
+                    <h2>Timing overview</h2>
+                    <p>Configured school timing blocks at a glance.</p>
+                </div>
+                <span class="schedule-chip">Overview</span>
+            </div>
+            {% if timings %}
+            <div class="schedule-card-list">
+                {% for timing in timings %}
+                <article class="schedule-mini-card">
+                    <div class="schedule-mini-head">
+                        <strong>{{ timing["day_type"] }}</strong>
+                        <a class="schedule-delete-link" href="{{ url_for('school_timings.delete', timing_id=timing['id']) }}" onclick="return confirm('Delete this timing?')">Delete</a>
+                    </div>
+                    <div class="schedule-stat-line"><span>Reporting</span><b>{{ timing["reporting_time"] }}</b></div>
+                    <div class="schedule-stat-line"><span>Recess</span><b>{{ timing["recess_time"] }}</b></div>
+                    <div class="schedule-stat-line"><span>XI-XII</span><b>{{ timing["dispersal_senior"] }}</b></div>
+                    <div class="schedule-stat-line"><span>I-X</span><b>{{ timing["dispersal_junior"] }}</b></div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No timing blocks yet</h3>
+                <p>First school timing create karne ke baad overview yahin show hoga.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

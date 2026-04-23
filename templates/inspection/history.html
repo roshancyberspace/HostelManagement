@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Inspection History</h1>
+
+<table border="1" cellpadding="8">
+<tr>
+    <th>Date</th>
+    <th>Type</th>
+    <th>Remarks</th>
+    <th>Damage</th>
+    <th>Fine</th>
+</tr>
+
+{% for i in history %}
+<tr>
+    <td>{{ i.inspected_on }}</td>
+    <td>{{ i.inspection_type }}</td>
+    <td>{{ i.remarks }}</td>
+    <td>
+        {% if i.damage %}
+            <span class="red">Damaged</span>
+        {% else %}
+            <span class="green">Good</span>
+        {% endif %}
+    </td>
+    <td>₹{{ i.fine }}</td>
+</tr>
+{% else %}
+<tr><td colspan="5">No inspection history found.</td></tr>
+{% endfor %}
+</table>
+
+{% endblock %}

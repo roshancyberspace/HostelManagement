@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HostelERP Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="light auth-page">
+<section class="auth-shell">
+    <div class="auth-showcase">
+        <div class="auth-showcase-copy">
+            <div class="auth-brand auth-showcase-brand">
+                <div class="brand-mark">H</div>
+                <div>
+                    <div class="brand-name">HostelERP</div>
+                    <div class="brand-meta">Operations command center</div>
+                </div>
+            </div>
+            <h2>Run your hostel with clarity.</h2>
+            <p>Attendance, rooms, gate pass, laundry, stock, and reports stay connected in one secure workspace.</p>
+        </div>
+
+        <div class="auth-dashboard-preview" aria-hidden="true">
+            <div class="auth-preview-top">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="auth-preview-grid">
+                <div class="auth-preview-card auth-preview-card-wide">
+                    <small>Today</small>
+                    <strong>Dashboard Ready</strong>
+                    <div class="auth-preview-bar"><span></span></div>
+                </div>
+                <div class="auth-preview-card">
+                    <small>Rooms</small>
+                    <strong>86%</strong>
+                </div>
+                <div class="auth-preview-card">
+                    <small>Attendance</small>
+                    <strong>94%</strong>
+                </div>
+                <div class="auth-preview-list">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-card">
+        <div class="auth-brand">
+            <div class="brand-mark">H</div>
+            <div>
+                <div class="brand-name">HostelERP</div>
+                <div class="brand-meta">Secure hostel management</div>
+            </div>
+        </div>
+
+        <div class="auth-copy">
+            <span class="section-kicker">Login</span>
+            <h1>Welcome back</h1>
+            <p>Sign in to continue to your dashboard.</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="auth-alerts">
+            {% for category, msg in messages %}
+            <div class="alert {{ category }}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" class="auth-form">
+            <div class="compact-field auth-field">
+                <label for="user_id">User ID</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon">ID</span>
+                    <input id="user_id" name="user_id" required autofocus autocomplete="username" placeholder="Enter your user ID">
+                </div>
+            </div>
+
+            <div class="compact-field auth-field">
+                <label for="password">Password</label>
+                <div class="auth-input-wrap">
+                    <span class="auth-input-icon">**</span>
+                    <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="Enter your password">
+                    <button type="button" class="password-toggle" aria-label="Show password" aria-pressed="false">
+                        <span class="eye-open">Show</span>
+                        <span class="eye-closed">Hide</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="auth-options">
+                <label class="auth-remember">
+                    <input type="checkbox" name="remember" value="1">
+                    <span>Remember me</span>
+                </label>
+                <a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="auth-submit">Login</button>
+        </form>
+    </div>
+</section>
+<script>
+    const passwordInput = document.getElementById('password');
+    const passwordToggle = document.querySelector('.password-toggle');
+
+    passwordToggle?.addEventListener('click', function () {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        this.setAttribute('aria-pressed', String(isPassword));
+        this.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+    });
+</script>
+</body>
+</html>

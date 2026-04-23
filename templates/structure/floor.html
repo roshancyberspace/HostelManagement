@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="structure-shell">
+    <div class="structure-hero">
+        <div>
+            <p class="structure-kicker">Structure</p>
+            <h1>Floor management</h1>
+            <p class="structure-subtitle">Block-wise floors ko clearly map karo so room, inspection, aur common area planning simple rahe.</p>
+        </div>
+        <div class="structure-chip-row">
+            <span class="structure-chip">{{ floors|length }} floors</span>
+            <span class="structure-chip">{{ blocks|length }} blocks</span>
+        </div>
+    </div>
+
+    <div class="structure-grid structure-grid-2">
+        <div class="structure-panel">
+            <div class="structure-panel-head">
+                <div>
+                    <h2>Add floor</h2>
+                    <p>Selected block ke andar naya floor create karo.</p>
+                </div>
+            </div>
+
+            <form method="post" class="structure-form-grid">
+                <label class="structure-field">
+                    <span>Select Block</span>
+                    <select id="block_id" name="block_id" required>
+                        <option value="">Choose block</option>
+                        {% for b in blocks %}
+                            <option value="{{ b.id }}">{{ b.hostel_name }} - Block {{ b.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="structure-field">
+                    <span>Floor Number</span>
+                    <input id="floor_no" name="floor_no" placeholder="Enter floor number" required>
+                </label>
+
+                <div class="structure-form-actions">
+                    <button class="structure-primary-btn" type="submit">Add floor</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="structure-panel">
+            <div class="structure-panel-head">
+                <div>
+                    <h2>Floor registry</h2>
+                    <p>Mapped floors with quick cleanup action.</p>
+                </div>
+            </div>
+
+            {% if floors %}
+            <div class="structure-record-list">
+                {% for f in floors %}
+                <article class="structure-record-card">
+                    <div class="structure-record-head">
+                        <div>
+                            <strong>Floor {{ f.floor_no }}</strong>
+                            <span>{{ f.hostel_name }} - Block {{ f.block_name }}</span>
+                        </div>
+                    </div>
+
+                    <div class="structure-action-row">
+                        <form method="post" action="/structure/floor/delete/{{ f.id }}" onsubmit="return confirm('Delete floor?');">
+                            <button type="submit" class="structure-danger-btn">Delete</button>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No floors created yet</h3>
+                <p>Floor registry create karne ke baad yahin visible hogi.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

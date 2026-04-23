@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="schedule-shell">
+    <div class="schedule-hero">
+        <div>
+            <p class="schedule-kicker">Hostel Timetable</p>
+            <h1>Daily routine</h1>
+            <p class="schedule-subtitle">Simple routine setup for working day, Sunday, and holiday.</p>
+        </div>
+        <div class="schedule-day-switch">
+            <a href="?day_type=WORKING" class="schedule-tab {% if day_type=='WORKING' %}active{% endif %}">Working Day</a>
+            <a href="?day_type=SUNDAY" class="schedule-tab {% if day_type=='SUNDAY' %}active{% endif %}">Sunday</a>
+            <a href="?day_type=HOLIDAY" class="schedule-tab {% if day_type=='HOLIDAY' %}active{% endif %}">Holiday</a>
+        </div>
+    </div>
+
+    {% if not active_session %}
+    <div class="schedule-empty">
+        <h3>No active academic session</h3>
+        <p>Hostel timetable use karne se pehle active academic session required hai.</p>
+    </div>
+    {% else %}
+    <div class="schedule-grid schedule-grid-2">
+        <div class="schedule-panel">
+            <div class="schedule-panel-head">
+                <div>
+                    <h2>{{ day_type }} routine</h2>
+                    <p>{{ timetable|length }} items in {{ active_session["name"] }}.</p>
+                </div>
+                <span class="schedule-chip">{{ day_type }}</span>
+            </div>
+            {% if timetable %}
+            <div class="schedule-simple-list">
+                {% for item in timetable %}
+                <form method="post" action="{{ url_for('hostel_timetable.update', row_id=item.id) }}" class="schedule-simple-item">
+                    <div class="schedule-simple-meta">
+                        <span class="schedule-seq-pill">#{{ item.sequence_no }}</span>
+                        <div>
+                            <h3>{{ item.activity_name }}</h3>
+                            <span class="schedule-badge">{{ item.time_source.replace("_", " ") }}</span>
+                        </div>
+                    </div>
+                    <div class="schedule-simple-fields">
+                        <label class="schedule-field compact">
+                            <span>Sequence</span>
+                            <input type="number" name="sequence_no" value="{{ item.sequence_no }}" required>
+                        </label>
+                        <label class="schedule-field compact">
+                            <span>Start</span>
+                            {% if item.time_source == "MANUAL" %}
+                            <input type="time" name="start_time" value="{{ item.start_time }}">
+                            {% else %}
+                            <div class="schedule-static-value">{{ item.resolved_start or "-" }}</div>
+                            {% endif %}
+                        </label>
+                        <label class="schedule-field compact">
+                            <span>End</span>
+                            {% if item.time_source == "MANUAL" %}
+                            <input type="time" name="end_time" value="{{ item.end_time }}">
+                            {% else %}
+                            <div class="schedule-static-value">{{ item.resolved_end or "-" }}</div>
+                            {% endif %}
+                        </label>
+                    </div>
+                    <div class="schedule-action-row">
+                        <button class="schedule-primary-btn small" type="submit">Save</button>
+                        <a class="schedule-delete-link" href="{{ url_for('hostel_timetable.delete', row_id=item.id) }}" onclick="return confirm('Delete this activity?')">Delete</a>
+                    </div>
+                </form>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No activities yet</h3>
+                <p>{{ day_type }} ke liye abhi koi hostel activity define nahi hai.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="schedule-panel">
+            <div class="schedule-panel-head">
+                <div>
+                    <h2>Add hostel activity</h2>
+                    <p>Create a new routine item.</p>
+                </div>
+                <span class="schedule-chip">Create</span>
+            </div>
+
+            {% if day_type in ["SUNDAY", "HOLIDAY"] %}
+            <div class="schedule-note-card">
+                <strong>Holiday note</strong>
+                <p>School-linked reporting ya brunch activities avoid karo. Parent interaction aur in-hostel routines prioritize karo.</p>
+            </div>
+            {% endif %}
+            {% if day_type == "WORKING" %}
+            <div class="schedule-note-card schedule-note-soft">
+                <strong>Tip</strong>
+                <p>School-based source select karoge to timing automatically school timings se aayegi.</p>
+            </div>
+            {% endif %}
+
+            <form method="post" class="schedule-form-grid">
+                <label class="schedule-field">
+                    <span>Activity Name</span>
+                    <input name="activity_name" placeholder="Wake up, study hour, lunch, sports, lights out" required>
+                </label>
+                <label class="schedule-field">
+                    <span>Time Source</span>
+                    <select name="time_source" required>
+                        <option value="MANUAL">Manual</option>
+                        {% if day_type == "WORKING" %}
+                        <option value="SCHOOL_REPORTING">School Reporting</option>
+                        <option value="SCHOOL_RECESS">Brunch (School Recess)</option>
+                        <option value="SCHOOL_LUNCH">Lunch (After Dispersal)</option>
+                        {% endif %}
+                    </select>
+                </label>
+                <label class="schedule-field">
+                    <span>Start Time</span>
+                    <input type="time" name="start_time">
+                </label>
+                <label class="schedule-field">
+                    <span>End Time</span>
+                    <input type="time" name="end_time">
+                </label>
+                <label class="schedule-field">
+                    <span>Sequence</span>
+                    <input type="number" name="sequence_no" required>
+                </label>
+                <div class="schedule-form-actions">
+                    <button class="schedule-primary-btn" type="submit">Add activity</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

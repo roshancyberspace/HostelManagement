@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="intake-shell compact-page student-registry-shell">
+    <section class="intake-card compact-card student-registry-hero">
+        <div class="student-registry-hero-copy">
+            <span class="section-kicker">Student Directory</span>
+            <h1>Student Registry</h1>
+            <p>Admissions, biodata readiness, and current student status ko ek professional directory view me manage karo.</p>
+            <div class="student-registry-hero-tags">
+                <span class="student-registry-tag">Card View</span>
+                <span class="student-registry-tag">Responsive Layout</span>
+                <span class="student-registry-tag">Quick Actions</span>
+            </div>
+        </div>
+        <div class="student-registry-hero-stats">
+            <div class="student-registry-stat">
+                <span>Visible Records</span>
+                <strong>{{ total_students }}</strong>
+            </div>
+            <div class="student-registry-stat">
+                <span>Status Filter</span>
+                <strong>{{ status or 'All' }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="intake-card compact-card student-registry-toolbar-card">
+        <form method="get" class="registry-toolbar slim-toolbar">
+            <div class="toolbar-search compact-field">
+                <label for="student-search">Search</label>
+                <input id="student-search" type="text" name="q" placeholder="Search by Ledger, Name, or Class" value="{{ q or '' }}">
+            </div>
+            <div class="compact-field compact-select">
+                <label for="status-filter">Status</label>
+                <select id="status-filter" name="status">
+                    <option value="">All Status</option>
+                    <option value="ACTIVE" {% if status=="ACTIVE" %}selected{% endif %}>Active</option>
+                    <option value="DAY_SCHOLAR" {% if status=="DAY_SCHOLAR" %}selected{% endif %}>Day Scholar</option>
+                    <option value="TC" {% if status=="TC" %}selected{% endif %}>TC Issued</option>
+                    <option value="LEFT" {% if status=="LEFT" %}selected{% endif %}>Left</option>
+                    <option value="TERMINATED" {% if status=="TERMINATED" %}selected{% endif %}>Terminated</option>
+                </select>
+            </div>
+            <div class="toolbar-button-row">
+                <button type="submit">Search</button>
+                <a href="/students/list" class="ghost-btn btn">Reset</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="intake-card compact-card student-registry-board">
+        <div class="intake-card-head student-registry-board-head"><h3>Student Records</h3><span class="status-chip">Premium Directory</span></div>
+        {% if students %}
+        <div class="student-card-grid student-registry-list">
+            {% for s in students %}
+            <article class="student-reg-row student-reg-card {% if s.biodata_completed %}profile-complete{% else %}profile-pending{% endif %}">
+                <div class="student-reg-top">
+                    <div class="student-reg-identity">
+                        {% if s.student_photo %}
+                        <img src="{% if s.student_photo.startswith('instance_uploads/') %}{{ url_for('student_master.student_media', filename=s.student_photo.replace('instance_uploads/', '', 1)) }}{% else %}{{ url_for('static', filename=s.student_photo) }}{% endif %}" alt="{{ s.student_name }}" class="student-reg-avatar">
+                        {% else %}
+                        <div class="student-reg-avatar student-reg-avatar-fallback">
+                            {{ (s.student_name or 'S')[0]|upper }}
+                        </div>
+                        {% endif %}
+                        <div class="student-reg-identity-copy">
+                            <div class="student-reg-name">{{ s.student_name }}</div>
+                            <div class="student-reg-subline">Ledger {{ s.ledger_no }}</div>
+                        </div>
+                    </div>
+                    <span class="status-text student-reg-status-pill {% if s.status == 'ACTIVE' %}active{% elif s.status == 'DAY_SCHOLAR' %}day-scholar{% elif s.status == 'TC' %}tc{% elif s.status == 'LEFT' %}left{% else %}terminated{% endif %}">{{ s.status }}</span>
+                </div>
+
+                <div class="student-reg-detail-grid">
+                    <div class="student-reg-detail-card">
+                        <span>Class</span>
+                        <strong>{{ s.class }}</strong>
+                    </div>
+                    <div class="student-reg-detail-card">
+                        <span>Section</span>
+                        <strong>{{ s.section or '-' }}</strong>
+                    </div>
+                    <div class="student-reg-detail-card">
+                        <span>Profile</span>
+                        <strong>{% if s.biodata_completed %}100%{% else %}60%{% endif %}</strong>
+                    </div>
+                </div>
+
+                <div class="student-reg-col student-reg-col-actions">
+                    <div class="student-reg-actions">
+                        <a href="/students/profile/{{ s.ledger_no }}" class="btn small">Profile</a>
+                        <a href="/students/master-biodata?ledger_no={{ s.ledger_no }}" class="ghost-btn btn small">Biodata</a>
+                        <a href="/students/status/{{ s.ledger_no }}" class="btn danger small">Status</a>
+                        <form method="post" action="/students/delete/{{ s.ledger_no }}" class="student-delete-form" onsubmit="return confirm('Delete student {{ s.student_name }} ({{ s.ledger_no }})? This will remove biodata and linked student records.');">
+                            <button type="submit" class="btn danger small student-delete-btn">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state-cell">No students found for the selected criteria.</div>
+        {% endif %}
+
+        {% if total_pages > 1 %}
+        <div class="pagination-bar">
+            <span class="small-note">Page {{ page }} of {{ total_pages }}</span>
+            <div class="pagination-actions">
+                {% if page > 1 %}
+                    <a href="{{ url_for('student_master.student_list', q=q, status=status, page=page-1) }}" class="ghost-btn btn small">Previous</a>
+                {% endif %}
+                {% if page < total_pages %}
+                    <a href="{{ url_for('student_master.student_list', q=q, status=status, page=page+1) }}" class="btn small">Next</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </section>
+
+    <div class="footnote-panel">
+        Ledger Number is permanent and never changes. Use Status Change when you want to preserve history, or Delete when you want to remove the student record completely.
+    </div>
+</section>
+
+{% endblock %}

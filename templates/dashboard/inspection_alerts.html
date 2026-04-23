@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Inspection</p>
+            <h1>Inspection alerts</h1>
+            <p class="report-hub-subtitle">Overdue common-area inspections ko one place par review karo.</p>
+        </div>
+        <div class="report-hub-badges">
+            <span class="report-hub-badge">{{ due|length }} overdue</span>
+        </div>
+    </div>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Overdue register</h2>
+                <p>Last inspection aur pending days ke saath common area visibility.</p>
+            </div>
+        </div>
+
+        {% if due and due|length > 0 %}
+        <div class="report-hub-table-wrap">
+            <table class="report-hub-table">
+                <thead>
+                    <tr>
+                        <th>Hostel</th>
+                        <th>Block</th>
+                        <th>Floor</th>
+                        <th>Common Area</th>
+                        <th>Last Inspection</th>
+                        <th>Days Pending</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in due %}
+                    <tr>
+                        <td>{{ a.hostel_name }}</td>
+                        <td>{{ a.block_name }}</td>
+                        <td>{{ a.floor_no }}</td>
+                        <td>{{ a.area_name }}</td>
+                        <td>{{ a.last_inspected or "Never" }}</td>
+                        <td><span class="report-hub-badge damaged">{{ a.days_pending }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No overdue inspections</h3>
+            <p>Current schedule me koi pending common-area inspection nahi hai.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

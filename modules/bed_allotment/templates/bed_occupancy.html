@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="bed-shell">
+    <div class="bed-hero">
+        <div>
+            <p class="bed-kicker">Bed Allotment</p>
+            <h1>Bed occupancy</h1>
+            <p class="bed-subtitle">Currently allotted beds ka live occupancy view with student details and allot date.</p>
+        </div>
+        <div class="bed-chip-row">
+            <span class="bed-chip">{{ data|length }} occupied beds</span>
+        </div>
+    </div>
+
+    <section class="bed-panel">
+        <div class="bed-panel-head">
+            <div>
+                <h2>Current occupancy</h2>
+                <p>All active allotments currently mapped in the hostel.</p>
+            </div>
+        </div>
+
+        {% if data %}
+        <div class="bed-table-wrap">
+            <table class="bed-table">
+                <thead>
+                    <tr>
+                        <th>Floor</th>
+                        <th>Room</th>
+                        <th>Bed</th>
+                        <th>Ledger</th>
+                        <th>Student</th>
+                        <th>Allot Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in data %}
+                    <tr>
+                        <td>{{ r.floor_name or r.floor_no }}</td>
+                        <td>{{ r.room_no }}</td>
+                        <td>{{ r.bed_no }}</td>
+                        <td>{{ r.ledger_number }}</td>
+                        <td>{{ r.full_name or '-' }}</td>
+                        <td>{{ r.allot_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No occupied beds</h3>
+            <p>No beds are currently allotted.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

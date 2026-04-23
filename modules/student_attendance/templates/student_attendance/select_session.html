@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="attendance-shell">
+    <div class="attendance-hero">
+        <div>
+            <p class="attendance-kicker">Student Attendance</p>
+            <h1>Daily attendance control</h1>
+            <p class="attendance-subtitle">Select date, slot, and class filter to start roll call. Reports and PDF exports stay one click away.</p>
+        </div>
+        <div class="attendance-hero-actions">
+            <a class="attendance-pill-link" href="{{ url_for('student_attendance.dashboard') }}">Live dashboard</a>
+            <a class="attendance-pill-link" href="{{ url_for('student_attendance.management_report') }}">Management report</a>
+        </div>
+    </div>
+
+    <div class="attendance-grid attendance-grid-2">
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Load student list</h2>
+                    <p>Attendance slot aur class choose karke marking screen open karo.</p>
+                </div>
+                <span class="attendance-chip">Ready</span>
+            </div>
+            <form method="get" action="{{ url_for('student_attendance.load_students') }}" class="attendance-form-grid">
+                <label class="attendance-field">
+                    <span>Date</span>
+                    <input type="date" name="attendance_date" value="{{ today }}" required>
+                </label>
+
+                <label class="attendance-field">
+                    <span>Attendance Slot</span>
+                    <select name="slot" required>
+                        {% for s in slots %}
+                        <option value="{{ s }}">{{ s.replace('_', ' ') }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label class="attendance-field">
+                    <span>Class</span>
+                    <select name="class">
+                        <option value="">All active classes</option>
+                        {% for class_name in class_options %}
+                        <option value="{{ class_name }}">Class {{ class_name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <div class="attendance-form-actions">
+                    <button class="attendance-primary-btn" type="submit">Load attendance sheet</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Quick downloads</h2>
+                    <p>Daily, monthly, aur yearly PDFs direct yahin se download kar sakte ho.</p>
+                </div>
+                <span class="attendance-chip">Export</span>
+            </div>
+            <div class="attendance-shortcut-list">
+                <a class="attendance-shortcut-card" href="{{ url_for('student_attendance.export_daily_pdf', date=today.isoformat()) }}">
+                    <strong>Download Daily PDF</strong>
+                    <span>Today ki management summary export karo.</span>
+                </a>
+                <a class="attendance-shortcut-card" href="{{ url_for('student_attendance.export_monthly_pdf') }}">
+                    <strong>Download Monthly PDF</strong>
+                    <span>Default last-month attendance report export karo.</span>
+                </a>
+                <a class="attendance-shortcut-card" href="{{ url_for('student_attendance.export_yearly_pdf', year=today.year) }}">
+                    <strong>Download Yearly PDF</strong>
+                    <span>{{ today.year }} ka full annual summary generate karo.</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

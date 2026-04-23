@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="wallet-shell">
+    <section class="wallet-hero wallet-hero--single">
+        <div class="wallet-hero-card">
+            <span class="section-kicker">Pocket Money</span>
+            <h1>Collect Money</h1>
+            <p>Enter a ledger number to open the student collection screen and credit pocket money safely.</p>
+        </div>
+    </section>
+
+    <section class="intake-card wallet-card wallet-form-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Ledger Lookup</h2>
+                <p>Find the student wallet before recording a new collection.</p>
+            </div>
+        </div>
+        <form method="POST" class="wallet-search-form">
+            <div class="compact-field">
+                <label>Ledger Number</label>
+                <input type="text" name="ledger_no" class="form-control" placeholder="Enter ledger number" required>
+            </div>
+            <div class="wallet-search-actions">
+                <button class="btn btn-primary">Continue</button>
+            </div>
+        </form>
+    </section>
+</section>
+{% endblock %}

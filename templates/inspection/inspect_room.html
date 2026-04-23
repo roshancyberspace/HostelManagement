@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+{% set crumbs = [
+    ("Hostel", "/hostel"),
+    ("Block", "/block"),
+    ("Floor", "/floor"),
+    ("Room", "/room"),
+    ("Inspection", None)
+] %}
+<h1>Room Inspection</h1>
+
+<form method="post">
+    <input name="id" placeholder="Room ID">
+    <select name="type">
+        <option>PRE</option>
+        <option>POST</option>
+    </select>
+    <textarea name="remarks" placeholder="Remarks"></textarea>
+    <textarea name="damage" placeholder="Damage"></textarea>
+    <input name="fine" type="number" value="0">
+    <button>Save Inspection</button>
+</form>
+{% endblock %}

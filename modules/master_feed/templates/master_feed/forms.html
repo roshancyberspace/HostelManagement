@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="master-feed-shell">
+  <div class="master-feed-hero">
+    <div>
+      <span class="section-kicker">Form Registry</span>
+      <h1>System Forms</h1>
+      <p>Register operational forms and keep important entry points available for quick launch.</p>
+    </div>
+    <div class="master-feed-hero-card">
+      <span class="status-chip">Form directory</span>
+      <strong>{{ forms|length }}</strong>
+      <p>Registered form links currently available for staff workflow.</p>
+    </div>
+  </div>
+
+  <div class="master-feed-summary">
+    <div class="summary-pill">
+      <span class="summary-label">Module</span>
+      <strong>Form Master</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Records</span>
+      <strong>{{ forms|length }}</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Usage</span>
+      <strong>Quick Launch</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Action</span>
+      <strong>Create + Open</strong>
+    </div>
+  </div>
+
+  <div class="routine-layout">
+    <section class="master-feed-card">
+      <div class="master-feed-card-head">
+        <h3>Register New Form</h3>
+        <span class="status-chip">Create</span>
+      </div>
+      <p>Add a form name and target URL so staff can launch the screen directly from Master Feed.</p>
+
+      <form method="post" class="admin-form-grid routine-form-card">
+        <div>
+          <label for="form-name">Form Name</label>
+          <input id="form-name" type="text" name="form_name" placeholder="Enter form name" required>
+        </div>
+
+        <div>
+          <label for="target-url">Target URL</label>
+          <input id="target-url" type="text" name="target_url" placeholder="/inspection/room" required>
+        </div>
+
+        <div class="form-action-row">
+          <button type="submit">Register Form</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="master-feed-card">
+      <div class="master-feed-card-head">
+        <h3>Form Registry</h3>
+        <span class="status-chip">Launch</span>
+      </div>
+      <p>Open registered forms quickly from one organized list.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Form Name</th>
+              <th>Target URL</th>
+              <th style="width: 16%;">Launch</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if forms %}
+              {% for f in forms %}
+              <tr>
+                <td><strong>{{ f["form_name"] }}</strong></td>
+                <td>{{ f["target_url"] }}</td>
+                <td>
+                  <a href="{{ f['target_url'] }}" class="btn small">Open</a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="3" class="empty-state-cell">No forms registered yet.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>
+
+{% endblock %}

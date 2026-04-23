@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="wallet-shell">
+    <section class="wallet-hero">
+        <div class="wallet-hero-card">
+            <span class="section-kicker">Pocket Money</span>
+            <h1>Expense Entry</h1>
+            <p>Record student expenses with category, amount, and bill attachment in one clean form.</p>
+        </div>
+        <div class="wallet-summary-grid">
+            <div class="metric-pill">
+                <span>Ledger</span>
+                <strong>{{ ledger_no }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Student</span>
+                <strong>{{ student.student_name if student else 'Not found' }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Current Balance</span>
+                <strong>Rs. {{ wallet.current_balance if wallet else 0 }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <form method="post" enctype="multipart/form-data" class="intake-card wallet-card wallet-form-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Expense Details</h2>
+                <p>Save category, expense amount, note, and optional bill proof.</p>
+            </div>
+            <a href="{{ url_for('pocket_money.ledger', ledger_no=ledger_no) }}" class="btn btn-outline-primary">Open Ledger</a>
+        </div>
+        <div class="biodata-grid">
+            <div>
+                <label><b>Category</b></label>
+                <select name="category" class="form-control">
+                    <option>Medicine</option>
+                    <option>Hospital</option>
+                    <option>Stationery</option>
+                    <option>Canteen</option>
+                    <option>Excursion</option>
+                    <option>Other</option>
+                </select>
+            </div>
+            <div>
+                <label><b>Amount</b></label>
+                <input name="amount" class="form-control" type="number" step="0.01" required placeholder="Enter amount">
+            </div>
+            <div>
+                <label><b>Bill Upload</b></label>
+                <input type="file" name="bill" class="form-control">
+            </div>
+            <div class="biodata-grid-span">
+                <label><b>Description</b></label>
+                <textarea name="description" class="form-control" rows="4" placeholder="Reason, vendor, or expense note"></textarea>
+            </div>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary">Save Expense</button>
+            <a href="{{ url_for('pocket_money.dashboard') }}" class="btn btn-outline-primary">Back</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📄 Student Permission Entry</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+<label>Permission Type *</label>
+<select name="permission_type" required>
+    <option value="SELF_GOING">Self Going Permission</option>
+    <option value="DEVICE">Device Declaration</option>
+</select>
+
+<label>Device Type (If Applicable)</label>
+<select name="device_type">
+    <option value="">--</option>
+    <option value="MOBILE">Mobile</option>
+    <option value="LAPTOP">Laptop</option>
+    <option value="BOTH">Mobile + Laptop</option>
+</select>
+
+<label>Allowed?</label>
+<select name="is_allowed">
+    <option value="1">Yes</option>
+    <option value="0">No</option>
+</select>
+
+<label>Valid From</label>
+<input type="date" name="valid_from">
+
+<label>Valid To</label>
+<input type="date" name="valid_to">
+
+<label>Handwritten Application</label>
+<input type="file" name="application">
+
+<label>Principal / Parent Approval</label>
+<input type="file" name="approval">
+
+<label>Declaration (Device)</label>
+<input type="file" name="declaration">
+
+<label>Remarks</label>
+<textarea name="remarks"></textarea>
+
+<button class="btn btn-success">Save Permission</button>
+
+</form>
+
+{% endblock %}

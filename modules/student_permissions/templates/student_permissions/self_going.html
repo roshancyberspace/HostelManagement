@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="permission-shell">
+    <div class="permission-hero">
+        <div>
+            <p class="permission-kicker">Student Permissions</p>
+            <h1>Self Going permission</h1>
+            <p class="permission-subtitle">Ledger search se student load karo, approval period define karo, aur current permission status live dekho.</p>
+        </div>
+        <form method="get" class="permission-search-form">
+            <input name="ledger_no" placeholder="Enter ledger number" value="{{ request.args.get('ledger_no', '') }}" required>
+            <button class="permission-primary-btn" type="submit">Load student</button>
+        </form>
+    </div>
+
+    <div class="permission-grid permission-grid-2">
+        <div class="permission-panel">
+            <div class="permission-panel-head">
+                <div>
+                    <h2>Issue or update permission</h2>
+                    <p>Student select hone ke baad form fill karke permission save karo.</p>
+                </div>
+                <span class="permission-chip">Self Going</span>
+            </div>
+
+            {% if student %}
+            <div class="permission-student-card">
+                <div>
+                    <strong>{{ student.student_name }}</strong>
+                    <p>{{ student.ledger_no }} · Class {{ student.class }}{% if student.section %} {{ student.section }}{% endif %}</p>
+                </div>
+                {% if active_permission %}
+                <span class="permission-badge success">Active till {{ active_permission.valid_to or 'Open' }}</span>
+                {% else %}
+                <span class="permission-badge neutral">No active permission</span>
+                {% endif %}
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="permission-form-grid">
+                <input type="hidden" name="ledger_no" value="{{ student.ledger_no }}">
+
+                <label class="permission-field">
+                    <span>Allowed</span>
+                    <select name="allowed" required>
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </label>
+
+                <label class="permission-field">
+                    <span>Valid From</span>
+                    <input type="date" name="valid_from" required>
+                </label>
+
+                <label class="permission-field">
+                    <span>Valid To</span>
+                    <input type="date" name="valid_to" required>
+                </label>
+
+                <label class="permission-field permission-field-full">
+                    <span>Application file</span>
+                    <input type="file" name="application_file">
+                </label>
+
+                <label class="permission-field permission-field-full">
+                    <span>Remarks</span>
+                    <textarea name="remarks" rows="4" placeholder="Approval note, restrictions, return time, or parent reference"></textarea>
+                </label>
+
+                <div class="permission-form-actions">
+                    <button class="permission-primary-btn" type="submit">Save permission</button>
+                    <a class="permission-secondary-btn" href="{{ url_for('student_permissions.permission_history', ledger_no=student.ledger_no) }}">Open full history</a>
+                </div>
+            </form>
+            {% else %}
+            <div class="permission-empty">
+                <h3>Load a student first</h3>
+                <p>Ledger number enter karke student profile load karo, phir approval form open hoga.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="permission-panel">
+            <div class="permission-panel-head">
+                <div>
+                    <h2>Current status and history</h2>
+                    <p>Active permission aur latest records student-wise review karo.</p>
+                </div>
+                <span class="permission-chip">{{ history|length }} records</span>
+            </div>
+            {% if active_permission %}
+            <div class="permission-highlight-card">
+                <strong>Current active permission</strong>
+                <p>{{ active_permission.valid_from or 'Not set' }} to {{ active_permission.valid_to or 'Open ended' }}</p>
+                <p>{{ active_permission.remarks or 'No remarks added.' }}</p>
+            </div>
+            {% endif %}
+
+            {% if history %}
+            <div class="permission-card-list">
+                {% for item in history %}
+                <article class="permission-history-card">
+                    <div class="permission-history-meta">
+                        <strong>{{ item.valid_from or 'Not set' }} to {{ item.valid_to or 'Not set' }}</strong>
+                        <span class="permission-badge {% if item.revoked_at %}danger{% else %}success{% endif %}">
+                            {% if item.revoked_at %}Revoked{% else %}Active{% endif %}
+                        </span>
+                    </div>
+                    <p>{{ item.remarks or 'No remarks added.' }}</p>
+                    {% if not item.revoked_at %}
+                    <form method="post" action="{{ url_for('student_permissions.revoke_self', pid=item.id) }}" class="permission-inline-form">
+                        <input name="reason" placeholder="Reason to revoke" required>
+                        <button class="permission-danger-btn" type="submit">Revoke</button>
+                    </form>
+                    {% else %}
+                    <p class="permission-muted">Revoked: {{ item.revoked_reason or 'Reason not recorded' }}</p>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="permission-empty">
+                <h3>No self going history yet</h3>
+                <p>Student choose karne ke baad saved permissions yahan show honge.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

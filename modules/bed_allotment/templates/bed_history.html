@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="bed-shell">
+    <div class="bed-hero">
+        <div>
+            <p class="bed-kicker">Bed Allotment</p>
+            <h1>Bed history</h1>
+            <p class="bed-subtitle">Ledger-wise allotment and vacate history ko quickly search aur review karo.</p>
+        </div>
+        {% if ledger %}
+        <div class="bed-chip-row">
+            <span class="bed-chip">Ledger {{ ledger }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <section class="bed-panel">
+        <div class="bed-panel-head">
+            <div>
+                <h2>Search history</h2>
+                <p>Ledger number enter karke student ki bed history dekho.</p>
+            </div>
+        </div>
+        <form method="post" class="bed-history-form">
+            <label class="bed-field">
+                <span>Ledger Number</span>
+                <input type="text" name="ledger" value="{{ ledger }}" placeholder="Enter ledger number" required>
+            </label>
+            <div class="bed-form-actions">
+                <button type="submit" class="bed-primary-btn">Search history</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="bed-panel">
+        <div class="bed-panel-head">
+            <div>
+                <h2>History register</h2>
+                <p>Allotment and vacate events for the selected ledger.</p>
+            </div>
+        </div>
+
+        {% if history %}
+        <div class="bed-table-wrap">
+            <table class="bed-table">
+                <thead>
+                    <tr>
+                        <th>Floor</th>
+                        <th>Room</th>
+                        <th>Bed</th>
+                        <th>Status</th>
+                        <th>Allot Date</th>
+                        <th>Vacate Date</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for h in history %}
+                    <tr>
+                        <td>{{ h.floor_name or h.floor_no }}</td>
+                        <td>{{ h.room_no }}</td>
+                        <td>{{ h.bed_no }}</td>
+                        <td><span class="bed-badge {{ (h.status or '')|lower }}">{{ h.status }}</span></td>
+                        <td>{{ h.allot_date or '-' }}</td>
+                        <td>{{ h.vacate_date or '-' }}</td>
+                        <td>{{ h.vacate_reason or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% elif ledger %}
+        <div class="schedule-empty compact">
+            <h3>No bed history found</h3>
+            <p>No bed history exists for this ledger.</p>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>Search a ledger</h3>
+            <p>Enter a ledger number to load bed history.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="inspect-shell">
+    <div class="inspect-hero">
+        <div>
+            <p class="inspect-kicker">Inspection</p>
+            <h1>Room inspection report</h1>
+            <p class="inspect-subtitle">Damaged aur missing room inspection lines ko quickly review karo.</p>
+        </div>
+        <div class="inspect-chip-row">
+            <span class="inspect-chip">{{ issues|length }} flagged lines</span>
+            <span class="inspect-chip alert">{{ damaged_count }} damaged</span>
+            <span class="inspect-chip warning">{{ missing_count }} missing</span>
+        </div>
+    </div>
+
+    <section class="inspect-panel">
+        <div class="inspect-panel-head">
+            <div>
+                <h2>Filter report</h2>
+                <p>Condition ya room/item search se report narrow karo.</p>
+            </div>
+        </div>
+        <form method="get" class="inspect-toolbar">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search by room, item, floor, inspector or remarks">
+            <select name="condition">
+                <option value="">All flagged conditions</option>
+                <option value="DAMAGED" {% if condition == 'DAMAGED' %}selected{% endif %}>Damaged</option>
+                <option value="MISSING" {% if condition == 'MISSING' %}selected{% endif %}>Missing</option>
+            </select>
+            <button type="submit" class="inspect-primary-btn">Apply</button>
+            <a href="{{ url_for('room_inspection.inspection_dashboard') }}" class="inspect-secondary-btn">Reset</a>
+        </form>
+    </section>
+
+    <section class="inspect-panel">
+        <div class="inspect-panel-head">
+            <div>
+                <h2>Issue register</h2>
+                <p>Latest damaged ya missing lines across inspected rooms.</p>
+            </div>
+        </div>
+
+        {% if issues %}
+        <div class="inspect-table-wrap">
+            <table class="inspect-table">
+                <thead>
+                    <tr>
+                        <th>Floor</th>
+                        <th>Room</th>
+                        <th>Item</th>
+                        <th>Condition</th>
+                        <th>Remarks</th>
+                        <th>Inspected On</th>
+                        <th>Inspector</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in issues %}
+                    <tr>
+                        <td>{{ r.floor_name or '-' }}</td>
+                        <td>{{ r.room_no }}</td>
+                        <td>{{ r.item_name }}</td>
+                        <td><span class="inspect-badge {{ (r.condition or '')|lower }}">{{ r.condition }}</span></td>
+                        <td>{{ r.remarks or '-' }}</td>
+                        <td>{{ r.inspected_on or '-' }}</td>
+                        <td>{{ r.inspector_name or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No flagged room issues</h3>
+            <p>Current report me damaged ya missing lines nahi mili.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

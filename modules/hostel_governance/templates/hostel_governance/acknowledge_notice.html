@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Acknowledge Notice #{{ notice_id }}</h3>
+<form method="post">
+  <input name="ledger_no" placeholder="Ledger Number" required>
+  <button type="submit">Acknowledge</button>
+</form>
+
+<h4>Already Acknowledged</h4>
+<ul>
+{% for a in acknowledgements %}
+  <li>{{ a.ledger_no }} @ {{ a.acknowledged_at }}</li>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="master-feed-shell">
+  <div class="master-feed-hero">
+    <div>
+      <span class="section-kicker">Workflow Hub</span>
+      <h1>Master Feed</h1>
+      <p>Manage routines, forms, and governance shortcuts from one cleaner operational board.</p>
+    </div>
+    <div class="master-feed-hero-card">
+      <span class="status-chip">Admin control</span>
+      <strong>4 launch areas</strong>
+      <p>Open the core setup screens your team uses every day.</p>
+    </div>
+  </div>
+
+  <div class="master-feed-summary">
+    <div class="summary-pill">
+      <span class="summary-label">Role</span>
+      <strong>{{ user_role }}</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Routines</span>
+      <strong>{% if modules.routines %}Enabled{% else %}Hidden{% endif %}</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Forms</span>
+      <strong>{% if modules.forms %}Enabled{% else %}Hidden{% endif %}</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Governance</span>
+      <strong>{% if modules.hostel_governance %}Enabled{% else %}Restricted{% endif %}</strong>
+    </div>
+  </div>
+
+  <div class="master-feed-grid">
+    {% if modules.routines %}
+    <section class="master-feed-card">
+      <div class="master-feed-card-head">
+        <h3>Routines</h3>
+        <span class="status-chip">Daily flow</span>
+      </div>
+      <p>Maintain routine definitions and open the routine workspace for updates.</p>
+      <div class="master-feed-actions">
+        <a class="btn" href="/master-feed/routines">Manage Routines</a>
+        <a class="ghost-btn btn" href="{{ url_for('daily_schedule.index') }}">Open Schedule View</a>
+      </div>
+    </section>
+    {% endif %}
+
+    {% if modules.forms %}
+    <section class="master-feed-card">
+      <div class="master-feed-card-head">
+        <h3>Forms</h3>
+        <span class="status-chip">Entry controls</span>
+      </div>
+      <p>Register operational forms and jump directly to the student permissions area.</p>
+      <div class="master-feed-actions">
+        <a class="btn" href="/master-feed/forms">Manage Forms</a>
+        <a class="ghost-btn btn" href="{{ url_for('student_permissions.index') }}">Open Permissions</a>
+      </div>
+    </section>
+    {% endif %}
+
+    <section class="master-feed-card">
+      <div class="master-feed-card-head">
+        <h3>Routine Logs</h3>
+        <span class="status-chip">Tracking</span>
+      </div>
+      <p>Review the latest routine activity entries and confirm module movement.</p>
+      <div class="master-feed-actions">
+        <a class="btn" href="/master-feed/routine-logs">Open Logs</a>
+      </div>
+    </section>
+
+    {% if modules.hostel_governance %}
+    <section class="master-feed-card featured">
+      <div class="master-feed-card-head">
+        <h3>Hostel Governance</h3>
+        <span class="status-chip">Leadership</span>
+      </div>
+      <p>Superintendent and warden governance space for notices, decisions, and compliance work.</p>
+      <div class="master-feed-actions">
+        <a class="btn" href="{{ url_for('hostel_governance.dashboard') }}">Open Governance</a>
+      </div>
+    </section>
+    {% endif %}
+  </div>
+
+  {% if not modules.hostel_governance and user_role %}
+  <div class="master-feed-note">
+    Governance access is currently limited to Superintendent and Warden roles.
+  </div>
+  {% endif %}
+</section>
+
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="permission-shell">
+    <div class="permission-hero">
+        <div>
+            <p class="permission-kicker">Student Permissions</p>
+            <h1>Permission history</h1>
+            <p class="permission-subtitle">Ledger-wise full permission trail dekho, revoke actions log karo, aur recent approvals monitor karo.</p>
+        </div>
+        <form method="get" class="permission-search-form">
+            <input name="ledger_no" placeholder="Enter ledger number" value="{{ request.args.get('ledger_no', '') }}" required>
+            <button class="permission-primary-btn" type="submit">Load history</button>
+        </form>
+    </div>
+
+    <div class="permission-grid permission-grid-2">
+        <div class="permission-panel">
+            <div class="permission-panel-head">
+                <div>
+                    <h2>Student permission history</h2>
+                    <p>Selected student ke self going aur device records.</p>
+                </div>
+                <span class="permission-chip">{% if student %}{{ student.ledger_no }}{% else %}Search{% endif %}</span>
+            </div>
+
+            {% if student %}
+            <div class="permission-student-card">
+                <div>
+                    <strong>{{ student.student_name }}</strong>
+                    <p>{{ student.ledger_no }} · Class {{ student.class }}{% if student.section %} {{ student.section }}{% endif %}</p>
+                </div>
+            </div>
+
+            <div class="permission-history-section">
+                <h3>Self Going history</h3>
+                {% if history.self_going %}
+                <div class="permission-card-list">
+                    {% for item in history.self_going %}
+                    <article class="permission-history-card">
+                        <div class="permission-history-meta">
+                            <strong>{{ item.valid_from or 'Not set' }} to {{ item.valid_to or 'Not set' }}</strong>
+                            <span class="permission-badge {% if item.revoked_at %}danger{% else %}success{% endif %}">
+                                {% if item.revoked_at %}Revoked{% else %}Active{% endif %}
+                            </span>
+                        </div>
+                        <p>{{ item.remarks or 'No remarks added.' }}</p>
+                        {% if not item.revoked_at %}
+                        <form method="post" action="{{ url_for('student_permissions.revoke_self', pid=item.id) }}" class="permission-inline-form">
+                            <input name="reason" placeholder="Reason to revoke" required>
+                            <button class="permission-danger-btn" type="submit">Revoke</button>
+                        </form>
+                        {% else %}
+                        <p class="permission-muted">Revoked: {{ item.revoked_reason or 'Reason not recorded' }}</p>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="permission-empty compact">
+                    <h3>No self going history</h3>
+                    <p>Selected student ke liye koi self going record nahi mila.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="permission-history-section">
+                <h3>Device permission history</h3>
+                {% if history.device %}
+                <div class="permission-card-list">
+                    {% for item in history.device %}
+                    <article class="permission-history-card">
+                        <div class="permission-history-meta">
+                            <strong>{{ item.device_type or 'Device not set' }}</strong>
+                            <span class="permission-badge {% if item.revoked_at %}danger{% else %}success{% endif %}">
+                                {% if item.revoked_at %}Revoked{% else %}Active{% endif %}
+                            </span>
+                        </div>
+                        <p>{{ item.remarks or 'No remarks added.' }}</p>
+                        {% if not item.revoked_at %}
+                        <form method="post" action="{{ url_for('student_permissions.revoke_device_perm', pid=item.id) }}" class="permission-inline-form">
+                            <input name="reason" placeholder="Reason to revoke" required>
+                            <button class="permission-danger-btn" type="submit">Revoke</button>
+                        </form>
+                        {% else %}
+                        <p class="permission-muted">Revoked: {{ item.revoked_reason or 'Reason not recorded' }}</p>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="permission-empty compact">
+                    <h3>No device permission history</h3>
+                    <p>Selected student ke liye koi device record nahi mila.</p>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="permission-empty">
+                <h3>Search by ledger number</h3>
+                <p>Ledger enter karke kisi bhi student ka full permission history view khol lo.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="permission-panel">
+            <div class="permission-panel-head">
+                <div>
+                    <h2>Recent permission activity</h2>
+                    <p>Module ke latest records quick review ke liye.</p>
+                </div>
+                <span class="permission-chip">{{ recent_activity|length }} records</span>
+            </div>
+            {% if recent_activity %}
+            <div class="permission-card-list">
+                {% for item in recent_activity %}
+                <article class="permission-mini-card">
+                    <div>
+                        <strong>{{ item["student_name"] or 'Student' }}</strong>
+                        <p>{{ item["ledger_no"] or 'N/A' }} · {{ item["permission_type"].replace('_', ' ') }}{% if item["class"] %} · Class {{ item["class"] }}{% endif %}</p>
+                    </div>
+                    <span class="permission-badge {% if item['revoked_at'] %}danger{% else %}success{% endif %}">
+                        {% if item["revoked_at"] %}Revoked{% else %}Active{% endif %}
+                    </span>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="permission-empty">
+                <h3>No permission activity yet</h3>
+                <p>Jab new self going ya device permission save hogi, recent records yahin dikhenge.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="grooming-shell">
+    <div class="grooming-hero">
+        <div>
+            <p class="grooming-kicker">Barber and Grooming</p>
+            <h1>Haircut dashboard</h1>
+            <p class="grooming-subtitle">Monthly haircut completion aur pending grooming view ko one clean dashboard me dekho.</p>
+        </div>
+        <form method="get" class="grooming-month-form">
+            <label class="grooming-field">
+                <span>Month</span>
+                <input type="month" name="month" value="{{ month_key }}">
+            </label>
+            <button class="grooming-primary-btn" type="submit">Load month</button>
+        </form>
+    </div>
+
+    <div class="grooming-stat-grid">
+        <article class="grooming-stat-card">
+            <span>Month</span>
+            <strong>{{ month_key }}</strong>
+        </article>
+        <article class="grooming-stat-card">
+            <span>Completed</span>
+            <strong>{{ done_list|length }}</strong>
+        </article>
+        <article class="grooming-stat-card">
+            <span>Defaulters</span>
+            <strong>{% if cutoff_active %}{{ defaulter_count }}{% else %}Hidden{% endif %}</strong>
+        </article>
+    </div>
+
+    <div class="grooming-grid">
+        <div class="grooming-panel">
+            <div class="grooming-panel-head">
+                <div>
+                    <h2>Quick actions</h2>
+                    <p>New haircut entry ya pending list instantly open karo.</p>
+                </div>
+            </div>
+            <div class="grooming-action-grid">
+                <a class="grooming-action-card" href="{{ url_for('barber_haircut.barber_record') }}">
+                    <strong>New haircut entry</strong>
+                    <span>Student haircut mark karo with photo and remarks.</span>
+                </a>
+                <a class="grooming-action-card" href="{{ url_for('barber_haircut.barber_defaulters', month=month_key) }}">
+                    <strong>View defaulters</strong>
+                    <span>{% if cutoff_active %}Pending students list open karo.{% else %}List {{ cutoff_day + 1 }}th onward visible hogi.{% endif %}</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="grooming-panel">
+            <div class="grooming-panel-head">
+                <div>
+                    <h2>Monthly completion</h2>
+                    <p>Latest haircut entries for selected month.</p>
+                </div>
+            </div>
+
+            {% if done_list %}
+            <div class="grooming-record-list">
+                {% for row in done_list %}
+                <article class="grooming-record-card">
+                    <div class="grooming-record-head">
+                        <div>
+                            <strong>{{ row["student_name"] }}</strong>
+                            <span>{{ row["ledger_no"] }} - {{ row["class_name"] }} {{ row["section"] }}</span>
+                        </div>
+                        <span class="grooming-status done">{{ row["haircut_date"] }}</span>
+                    </div>
+                    <div class="grooming-record-grid">
+                        <div>
+                            <span>Barber</span>
+                            <p>{{ row["barber_name"] or "Not entered" }}</p>
+                        </div>
+                        <div>
+                            <span>Remark</span>
+                            <p>{{ row["remark"] or "No remark" }}</p>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No haircut entries yet</h3>
+                <p>Selected month me abhi koi haircut record save nahi hua.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

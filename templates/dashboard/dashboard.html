@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="dashboard-summary-bar">
+    <div class="summary-pill">
+        <span class="summary-label">Occupancy</span>
+        <strong>{{ occupancy_percent }}%</strong>
+    </div>
+    <div class="summary-pill">
+        <span class="summary-label">Vacant Beds</span>
+        <strong>{{ beds_vacant }}</strong>
+    </div>
+    <div class="summary-pill">
+        <span class="summary-label">Present In Hostel</span>
+        <strong>{{ present_in_hostel }}</strong>
+    </div>
+    <div class="summary-pill alert-soft {% if bed_mismatch > 0 %}danger{% endif %}">
+        <span class="summary-label">Bed Mismatch</span>
+        <strong>{{ bed_mismatch }}</strong>
+    </div>
+</section>
+
+<section class="dashboard-hero compact">
+    <div class="dashboard-intro compact">
+        <div class="status-chip">Today overview</div>
+        <h1>Operations at a glance</h1>
+        <p>Quick visibility on rooms, students, fees, expenses, and inspection follow-up.</p>
+
+        <div class="hero-actions compact">
+            <a href="/vacant-rooms" class="btn small">Vacant Rooms</a>
+            <a href="/inspection-alerts" class="btn ghost-btn small">Inspection Alerts</a>
+            <a href="/mismatch-active-without-bed" class="btn ghost-btn small">Bed Mismatch</a>
+        </div>
+    </div>
+
+    <div class="hero-panel compact">
+        <h3>Open capacity</h3>
+        <div class="hero-inline-metric">
+            <strong>{{ capacity_left }}</strong>
+            <span>seats available</span>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-section compact">
+    <div class="cards compact-metrics">
+        <div class="card metric-card compact">
+            <h3>Total Rooms</h3>
+            <div class="value">{{ total_rooms }}</div>
+        </div>
+        <div class="card metric-card compact">
+            <h3>Vacant Rooms</h3>
+            <div class="value green">{{ vacant_rooms }}</div>
+            <a href="/vacant-rooms" class="metric-link">Open</a>
+        </div>
+        <div class="card metric-card compact">
+            <h3>Damaged Rooms</h3>
+            <div class="value red">{{ damaged_rooms }}</div>
+        </div>
+        <div class="card metric-card compact">
+            <h3>Total Beds</h3>
+            <div class="value">{{ total_beds }}</div>
+        </div>
+        <div class="card metric-card compact">
+            <h3>Students Active</h3>
+            <div class="value">{{ student_active }}</div>
+        </div>
+        <div class="card metric-card compact">
+            <h3>Pending Gate Pass</h3>
+            <div class="value amber">{{ pending_gate_pass }}</div>
+            <a href="/gate-pass" class="metric-link">Open</a>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-section compact">
+    <div class="charts-grid">
+        <div class="card compact chart-card blur-white">
+            <div class="section-heading compact">
+                <div>
+                    <h2>Fee and Expense</h2>
+                    <p>Total fee submit, pending fee, and expense.</p>
+                </div>
+            </div>
+            <div class="doughnut-layout">
+                <div class="chart-wrap doughnut-wrap">
+                    <canvas id="feeOverviewChart"></canvas>
+                </div>
+                <div class="chart-details">
+                    <div class="chart-stat">
+                        <span>Total Fee Submit</span>
+                        <strong>{{ total_fee_submitted }}</strong>
+                    </div>
+                    <div class="chart-stat">
+                        <span>Pending Fee</span>
+                        <strong>{{ fee_pending_count }}</strong>
+                    </div>
+                    <div class="chart-stat">
+                        <span>Total Expense</span>
+                        <strong>{{ total_expense }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card compact chart-card blur-white">
+            <div class="section-heading compact">
+                <div>
+                    <h2>Student Presence</h2>
+                    <p>Exact present count with active student comparison.</p>
+                </div>
+            </div>
+            <div class="doughnut-layout">
+                <div class="chart-wrap doughnut-wrap">
+                    <canvas id="hostelPresenceChart"></canvas>
+                </div>
+                <div class="chart-details">
+                    <div class="chart-stat">
+                        <span>Students Present In Hostel</span>
+                        <strong>{{ present_in_hostel }}</strong>
+                    </div>
+                    <div class="chart-stat">
+                        <span>Total Active Students</span>
+                        <strong>{{ student_active }}</strong>
+                    </div>
+                    <div class="chart-stat">
+                        <span>Outside / Not Present</span>
+                        <strong>{{ student_active - present_in_hostel if student_active >= present_in_hostel else 0 }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="dashboard-section compact">
+    <div class="card compact">
+        <div class="section-heading compact">
+            <div>
+                <h2>Focus today</h2>
+            </div>
+        </div>
+
+        <ul class="focus-list compact">
+            <li><strong>Inspection</strong> Keep room and common-area checks timely.</li>
+            <li><strong>Repairs</strong> Close damaged room and common-area items.</li>
+            <li><strong>Allotment</strong> Resolve active students without bed mapping.</li>
+            <li><strong>Gate Pass</strong> Clear pending approvals and violations.</li>
+        </ul>
+    </div>
+</section>
+
+<script>
+const feeCtx = document.getElementById("feeOverviewChart");
+if (feeCtx) {
+    new Chart(feeCtx, {
+        type: "doughnut",
+        data: {
+            labels: ["Total Fee Submit", "Pending Fee", "Total Expense"],
+            datasets: [{
+                data: [
+                    {{ total_fee_submitted|tojson }},
+                    {{ fee_pending_count|tojson }},
+                    {{ total_expense|tojson }}
+                ],
+                backgroundColor: [
+                    "rgba(35, 116, 225, 0.9)",
+                    "rgba(84, 150, 255, 0.82)",
+                    "rgba(255, 171, 73, 0.9)"
+                ],
+                borderWidth: 0,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "68%",
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+
+const presenceCtx = document.getElementById("hostelPresenceChart");
+if (presenceCtx) {
+    new Chart(presenceCtx, {
+        type: "doughnut",
+        data: {
+            labels: ["Students Present In Hostel", "Outside / Not Present"],
+            datasets: [{
+                data: [
+                    {{ present_in_hostel|tojson }},
+                    {{ (student_active - present_in_hostel) if student_active >= present_in_hostel else 0 }}
+                ],
+                backgroundColor: [
+                    "rgba(35, 116, 225, 0.9)",
+                    "rgba(190, 218, 255, 0.95)"
+                ],
+                borderWidth: 0,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "68%",
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
+</script>
+
+{% endblock %}

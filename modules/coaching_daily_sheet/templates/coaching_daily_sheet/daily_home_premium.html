@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="coaching-shell">
+    <div class="coaching-hero">
+        <div>
+            <span class="section-kicker">Daily Operations</span>
+            <h1>Daily Coaching and Study Sheet</h1>
+            <p>Select a date to open, edit, or print the daily coaching and self study register.</p>
+        </div>
+        <div class="coaching-hero-card">
+            <span class="status-chip">Daily workflow</span>
+            <strong>Open, update, print</strong>
+            <p>Choose a date and move directly into the live daily sheet workflow.</p>
+        </div>
+    </div>
+
+    <div class="coaching-summary">
+        <div class="summary-pill">
+            <span class="summary-label">Flow</span>
+            <strong>Select Date</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Edit</span>
+            <strong>Daily Sheet</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Export</span>
+            <strong>PDF Ready</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Speed</span>
+            <strong>Open Today</strong>
+        </div>
+    </div>
+
+    <div class="coaching-grid single">
+        <section class="coaching-card">
+            <h3>Choose Daily Sheet Date</h3>
+            <p>Open the required date, print the corresponding sheet, or jump straight to today's entry.</p>
+
+            <form method="post" id="dailyForm" class="admin-form-grid routine-form-card">
+                <div class="routine-form-full">
+                    <label for="sheet_date"><b>Select Date</b></label>
+                    <input type="date" name="sheet_date" id="sheet_date" required>
+                </div>
+
+                <div class="coaching-actions">
+                    <button type="submit">Open / Edit Daily Sheet</button>
+                    <button class="ghost-btn btn" type="button" onclick="printSelectedDate()">Print PDF Direct</button>
+                    <button class="ghost-btn btn" type="button" onclick="openToday()">Open Today</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="coaching-card">
+            <h3>Quick Notes</h3>
+            <ul class="focus-list compact">
+                <li>
+                    <strong>Standard flow</strong>
+                    Select date, open the daily sheet, update rows, then print if needed.
+                </li>
+                <li>
+                    <strong>Mandatory remark</strong>
+                    If coaching is suspended or changed, add a remark before saving.
+                </li>
+                <li>
+                    <strong>Fast access</strong>
+                    Use Open Today for the quickest daily update workflow.
+                </li>
+            </ul>
+        </section>
+    </div>
+</section>
+
+<script>
+function printSelectedDate() {
+    const d = document.getElementById("sheet_date").value;
+    if (!d) {
+        alert("Please select date first!");
+        return;
+    }
+    window.location.href = "/coaching/daily/" + d + "/print";
+}
+
+function openToday() {
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("sheet_date").value = today;
+    document.getElementById("dailyForm").submit();
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="inspect-shell">
+    <div class="inspect-hero">
+        <div>
+            <p class="inspect-kicker">Inspection</p>
+            <h1>Pre / post comparison</h1>
+            <p class="inspect-subtitle">{{ target_type }} target {{ target_id }} ke latest PRE aur POST records ko compare karo.</p>
+        </div>
+    </div>
+
+    {% if not pre and not post %}
+    <div class="schedule-empty compact">
+        <h3>No inspection records found</h3>
+        <p>Is target ke liye abhi PRE ya POST inspection available nahi hai.</p>
+    </div>
+    {% else %}
+    <div class="inspect-grid inspect-grid-2">
+        <section class="inspect-panel">
+            <div class="inspect-panel-head">
+                <div>
+                    <h2>PRE inspection</h2>
+                    <p>Before allotment ya earlier condition snapshot.</p>
+                </div>
+            </div>
+            <div class="inspect-detail-list">
+                <div><span>Date</span><strong>{{ pre.inspected_on if pre else 'Not available' }}</strong></div>
+                <div><span>Remarks</span><strong>{{ pre.remarks if pre and pre.remarks else '-' }}</strong></div>
+                <div><span>Damage</span><strong>{{ pre.damage if pre and pre.damage else 'No damage' }}</strong></div>
+                <div><span>Fine</span><strong>Rs. {{ pre.fine if pre else 0 }}</strong></div>
+            </div>
+        </section>
+
+        <section class="inspect-panel">
+            <div class="inspect-panel-head">
+                <div>
+                    <h2>POST inspection</h2>
+                    <p>Exit ya after-use condition snapshot.</p>
+                </div>
+            </div>
+            <div class="inspect-detail-list">
+                <div><span>Date</span><strong>{{ post.inspected_on if post else 'Not available' }}</strong></div>
+                <div><span>Remarks</span><strong>{{ post.remarks if post and post.remarks else '-' }}</strong></div>
+                <div><span>Damage</span><strong>{{ post.damage if post and post.damage else 'No damage' }}</strong></div>
+                <div><span>Fine</span><strong>Rs. {{ post.fine if post else 0 }}</strong></div>
+            </div>
+        </section>
+    </div>
+
+    <section class="inspect-panel">
+        <div class="inspect-panel-head">
+            <div>
+                <h2>Final assessment</h2>
+                <p>Latest PRE aur POST ke base par summary status.</p>
+            </div>
+        </div>
+
+        {% if post and post.damage %}
+        <div class="inspect-status-callout danger">
+            <strong>Damaged</strong>
+            <p>Recovery ya maintenance action required.</p>
+        </div>
+        {% elif pre and post %}
+        <div class="inspect-status-callout success">
+            <strong>Good</strong>
+            <p>No additional recovery required.</p>
+        </div>
+        {% else %}
+        <div class="inspect-status-callout warning">
+            <strong>Incomplete</strong>
+            <p>Final assessment ke liye PRE aur POST dono records chahiye.</p>
+        </div>
+        {% endif %}
+    </section>
+    {% endif %}
+</section>
+{% endblock %}

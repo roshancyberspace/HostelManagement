@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Reports</p>
+            <h1>Floor report</h1>
+            <p class="report-hub-subtitle">Floor {{ floor_id }} ke room condition aur overdue inspection view.</p>
+        </div>
+    </div>
+
+    <section class="report-hub-stat-grid short">
+        <article class="report-hub-stat-card success">
+            <span>Good</span>
+            <strong>{{ data.summary.GOOD }}</strong>
+        </article>
+        <article class="report-hub-stat-card danger">
+            <span>Damaged</span>
+            <strong>{{ data.summary.DAMAGED }}</strong>
+        </article>
+        <article class="report-hub-stat-card warning">
+            <span>Overdue</span>
+            <strong>{{ data.summary.OVERDUE }}</strong>
+        </article>
+    </section>
+
+    {% if data.rooms %}
+    <section class="report-room-grid">
+        {% for r in data.rooms %}
+        <article class="report-room-tile {{ r.heat }}">
+            <strong>Room {{ r.room_no }}</strong>
+            <span>{{ r.heat|upper }}</span>
+            <p>{{ r.last_inspection or 'No inspection yet' }}</p>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <div class="schedule-empty compact">
+        <h3>No rooms found</h3>
+        <p>Is floor par abhi koi room available nahi hai.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

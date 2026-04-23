@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Reports</p>
+            <h1>Floor heatmap</h1>
+            <p class="report-hub-subtitle">Floor-wise inspection coverage aur damaged room pressure ko simple visual tiles me dekho.</p>
+        </div>
+        <div class="report-hub-badges">
+            <span class="report-hub-badge">{{ heatmap|length }} floors</span>
+        </div>
+    </div>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Filter heatmap</h2>
+                <p>Specific hostel choose karke floor health snapshot dekho.</p>
+            </div>
+        </div>
+        <form method="get" class="report-hub-toolbar narrow">
+            <select name="hostel_id">
+                <option value="">All hostels</option>
+                {% for hostel in hostels %}
+                <option value="{{ hostel.id }}" {% if selected_hostel_id == hostel.id %}selected{% endif %}>{{ hostel.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="report-hub-primary-btn">Apply</button>
+            <a href="{{ url_for('reports.floor_heatmap') }}" class="report-hub-secondary-btn">Reset</a>
+        </form>
+    </section>
+
+    {% if heatmap %}
+    <section class="report-hub-grid">
+        {% for f in heatmap %}
+        <article class="report-heat-card {{ f.health }}">
+            <div class="report-heat-card-head">
+                <div>
+                    <h3>{{ f.floor }}</h3>
+                    <p>{{ f.hostel }} - {{ f.block }}</p>
+                </div>
+                <span class="report-hub-badge">{{ f.percent }}%</span>
+            </div>
+            <div class="report-heat-progress">
+                <span style="width: {{ f.percent }}%"></span>
+            </div>
+            <div class="report-heat-stats">
+                <div>
+                    <span>Inspected</span>
+                    <strong>{{ f.inspected }}/{{ f.total }}</strong>
+                </div>
+                <div>
+                    <span>Damaged</span>
+                    <strong>{{ f.damaged }}</strong>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <div class="schedule-empty compact">
+        <h3>No floor data found</h3>
+        <p>Selected hostel ke liye heatmap data available nahi hai.</p>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

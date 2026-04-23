@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Notices</h3>
+<a href="{{ url_for('hostel_governance.create_notice_view') }}">+ New Notice</a>
+<table border="1">
+<tr><th>ID</th><th>Title</th><th>Scope</th><th>Action</th></tr>
+{% for n in notices %}
+<tr>
+  <td>{{ n.id }}</td>
+  <td>{{ n.title }}</td>
+  <td>{{ n.target_scope }}</td>
+  <td>
+    <a href="{{ url_for('hostel_governance.acknowledge_notice_view', notice_id=n.id) }}">Acknowledge</a>
+  </td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="permission-shell">
+    <div class="permission-hero">
+        <div>
+            <p class="permission-kicker">Student Permissions</p>
+            <h1>Permission dashboard</h1>
+            <p class="permission-subtitle">Self Going aur Device Permission approvals ko track, issue, aur revoke karne ke liye centralized control board.</p>
+        </div>
+        <div class="permission-hero-actions">
+            <a class="permission-pill-link" href="{{ url_for('student_permissions.self_going') }}">Open Self Going</a>
+            <a class="permission-pill-link" href="{{ url_for('student_permissions.device_permission') }}">Open Device Permission</a>
+            <a class="permission-pill-link" href="{{ url_for('student_permissions.permission_history') }}">View History</a>
+        </div>
+    </div>
+
+    <div class="permission-stat-grid">
+        <article class="permission-stat-card">
+            <span>Active self going</span>
+            <strong>{{ metrics.active_self_going }}</strong>
+        </article>
+        <article class="permission-stat-card">
+            <span>Active device permissions</span>
+            <strong>{{ metrics.active_device }}</strong>
+        </article>
+        <article class="permission-stat-card">
+            <span>Total self going records</span>
+            <strong>{{ metrics.self_going_total }}</strong>
+        </article>
+        <article class="permission-stat-card">
+            <span>Total device records</span>
+            <strong>{{ metrics.device_total }}</strong>
+        </article>
+    </div>
+
+    <div class="permission-grid permission-grid-2">
+        <div class="permission-panel">
+            <div class="permission-panel-head">
+                <div>
+                    <h2>Quick actions</h2>
+                    <p>Frequent permission tasks ko seedha open karo.</p>
+                </div>
+                <span class="permission-chip">Controls</span>
+            </div>
+            <div class="permission-shortcut-list">
+                <a class="permission-shortcut-card" href="{{ url_for('student_permissions.self_going') }}">
+                    <strong>Self Going</strong>
+                    <span>Classes IX-XII ya eligible students ke outdoor movement permissions manage karo.</span>
+                </a>
+                <a class="permission-shortcut-card" href="{{ url_for('student_permissions.device_permission') }}">
+                    <strong>Device Permission</strong>
+                    <span>Mobile, laptop, tablet approval records student-wise maintain karo.</span>
+                </a>
+                <a class="permission-shortcut-card" href="{{ url_for('student_permissions.permission_history') }}">
+                    <strong>Permission History</strong>
+                    <span>Past approvals aur revoked entries student ledger se search karo.</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="permission-panel">
+            <div class="permission-panel-head">
+                <div>
+                    <h2>Recent activity</h2>
+                    <p>Latest permission actions ka quick overview.</p>
+                </div>
+                <span class="permission-chip">{{ recent_activity|length }} records</span>
+            </div>
+            {% if recent_activity %}
+            <div class="permission-card-list">
+                {% for item in recent_activity %}
+                <article class="permission-mini-card">
+                    <div>
+                        <strong>{{ item["student_name"] or 'Student' }}</strong>
+                        <p>{{ item["ledger_no"] or 'N/A' }} · {{ item["permission_type"].replace('_', ' ') }}{% if item["class"] %} · Class {{ item["class"] }}{% endif %}</p>
+                    </div>
+                    <span class="permission-badge {% if item['revoked_at'] %}danger{% else %}success{% endif %}">
+                        {% if item["revoked_at"] %}Revoked{% else %}Active{% endif %}
+                    </span>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="permission-empty">
+                <h3>No permissions created yet</h3>
+                <p>Jab first self going ya device permission save hogi, recent activity yahin dikhegi.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

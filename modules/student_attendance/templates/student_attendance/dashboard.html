@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="attendance-shell">
+    <div class="attendance-hero">
+        <div>
+            <p class="attendance-kicker">Attendance Dashboard</p>
+            <h1>Live slot summary</h1>
+            <p class="attendance-subtitle">Current slot ki strength, status totals, aur absent list ek jagah par.</p>
+        </div>
+        <form method="get" class="attendance-filter-bar">
+            <input type="date" name="date" value="{{ attendance_date }}" required>
+            <select name="slot">
+                {% for item in slots %}
+                <option value="{{ item }}" {% if item == slot %}selected{% endif %}>{{ item.replace('_', ' ') }}</option>
+                {% endfor %}
+            </select>
+            <button class="attendance-primary-btn" type="submit">Refresh</button>
+        </form>
+    </div>
+
+    <div class="attendance-stat-grid">
+        <article class="attendance-stat-card">
+            <span>Total strength</span>
+            <strong>{{ strength }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Present</span>
+            <strong>{{ totals.PRESENT }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Absent</span>
+            <strong>{{ totals.ABSENT }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Leave / Medical</span>
+            <strong>{{ totals.LEAVE + totals.MEDICAL }}</strong>
+        </article>
+    </div>
+
+    <div class="attendance-grid attendance-grid-2">
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Class and block summary</h2>
+                    <p>Selected slot ke hisaab se grouped attendance totals.</p>
+                </div>
+                <span class="attendance-chip">{{ slot.replace('_', ' ') }}</span>
+            </div>
+            {% if summary %}
+            <div class="attendance-table-wrap">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Block</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in summary %}
+                        <tr>
+                            <td>{{ row["class"] }}</td>
+                            <td>{{ row["block"] }}</td>
+                            <td>{{ row["status"] }}</td>
+                            <td>{{ row["total"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="attendance-empty">
+                <h3>No attendance marked yet</h3>
+                <p>Is date aur slot ke liye abhi records nahi bane hain. Daily Attendance se marking start karo.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Absent students</h2>
+                    <p>Current slot me jo students absent hain unki quick list.</p>
+                </div>
+                <span class="attendance-chip">{{ absentees|length }} flagged</span>
+            </div>
+            {% if absentees %}
+            <div class="attendance-card-list">
+                {% for student in absentees %}
+                <article class="attendance-mini-card">
+                    <div>
+                        <strong>{{ student["student_name"] or student["ledger_no"] }}</strong>
+                        <p>{{ student["ledger_no"] }} · Class {{ student["class"] or 'Unassigned' }}</p>
+                    </div>
+                    <span class="attendance-badge danger">
+                        {% if student["is_gatepass"] == 1 %}Gatepass{% else %}Absent{% endif %}
+                    </span>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="attendance-empty">
+                <h3>No absentees in this slot</h3>
+                <p>Good sign. Selected slot ke liye koi absent student record nahi mila.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

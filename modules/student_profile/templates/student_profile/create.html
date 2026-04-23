@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>➕ Create Student Profile</h2>
+
+<form method="post">
+
+    <label>Ledger Number</label>
+    <input name="ledger_no" required>
+
+    <label>Full Name</label>
+    <input name="full_name" required>
+
+    <label>Class</label>
+    <input name="class" required>
+
+    <label>Section</label>
+    <input name="section" required>
+
+    <label>Roll No</label>
+    <input name="roll_no">
+
+    <label>Father Name</label>
+    <input name="father_name">
+
+    <label>Mother Name</label>
+    <input name="mother_name">
+
+    <label>Guardian Contact</label>
+    <input name="guardian_contact">
+
+    <label>Joining Date</label>
+    <input type="date" name="joining_date" required>
+
+    <label>Remarks</label>
+    <textarea name="remarks"></textarea>
+
+    <br>
+    <button type="submit" class="btn">Save Profile</button>
+
+</form>
+
+{% endblock %}

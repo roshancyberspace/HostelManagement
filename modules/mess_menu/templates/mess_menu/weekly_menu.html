@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="menu-shell">
+    <div class="menu-hero">
+        <div>
+            <p class="menu-kicker">Mess Menu</p>
+            <h1>Weekly meal chart</h1>
+            <p class="menu-subtitle">Working, Sunday, aur holiday ke liye weekly meal planning ko clean board me manage karo.</p>
+        </div>
+        <div class="menu-day-switch">
+            <a href="?day_type=WORKING" class="menu-tab {% if day_type == 'WORKING' %}active{% endif %}">Working Day</a>
+            <a href="?day_type=SUNDAY" class="menu-tab {% if day_type == 'SUNDAY' %}active{% endif %}">Sunday</a>
+            <a href="?day_type=HOLIDAY" class="menu-tab {% if day_type == 'HOLIDAY' %}active{% endif %}">Holiday</a>
+        </div>
+    </div>
+
+    {% if not header %}
+    <div class="menu-panel">
+        <div class="menu-panel-head">
+            <div>
+                <h2>Create weekly menu</h2>
+                <p>Selected day type ke liye ek fresh menu cycle start karo.</p>
+            </div>
+        </div>
+        <form method="post" class="menu-create-form">
+            <input type="hidden" name="create_new" value="1">
+            <label class="menu-field">
+                <span>Menu Title</span>
+                <input name="title" placeholder="Working Menu April 2026">
+            </label>
+            <button class="menu-primary-btn" type="submit">Create weekly menu</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="menu-stat-grid">
+        <article class="menu-stat-card">
+            <span>Menu Title</span>
+            <strong>{{ header["title"] }}</strong>
+        </article>
+        <article class="menu-stat-card">
+            <span>Day Type</span>
+            <strong>{{ day_type }}</strong>
+        </article>
+        <article class="menu-stat-card">
+            <span>Days</span>
+            <strong>{{ item_count }}</strong>
+        </article>
+    </div>
+
+    <div class="menu-panel">
+        <div class="menu-panel-head">
+            <div>
+                <h2>Meal planner</h2>
+                <p>Each day ke liye breakfast, lunch, snacks, dinner aur optional brunch plan update karo.</p>
+            </div>
+            <span class="menu-chip">{{ header["title"] }}</span>
+        </div>
+
+        <form method="post" class="menu-card-list">
+            {% for row in items %}
+            {% set d = row.day_name %}
+            <article class="menu-day-card">
+                <div class="menu-day-head">
+                    <div>
+                        <strong>{{ days[loop.index0][1] }}</strong>
+                        <span>{{ d }}</span>
+                    </div>
+                </div>
+
+                <div class="menu-meal-grid">
+                    <label class="menu-field">
+                        <span>Breakfast</span>
+                        <textarea name="{{ d }}_breakfast" rows="3" placeholder="Morning meal">{{ row.breakfast }}</textarea>
+                    </label>
+
+                    {% if brunch_enabled %}
+                    <label class="menu-field">
+                        <span>Brunch</span>
+                        <textarea name="{{ d }}_brunch" rows="3" placeholder="Midday brunch">{{ row.brunch }}</textarea>
+                    </label>
+                    {% else %}
+                    <input type="hidden" name="{{ d }}_brunch" value="{{ row.brunch or '' }}">
+                    <div class="menu-disabled-card">
+                        <strong>Brunch hidden</strong>
+                        <span>Sunday / holiday menu me brunch field optional nahi dikhaya ja raha.</span>
+                    </div>
+                    {% endif %}
+
+                    <label class="menu-field">
+                        <span>Lunch</span>
+                        <textarea name="{{ d }}_lunch" rows="3" placeholder="Lunch item">{{ row.lunch }}</textarea>
+                    </label>
+
+                    <label class="menu-field">
+                        <span>Evening Snacks</span>
+                        <textarea name="{{ d }}_evening_snacks" rows="3" placeholder="Evening snacks">{{ row.evening_snacks }}</textarea>
+                    </label>
+
+                    <label class="menu-field menu-field-wide">
+                        <span>Dinner</span>
+                        <textarea name="{{ d }}_dinner" rows="3" placeholder="Dinner menu">{{ row.dinner }}</textarea>
+                    </label>
+                </div>
+            </article>
+            {% endfor %}
+
+            <div class="menu-form-actions">
+                <button class="menu-primary-btn" type="submit">Save menu</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Dashboard</p>
+            <h1>Active students without bed</h1>
+            <p class="report-hub-subtitle">Immediate allotment required for active students who are not mapped to any bed.</p>
+        </div>
+        <div class="report-hub-badges">
+            <span class="report-hub-badge">{{ students|length }} students</span>
+            <span class="report-hub-badge">{{ beds|length }} vacant beds</span>
+        </div>
+    </div>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Mismatch register</h2>
+                <p>Student profile open karo ya direct yahin se vacant bed allot karo.</p>
+            </div>
+        </div>
+
+        {% if students %}
+        <div class="report-hub-table-wrap">
+            <table class="report-hub-table">
+                <thead>
+                    <tr>
+                        <th>Ledger</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Allot Bed</th>
+                        <th>Profile</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td>{{ s.ledger_no }}</td>
+                        <td>{{ s.student_name }}</td>
+                        <td>{{ s.class }} {{ s.section }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('dashboard.mismatch_allot_bed') }}" class="inline-allot-form">
+                                <input type="hidden" name="ledger_no" value="{{ s.ledger_no }}">
+                                <select name="bed_id" required>
+                                    <option value="">Select vacant bed</option>
+                                    {% for bed in beds %}
+                                    <option value="{{ bed.id }}">{{ bed.floor_no }} - Room {{ bed.room_no }} - {{ bed.bed_no }}</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="report-hub-primary-btn">Allot</button>
+                            </form>
+                        </td>
+                        <td><a href="/students/profile/{{ s.ledger_no }}" class="report-hub-link-btn">View</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No mismatch found</h3>
+            <p>All active students currently have valid bed allotments.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

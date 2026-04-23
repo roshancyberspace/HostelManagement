@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="schedule-shell">
+    <div class="schedule-hero">
+        <div>
+            <p class="schedule-kicker">Daily Schedule</p>
+            <h1>Today's routine board</h1>
+            <p class="schedule-subtitle">Selected day type ke hisaab se complete activity timeline aur linked mess items ek clean view me dekho.</p>
+        </div>
+        <div class="schedule-day-switch">
+            <a href="?day_type=WORKING" class="schedule-tab {% if day_type=='WORKING' %}active{% endif %}">Working Day</a>
+            <a href="?day_type=SUNDAY" class="schedule-tab {% if day_type=='SUNDAY' %}active{% endif %}">Sunday</a>
+            <a href="?day_type=HOLIDAY" class="schedule-tab {% if day_type=='HOLIDAY' %}active{% endif %}">Holiday</a>
+            <a href="{{ url_for('daily_schedule.print_view', day_type=day_type) }}" target="_blank" class="schedule-tab">Print</a>
+        </div>
+    </div>
+
+    <div class="schedule-stat-grid">
+        <article class="schedule-stat-card">
+            <span>Date</span>
+            <strong>{{ today }}</strong>
+        </article>
+        <article class="schedule-stat-card">
+            <span>Weekday</span>
+            <strong>{{ weekday }}</strong>
+        </article>
+        <article class="schedule-stat-card">
+            <span>Timeline Items</span>
+            <strong>{{ schedule|length }}</strong>
+        </article>
+        <article class="schedule-stat-card">
+            <span>Meal Blocks</span>
+            <strong>{{ meal_count }}</strong>
+        </article>
+    </div>
+
+    <div class="schedule-panel">
+        <div class="schedule-panel-head">
+            <div>
+                <h2>Routine timeline</h2>
+                <p>First visible block: {{ first_item }}</p>
+            </div>
+            <span class="schedule-chip">{{ day_type }}</span>
+        </div>
+
+        {% if schedule %}
+        <div class="daily-board-list">
+            {% for row in schedule %}
+            <article class="daily-board-item {% if row.has_menu %}has-menu{% endif %}">
+                <div class="daily-board-time">
+                    <span class="daily-board-seq">#{{ row.sequence_no }}</span>
+                    <strong>{{ row.time }}</strong>
+                </div>
+                <div class="daily-board-main">
+                    <div class="daily-board-head">
+                        <h3>{{ row.activity }}</h3>
+                        <span class="schedule-badge">{{ row.source }}</span>
+                    </div>
+                    {% if row.has_menu %}
+                    <p class="daily-board-menu">{{ row.menu }}</p>
+                    {% else %}
+                    <p class="daily-board-note">{{ row.menu }}</p>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No schedule generated</h3>
+            <p>Selected day type ke liye timetable aur menu mapping abhi ready nahi hai.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

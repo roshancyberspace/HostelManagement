@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="inspect-shell">
+    <div class="inspect-hero">
+        <div>
+            <p class="inspect-kicker">Inspection</p>
+            <h1>Common inspection</h1>
+            <p class="inspect-subtitle">Common areas ke PRE, POST, aur SPECIAL inspections simple flow me save karo.</p>
+        </div>
+        <div class="inspect-chip-row">
+            <span class="inspect-chip">{{ areas|length }} common areas</span>
+        </div>
+    </div>
+
+    <form method="post" class="inspect-grid inspect-grid-2">
+        <section class="inspect-panel">
+            <div class="inspect-panel-head">
+                <div>
+                    <h2>Inspection form</h2>
+                    <p>Area select karke remarks, damage, aur fine save karo.</p>
+                </div>
+            </div>
+            <div class="inspect-form-grid">
+                <label class="inspect-field inspect-field-wide">
+                    <span>Common Area</span>
+                    <select name="area_id" required>
+                        <option value="">Select common area</option>
+                        {% for area in areas %}
+                        <option value="{{ area.id }}" {% if selected_area_id and selected_area_id|string == area.id|string %}selected{% endif %}>
+                            {{ area.hostel_name }} - {{ area.floor_no }} - {{ area.area_name }} ({{ area.status }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label class="inspect-field">
+                    <span>Inspection Type</span>
+                    <select name="inspection_type" required>
+                        <option value="PRE">PRE</option>
+                        <option value="POST">POST</option>
+                        <option value="SPECIAL">SPECIAL</option>
+                    </select>
+                </label>
+                <label class="inspect-field">
+                    <span>Fine Amount</span>
+                    <input type="number" name="fine" min="0" value="0">
+                </label>
+                <label class="inspect-field inspect-field-wide">
+                    <span>Remarks</span>
+                    <textarea name="remarks" placeholder="General area remarks"></textarea>
+                </label>
+                <label class="inspect-field inspect-field-wide">
+                    <span>Damage Summary</span>
+                    <textarea name="damage" placeholder="Damage details if any"></textarea>
+                </label>
+            </div>
+            <div class="inspect-actions">
+                <button type="submit" class="inspect-primary-btn">Save common inspection</button>
+            </div>
+        </section>
+
+        <section class="inspect-panel">
+            <div class="inspect-panel-head">
+                <div>
+                    <h2>Available areas</h2>
+                    <p>Status visibility ke saath quick inspection target list.</p>
+                </div>
+            </div>
+            {% if areas %}
+            <div class="inspect-list">
+                {% for area in areas %}
+                <div class="inspect-list-item">
+                    <strong>{{ area.area_name }}</strong>
+                    <span>{{ area.hostel_name }} - {{ area.floor_no }}</span>
+                    <span class="inspect-badge {{ (area.status or '')|lower }}">{{ area.status }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No common areas found</h3>
+                <p>Structure me common areas available nahi hain.</p>
+            </div>
+            {% endif %}
+        </section>
+    </form>
+</section>
+{% endblock %}

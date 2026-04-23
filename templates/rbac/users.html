@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+{% set active_users = users|selectattr('is_active')|list %}
+{% set inactive_users = users|rejectattr('is_active')|list %}
+<section class="rbac-users-shell">
+    <section class="rbac-users-hero">
+        <div class="rbac-users-hero-copy">
+            <span class="section-kicker">RBAC</span>
+            <h1>User Access</h1>
+            <p>Create login accounts, assign each user a role, and keep inactive accounts out of daily access.</p>
+        </div>
+        <div class="rbac-users-actions">
+            <a href="#user-form" class="btn">Add User</a>
+            <a href="{{ url_for('rbac.roles') }}" class="ghost-btn btn">Roles and Permissions</a>
+        </div>
+    </section>
+
+    <section class="rbac-users-stats">
+        <article>
+            <span>Total Users</span>
+            <strong>{{ users|length }}</strong>
+        </article>
+        <article>
+            <span>Active</span>
+            <strong>{{ active_users|length }}</strong>
+        </article>
+        <article>
+            <span>Inactive</span>
+            <strong>{{ inactive_users|length }}</strong>
+        </article>
+        <article>
+            <span>Roles</span>
+            <strong>{{ roles|length }}</strong>
+        </article>
+    </section>
+
+    <section class="rbac-users-layout">
+        <section class="rbac-user-form-card" id="user-form">
+            <div class="rbac-card-head">
+                <div>
+                    <span class="section-kicker">{{ 'Edit Account' if editing_user else 'New Account' }}</span>
+                    <h2>{% if editing_user %}Update {{ editing_user.full_name }}{% else %}Create Login User{% endif %}</h2>
+                    <p>{% if editing_user %}Leave password blank to keep the current password.{% else %}Use a unique User ID. The user will land on the dashboard allowed by the selected role.{% endif %}</p>
+                </div>
+                <span class="status-chip">{{ 'Editing' if editing_user else 'Ready' }}</span>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="rbac-user-form">
+                <div class="rbac-field">
+                    <label>User ID</label>
+                    <input name="user_id" value="{{ editing_user.user_id if editing_user else '' }}" placeholder="example: warden01" required>
+                </div>
+                <div class="rbac-field">
+                    <label>Full Name</label>
+                    <input name="full_name" value="{{ editing_user.full_name if editing_user else '' }}" placeholder="User display name" required>
+                </div>
+                <div class="rbac-field">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="{% if editing_user %}Keep unchanged{% else %}Set password{% endif %}" {% if not editing_user %}required{% endif %}>
+                </div>
+                <div class="rbac-field">
+                    <label>Role</label>
+                    <select name="role_key" required>
+                        {% for role in roles %}
+                        <option value="{{ role.role_key }}" {% if editing_user and editing_user.role_key == role.role_key %}selected{% endif %}>{{ role.role_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="rbac-field">
+                    <label>Profile Image</label>
+                    <input type="file" name="profile_image" accept="image/*">
+                </div>
+                <div class="rbac-active-toggle">
+                    <label class="rbac-check">
+                        <input type="checkbox" name="is_active" {% if not editing_user or editing_user.is_active %}checked{% endif %}>
+                        <span>
+                            <strong>Active User</strong>
+                            <small>Allow this account to login</small>
+                        </span>
+                    </label>
+                </div>
+                <div class="rbac-form-actions">
+                    <button type="submit">{% if editing_user %}Update User{% else %}Create User{% endif %}</button>
+                    {% if editing_user %}
+                    <a href="{{ url_for('rbac.users') }}" class="ghost-btn btn">Cancel</a>
+                    {% endif %}
+                </div>
+            </form>
+        </section>
+
+        <section class="rbac-users-board">
+            <div class="rbac-card-head">
+                <div>
+                    <span class="section-kicker">Directory</span>
+                    <h2>System Users</h2>
+                    <p>Review account status and open any user for quick edits.</p>
+                </div>
+                <span class="status-chip">{{ users|length }} users</span>
+            </div>
+
+            <div class="rbac-user-list">
+                {% for user in users %}
+                <article class="rbac-user-row {% if not user.is_active %}is-inactive{% endif %}">
+                    <div class="rbac-user-main">
+                        <div class="rbac-user-avatar-wrap">
+                            {% if user.profile_image %}
+                            <img src="{{ url_for('static', filename=user.profile_image) }}" alt="{{ user.full_name }}" class="rbac-user-avatar">
+                            {% else %}
+                            <div class="rbac-user-avatar rbac-user-avatar-fallback">{{ user.full_name[:1] }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="rbac-user-copy">
+                            <strong>{{ user.full_name }}</strong>
+                            <span>{{ user.user_id }}</span>
+                        </div>
+                    </div>
+                    <div class="rbac-user-role">
+                        <span>Role</span>
+                        <strong>{{ user.role_label }}</strong>
+                    </div>
+                    <span class="rbac-user-status {% if user.is_active %}active{% else %}inactive{% endif %}">{{ 'Active' if user.is_active else 'Inactive' }}</span>
+                    <div class="rbac-user-actions">
+                        <a href="{{ url_for('rbac.edit_user', user_id=user.id) }}#user-form" class="btn small">Edit</a>
+                    </div>
+                </article>
+                {% else %}
+                <div class="rbac-empty-state">No users created yet.</div>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+</section>
+{% endblock %}

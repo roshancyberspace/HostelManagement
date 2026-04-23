@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="bed-shell">
+    <div class="bed-hero">
+        <div>
+            <p class="bed-kicker">Structure</p>
+            <h1>Bed management</h1>
+            <p class="bed-subtitle">Room select karke new bed create karo aur existing beds ko simple register me manage karo.</p>
+        </div>
+        <div class="bed-chip-row">
+            <span class="bed-chip">{{ beds|length }} beds</span>
+        </div>
+    </div>
+
+    <div class="bed-grid bed-grid-2">
+        <section class="bed-panel">
+            <div class="bed-panel-head">
+                <div>
+                    <h2>Add bed</h2>
+                    <p>Hostel se room tak chain select karke bed create karo.</p>
+                </div>
+            </div>
+
+            <form method="post" class="bed-form-grid">
+                <label class="bed-field">
+                    <span>Hostel</span>
+                    <select id="hostel" required>
+                        <option value="">Select hostel</option>
+                        {% for h in hostels %}
+                        <option value="{{ h.id }}">{{ h.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label class="bed-field">
+                    <span>Block</span>
+                    <select id="block" required>
+                        <option value="">Select block</option>
+                    </select>
+                </label>
+                <label class="bed-field">
+                    <span>Floor</span>
+                    <select id="floor" required>
+                        <option value="">Select floor</option>
+                    </select>
+                </label>
+                <label class="bed-field">
+                    <span>Room</span>
+                    <select name="room_id" id="room" required>
+                        <option value="">Select room</option>
+                    </select>
+                </label>
+                <label class="bed-field bed-field-wide">
+                    <span>Bed No</span>
+                    <input name="bed_no" placeholder="e.g. B1, B2" required>
+                </label>
+                <div class="bed-form-actions">
+                    <button type="submit" class="bed-primary-btn">Add bed</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="bed-panel">
+            <div class="bed-panel-head">
+                <div>
+                    <h2>Bed register</h2>
+                    <p>Current beds with room mapping and quick delete action.</p>
+                </div>
+            </div>
+
+            {% if beds %}
+            <div class="bed-table-wrap">
+                <table class="bed-table">
+                    <thead>
+                        <tr>
+                            <th>Room</th>
+                            <th>Bed</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in beds %}
+                        <tr>
+                            <td>{% if b.room_no is defined %}Room {{ b.room_no }}{% else %}Room ID {{ b.room_id }}{% endif %}</td>
+                            <td><strong>{{ b.bed_no }}</strong></td>
+                            <td><span class="bed-badge {{ (b.status or '')|lower }}">{{ b.status }}</span></td>
+                            <td>
+                                <form method="post" action="/structure/bed/delete/{{ b.id }}" onsubmit="return confirm('Delete this bed?');">
+                                    <button type="submit" class="bed-danger-btn">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No beds created yet</h3>
+                <p>Current structure me abhi koi bed available nahi hai.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</section>
+
+<script>
+const hostel = document.getElementById("hostel");
+const block = document.getElementById("block");
+const floor = document.getElementById("floor");
+const room = document.getElementById("room");
+
+hostel.onchange = () => {
+    block.innerHTML = '<option value="">Select block</option>';
+    floor.innerHTML = '<option value="">Select floor</option>';
+    room.innerHTML = '<option value="">Select room</option>';
+    if (!hostel.value) return;
+    fetch(`/structure/api/blocks/${hostel.value}`)
+        .then(r => r.json())
+        .then(data => {
+            data.forEach(b => {
+                block.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+            });
+        });
+};
+
+block.onchange = () => {
+    floor.innerHTML = '<option value="">Select floor</option>';
+    room.innerHTML = '<option value="">Select room</option>';
+    if (!block.value) return;
+    fetch(`/structure/api/floors/${block.value}`)
+        .then(r => r.json())
+        .then(data => {
+            data.forEach(f => {
+                floor.innerHTML += `<option value="${f.id}">Floor ${f.floor_no}</option>`;
+            });
+        });
+};
+
+floor.onchange = () => {
+    room.innerHTML = '<option value="">Select room</option>';
+    if (!floor.value) return;
+    fetch(`/structure/api/rooms/${floor.value}`)
+        .then(r => r.json())
+        .then(data => {
+            data.forEach(rm => {
+                room.innerHTML += `<option value="${rm.id}">Room ${rm.room_no}</option>`;
+            });
+        });
+};
+</script>
+{% endblock %}

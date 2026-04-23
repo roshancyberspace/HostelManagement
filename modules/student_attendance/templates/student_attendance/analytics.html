@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="attendance-shell">
+    <div class="attendance-hero">
+        <div>
+            <p class="attendance-kicker">Attendance Analytics</p>
+            <h1>Trends and chronic alerts</h1>
+            <p class="attendance-subtitle">Date range select karke class, block, gatepass, aur absentee trends visually review karo.</p>
+        </div>
+        <form method="get" class="attendance-filter-bar">
+            <input type="date" name="start" value="{{ start_date }}" required>
+            <input type="date" name="end" value="{{ end_date }}" required>
+            <button class="attendance-primary-btn" type="submit">Apply range</button>
+        </form>
+    </div>
+
+    <div class="attendance-grid attendance-grid-2">
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Attendance by class</h2>
+                    <p>Class-wise present percentage trend.</p>
+                </div>
+            </div>
+            <div class="attendance-chart-wrap">
+                <canvas id="classChart"></canvas>
+            </div>
+        </div>
+
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Attendance by block</h2>
+                    <p>Block-wise attendance percentage comparison.</p>
+                </div>
+            </div>
+            <div class="attendance-chart-wrap">
+                <canvas id="blockChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="attendance-grid attendance-grid-2">
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Gatepass trend</h2>
+                    <p>Selected range me daily gatepass count.</p>
+                </div>
+            </div>
+            <div class="attendance-chart-wrap">
+                <canvas id="gatepassChart"></canvas>
+            </div>
+        </div>
+
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Chronic absentees</h2>
+                    <p>Most repeated absent students with class context.</p>
+                </div>
+                <span class="attendance-chip">{{ chronic|length }} listed</span>
+            </div>
+            {% if chronic %}
+            <div class="attendance-table-wrap">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Ledger</th>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Absent Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in chronic %}
+                        <tr>
+                            <td>{{ student["ledger_no"] }}</td>
+                            <td>{{ student["student_name"] }}</td>
+                            <td>{{ student["class"] }}</td>
+                            <td>{{ student["absents"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="attendance-empty">
+                <h3>No analytics records yet</h3>
+                <p>Is range me absentee data generate hone ke liye attendance records chahiye honge.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<script>
+const classLabels = {{ class_data | map(attribute='class') | list | tojson }};
+const classValues = {{ class_data | map(attribute='percentage') | list | tojson }};
+const blockLabels = {{ block_data | map(attribute='block') | list | tojson }};
+const blockValues = {{ block_data | map(attribute='percentage') | list | tojson }};
+const gatepassLabels = {{ gatepass_data | map(attribute='attendance_date') | list | tojson }};
+const gatepassValues = {{ gatepass_data | map(attribute='total') | list | tojson }};
+
+function renderChart(id, type, labels, values, color) {
+    new Chart(document.getElementById(id), {
+        type,
+        data: {
+            labels: labels.length ? labels : ['No data'],
+            datasets: [{
+                label: id === 'gatepassChart' ? 'Gatepass Count' : 'Attendance %',
+                data: values.length ? values : [0],
+                borderColor: color,
+                backgroundColor: color + '33',
+                borderWidth: 2,
+                fill: type === 'line',
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+renderChart('classChart', 'bar', classLabels, classValues, '#2563eb');
+renderChart('blockChart', 'bar', blockLabels, blockValues, '#0f766e');
+renderChart('gatepassChart', 'line', gatepassLabels, gatepassValues, '#f97316');
+</script>
+{% endblock %}

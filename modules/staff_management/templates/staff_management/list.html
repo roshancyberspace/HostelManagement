@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="staff-shell">
+    <section class="staff-hero">
+        <div class="staff-hero-card">
+            <span class="section-kicker">Staff and Members</span>
+            <h1>Staff Registry</h1>
+            <p>Track wardens, tutors, guards, kitchen staff, and support members from one cleaner directory.</p>
+        </div>
+        <div class="staff-summary">
+            <div class="metric-pill">
+                <span>Total Listed</span>
+                <strong>{{ staff_rows|length }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Status View</span>
+                <strong>{{ status|title }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Mode</span>
+                <strong>{% if search or role or staff_code or department or phone %}Filtered{% else %}Full Registry{% endif %}</strong>
+            </div>
+            <a class="btn btn-primary" href="/staff/create">Add Staff</a>
+        </div>
+    </section>
+
+    <section class="intake-card staff-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Search and Filter</h2>
+                <p>Find staff by name, role, staff code, member id, department, phone, and status.</p>
+            </div>
+            <span class="soft-badge">Quick lookup</span>
+        </div>
+
+        <form method="get" class="staff-filter-grid">
+            <div class="compact-field">
+                <label>Search</label>
+                <input type="text" name="search" class="form-control" value="{{ search }}" placeholder="Name, role, code, department, or phone">
+            </div>
+            <div class="compact-field">
+                <label>Role</label>
+                <input type="text" name="role" class="form-control" value="{{ role }}" placeholder="Warden / Guard / Tutor">
+            </div>
+            <div class="compact-field">
+                <label>Staff Code or ID</label>
+                <input type="text" name="staff_code" class="form-control" value="{{ staff_code }}" placeholder="STAFF0001 or 1">
+            </div>
+            <div class="compact-field">
+                <label>Department</label>
+                <input type="text" name="department" class="form-control" value="{{ department }}" placeholder="HOSTEL / ADMIN">
+            </div>
+            <div class="compact-field">
+                <label>Phone</label>
+                <input type="text" name="phone" class="form-control" value="{{ phone }}" placeholder="Search mobile">
+            </div>
+            <div class="compact-field">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="ACTIVE" {% if status == 'ACTIVE' %}selected{% endif %}>Active</option>
+                    <option value="INACTIVE" {% if status == 'INACTIVE' %}selected{% endif %}>Inactive</option>
+                    <option value="ALL" {% if status == 'ALL' %}selected{% endif %}>All Staff</option>
+                </select>
+            </div>
+            <div class="staff-filter-actions">
+                <button class="btn btn-primary" type="submit">Apply Filters</button>
+                <a class="btn btn-outline-primary" href="/staff">Reset</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="intake-card staff-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Registry Records</h2>
+                <p>Each card keeps identity, role, contact details, and quick actions in one place.</p>
+            </div>
+            <span class="soft-badge">{{ staff_rows|length }} listed</span>
+        </div>
+
+        {% if staff_rows %}
+        <div class="staff-card-grid">
+            {% for s in staff_rows %}
+            <article class="staff-record-card">
+                <div class="staff-record-top">
+                    <div>
+                        <span class="soft-badge">{{ s["staff_code"] }}</span>
+                        <h3 class="staff-record-name">{{ s["full_name"] }}</h3>
+                    </div>
+                    <span class="status-badge {% if s['status'] == 'ACTIVE' %}status-good{% else %}status-neutral{% endif %}">
+                        {{ s["status"] }}
+                    </span>
+                </div>
+                <div class="student-reg-meta">
+                    <span><strong>ID:</strong> {{ s["id"] }}</span>
+                    <span><strong>Role:</strong> {{ s["designation"] or "Not set" }}</span>
+                    <span><strong>Phone:</strong> {{ s["phone"] or "Not added" }}</span>
+                    <span><strong>Department:</strong> {{ s["department"] or "Hostel" }}</span>
+                </div>
+                <div class="staff-record-actions">
+                    <a class="btn btn-primary" href="/staff/{{ s['id'] }}/view">View Profile</a>
+                    <a class="btn btn-outline-primary" href="/staff/{{ s['id'] }}/edit">Edit Staff</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No staff records found</h3>
+            <p>Try a different search, adjust filters, or add a new staff member.</p>
+            <div class="staff-record-actions">
+                <a class="btn btn-outline-primary" href="/staff">Clear Filters</a>
+                <a class="btn btn-primary" href="/staff/create">Add Staff</a>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

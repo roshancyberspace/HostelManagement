@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📝 New Hostel Student Enrolment</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+<h4>Ledger (School Admission No)</h4>
+<input name="ledger_no" required>
+
+<h4>Student</h4>
+<input name="student_name" placeholder="Name" required>
+<input name="class" placeholder="Class" required>
+<input name="section" placeholder="Section" required>
+
+<h4>Student Photo</h4>
+<input type="file" name="student_photo" required>
+
+<h4>Father</h4>
+<input name="father_name" required>
+<input name="father_mobile" required>
+<input type="file" name="father_photo" required>
+
+<h4>Mother</h4>
+<input name="mother_name" required>
+<input name="mother_mobile" required>
+<input type="file" name="mother_photo" required>
+
+<h4>Permanent Address</h4>
+<textarea name="permanent_address" required></textarea>
+
+<h4>Guardians</h4>
+<div id="guardians"></div>
+<button type="button" onclick="addGuardian()">+ Add Guardian</button>
+
+<br><br>
+<button class="btn btn-success">Submit & Generate Student</button>
+
+</form>
+
+<script>
+function addGuardian(){
+  const g = document.createElement("div");
+  g.innerHTML = `
+    <input name="guardian_name[]" placeholder="Name">
+    <input name="guardian_relation[]" placeholder="Relation">
+    <input name="guardian_mobile[]" placeholder="Mobile">
+    <input type="file" name="guardian_photo[]">
+    <hr>`;
+  document.getElementById("guardians").appendChild(g);
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Create Coaching Routine</h3>
+
+<form method="post">
+    <input name="routine_name" class="form-control mb-2" placeholder="Routine Name" required>
+    <input name="subject" class="form-control mb-2" placeholder="Subject">
+    <input name="coach_name" class="form-control mb-2" placeholder="Coach Name">
+    <input name="days" class="form-control mb-2" placeholder="Mon,Tue,Wed">
+    <input name="start_time" type="time" class="form-control mb-2">
+    <input name="end_time" type="time" class="form-control mb-2">
+    <input name="location" class="form-control mb-2" placeholder="Location">
+    <input name="target_group" class="form-control mb-2" placeholder="Class / Batch">
+
+    <button class="btn btn-success">Save Routine</button>
+</form>
+
+{% endblock %}

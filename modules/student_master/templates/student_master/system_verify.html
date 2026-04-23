@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="student-view-shell">
+    <div class="student-view-hero">
+        <div>
+            <p class="student-view-kicker">Student Intake</p>
+            <h1>System verification</h1>
+            <p class="student-view-subtitle">Student lifecycle automation, bed mapping, aur permission revoke checks ka audit view.</p>
+        </div>
+        <div class="student-view-hero-badges">
+            <span class="student-view-badge">Ledger {{ student.ledger_no }}</span>
+            <span class="student-view-badge {{ (student.status or '')|lower }}">{{ student.status }}</span>
+        </div>
+    </div>
+
+    <div class="student-view-grid student-view-grid-2">
+        <section class="student-view-panel">
+            <div class="student-view-panel-head">
+                <div>
+                    <h2>Student</h2>
+                    <p>Core student record under verification.</p>
+                </div>
+            </div>
+            <div class="student-view-detail-list">
+                <div><span>Ledger</span><strong>{{ student.ledger_no }}</strong></div>
+                <div><span>Name</span><strong>{{ student.student_name }}</strong></div>
+                <div><span>Class</span><strong>{{ student.class }} {{ student.section }}</strong></div>
+                <div><span>Status</span><strong>{{ student.status }}</strong></div>
+            </div>
+        </section>
+
+        <section class="student-view-panel">
+            <div class="student-view-panel-head">
+                <div>
+                    <h2>Bed allotment check</h2>
+                    <p>Current bed mapping and vacate context.</p>
+                </div>
+            </div>
+            {% if bed %}
+            <div class="student-view-detail-list">
+                <div><span>Block</span><strong>{{ bed.block_name }}</strong></div>
+                <div><span>Room</span><strong>{{ bed.room_number }}</strong></div>
+                <div><span>Bed</span><strong>{{ bed.bed_number }}</strong></div>
+                <div><span>Status</span><strong>{{ bed.status }}</strong></div>
+                <div><span>Vacate Reason</span><strong>{{ bed.vacate_reason or "-" }}</strong></div>
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No bed record found</h3>
+                <p>Student ke liye current bed mapping available nahi hai.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <div class="student-view-grid student-view-grid-2">
+        <section class="student-view-panel">
+            <div class="student-view-panel-head">
+                <div>
+                    <h2>Self going permission</h2>
+                    <p>Latest self-going state and revoke reason.</p>
+                </div>
+            </div>
+            {% if self_going %}
+            <div class="student-view-detail-list">
+                <div><span>Allowed</span><strong>{{ "YES" if self_going.allowed else "NO" }}</strong></div>
+                <div><span>Revoke Reason</span><strong>{{ self_going.revoked_reason or "-" }}</strong></div>
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No self-going record</h3>
+                <p>Student ke liye self-going data nahi mila.</p>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="student-view-panel">
+            <div class="student-view-panel-head">
+                <div>
+                    <h2>Device permission</h2>
+                    <p>Latest device permission status.</p>
+                </div>
+            </div>
+            {% if device %}
+            <div class="student-view-detail-list">
+                <div><span>Device</span><strong>{{ device.device_type }}</strong></div>
+                <div><span>Allowed</span><strong>{{ "YES" if device.allowed else "NO" }}</strong></div>
+                <div><span>Revoke Reason</span><strong>{{ device.revoked_reason or "-" }}</strong></div>
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No device permission record</h3>
+                <p>Student ke liye device permission data nahi mila.</p>
+            </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <section class="student-view-panel">
+        <div class="student-view-panel-head">
+            <div>
+                <h2>Automation verdict</h2>
+                <p>Student status change ke saath linked automations ka quick result.</p>
+            </div>
+        </div>
+        <div class="student-view-grid student-view-grid-2">
+            <div class="inspect-status-callout {% if student.status != 'ACTIVE' and bed and bed.status == 'VACATED' %}success{% elif student.status == 'ACTIVE' %}warning{% else %}danger{% endif %}">
+                <strong>Bed auto-vacate on status change</strong>
+                <p>
+                    {% if student.status != 'ACTIVE' and bed and bed.status == 'VACATED' %}
+                    PASS
+                    {% elif student.status == 'ACTIVE' %}
+                    Not applicable
+                    {% else %}
+                    FAIL
+                    {% endif %}
+                </p>
+            </div>
+            <div class="inspect-status-callout {% if student.status != 'ACTIVE' and (self_going and not self_going.allowed) and (device and not device.allowed) %}success{% elif student.status == 'ACTIVE' %}warning{% else %}danger{% endif %}">
+                <strong>Permission auto-revoke on status change</strong>
+                <p>
+                    {% if student.status != 'ACTIVE' and (self_going and not self_going.allowed) and (device and not device.allowed) %}
+                    PASS
+                    {% elif student.status == 'ACTIVE' %}
+                    Not applicable
+                    {% else %}
+                    FAIL
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <div class="student-view-actions">
+        <a href="{{ url_for('student_master.student_list') }}" class="student-view-secondary-btn">Back to Registry</a>
+    </div>
+</section>
+{% endblock %}

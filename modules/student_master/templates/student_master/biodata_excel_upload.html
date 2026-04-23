@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="intake-shell">
+    <div class="intake-hero">
+        <div>
+            <span class="section-kicker">Full Biodata</span>
+            <h1>Upload Full Biodata Excel</h1>
+            <p>Import detailed student biodata for existing ledger numbers using the full hostel biodata sheet.</p>
+        </div>
+        <div class="intake-hero-card">
+            <span class="status-chip">Phase 2</span>
+            <strong>Detailed records</strong>
+            <p>Use this step after the initial student list has already been created.</p>
+        </div>
+    </div>
+    <div class="intake-grid">
+        <section class="intake-card featured">
+            <div class="intake-card-head"><h3>Download Biodata Sheet</h3><span class="status-chip">Step 1</span></div>
+            <p>Download the full biodata workbook before uploading completed student details.</p>
+            <div class="intake-actions"><a href="/students/download/biodata-excel" class="btn">Download Full Biodata Excel</a></div>
+        </section>
+        <section class="intake-card">
+            <div class="intake-card-head"><h3>Upload Completed File</h3><span class="status-chip">Step 2</span></div>
+            <p>Upload the completed biodata workbook to populate detailed admission and parent records.</p>
+            <form method="post" enctype="multipart/form-data" class="admin-form-grid intake-form">
+                <div class="full-span"><label for="biodata-upload-file">Biodata Excel File</label><input id="biodata-upload-file" type="file" name="file" required></div>
+                <div class="form-action-row"><button type="submit">Upload Excel</button></div>
+            </form>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

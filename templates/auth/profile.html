@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-shell">
+    <section class="profile-hero">
+        <div class="profile-identity">
+            {% if current_user.profile_image %}
+            <img src="{{ url_for('static', filename=current_user.profile_image) }}" alt="{{ current_user.name }}" class="profile-avatar-large">
+            {% else %}
+            <div class="profile-avatar-large profile-avatar-fallback">{{ current_user.name[:1] }}</div>
+            {% endif %}
+            <div>
+                <span class="section-kicker">My Profile</span>
+                <h1>{{ current_user.name }}</h1>
+                <p>Manage your display name, profile picture, and account password.</p>
+            </div>
+        </div>
+        <span class="status-chip">{{ current_user.role_label }}</span>
+    </section>
+
+    <section class="profile-summary">
+        <article>
+            <span>User ID</span>
+            <strong>{{ current_user.user_id }}</strong>
+        </article>
+        <article>
+            <span>Role</span>
+            <strong>{{ current_user.role_label }}</strong>
+        </article>
+        <article>
+            <span>Permissions</span>
+            <strong>{{ current_user.permissions|length }}</strong>
+        </article>
+    </section>
+
+    <form method="post" enctype="multipart/form-data" class="profile-edit-card">
+        <div class="profile-card-head">
+            <div>
+                <span class="section-kicker">Edit Details</span>
+                <h2>Account Information</h2>
+                <p>Password fields are optional. Fill them only when you want to change your password.</p>
+            </div>
+        </div>
+
+        <div class="profile-form-grid">
+            <div class="profile-field">
+                <label>Full Name</label>
+                <input name="full_name" value="{{ current_user.name }}" required>
+            </div>
+            <div class="profile-field">
+                <label>Profile Picture</label>
+                <input type="file" name="profile_image" accept="image/*">
+            </div>
+            <div class="profile-field">
+                <label>Current Password</label>
+                <input type="password" name="current_password" placeholder="Required only for password change">
+            </div>
+            <div class="profile-field">
+                <label>New Password</label>
+                <input type="password" name="new_password" placeholder="Minimum 6 characters">
+            </div>
+            <div class="profile-field">
+                <label>Confirm New Password</label>
+                <input type="password" name="confirm_password" placeholder="Repeat new password">
+            </div>
+        </div>
+
+        <div class="profile-action-row">
+            <button type="submit">Save Profile</button>
+            <a href="{{ url_for('dashboard.dashboard') }}" class="ghost-btn btn">Back to Dashboard</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

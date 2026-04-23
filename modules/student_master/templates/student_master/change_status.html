@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>⚠️ Change Student Status</h2>
+
+<div class="card">
+    <h3>{{ student.student_name }}</h3>
+    <p>
+        <b>Ledger:</b> {{ student.ledger_no }}<br>
+        <b>Class:</b> {{ student.class }} {{ student.section or "" }}<br>
+        <b>Current Status:</b> {{ student.status }}
+    </p>
+
+    <form method="post">
+        <label>New Status</label>
+        <select name="status" required>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="DAY_SCHOLAR">DAY SCHOLAR</option>
+            <option value="TC">TC ISSUED</option>
+            <option value="LEFT">LEFT</option>
+            <option value="TERMINATED">TERMINATED</option>
+        </select>
+
+        <label>Reason / Remarks</label>
+        <textarea name="reason" required></textarea>
+
+        <br><br>
+        <button class="btn btn-danger">Confirm Status Change</button>
+        <a href="/students/list" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+{% endblock %}

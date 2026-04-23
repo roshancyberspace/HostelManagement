@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="room-report-shell">
+    <div class="room-report-hero">
+        <div>
+            <p class="room-report-kicker">Reports</p>
+            <h1>Room {{ data["room"].room_no }} report</h1>
+            <p class="room-report-subtitle">Inspection history, recovery ledger, and room stock in one place.</p>
+        </div>
+        <div class="room-report-badges">
+            <span class="room-report-badge">{{ data["room"].ac_type }}</span>
+            <span class="room-report-badge">{{ data["room"].status }}</span>
+        </div>
+    </div>
+
+    <div class="room-report-grid">
+        <article class="room-report-card">
+            <span>Floor</span>
+            <strong>{{ data["room"].floor_no }}</strong>
+        </article>
+        <article class="room-report-card">
+            <span>Inspections</span>
+            <strong>{{ data["inspections"]|length }}</strong>
+        </article>
+        <article class="room-report-card">
+            <span>Recoveries</span>
+            <strong>{{ data["recoveries"]|length }}</strong>
+        </article>
+        <article class="room-report-card">
+            <span>Items</span>
+            <strong>{{ data["items"]|length }}</strong>
+        </article>
+    </div>
+
+    <div class="room-report-panel">
+        <div class="room-report-panel-head">
+            <h2>Inspection history</h2>
+        </div>
+        {% if data["inspections"] %}
+        <div class="room-report-table-wrap">
+            <table class="room-report-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Damage</th>
+                        <th>Fine</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in data["inspections"] %}
+                    <tr>
+                        <td>{{ i.inspected_on }}</td>
+                        <td>{{ i.inspection_type }}</td>
+                        <td>{{ i.damage or 'No damage' }}</td>
+                        <td>Rs. {{ i.fine or 0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No inspections yet</h3>
+            <p>This room has no inspection history yet.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="room-report-grid room-report-grid-2">
+        <div class="room-report-panel">
+            <div class="room-report-panel-head">
+                <h2>Recovery ledger</h2>
+            </div>
+            {% if data["recoveries"] %}
+            <div class="room-report-list">
+                {% for r in data["recoveries"] %}
+                <article class="room-report-list-item">
+                    <strong>Rs. {{ r.amount }}</strong>
+                    <p>{{ r.reason }}</p>
+                    <span>{{ r.created_on }}</span>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No recoveries</h3>
+                <p>No recovery ledger entries found for this room.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="room-report-panel">
+            <div class="room-report-panel-head">
+                <h2>Room stock</h2>
+            </div>
+            {% if data["items"] %}
+            <div class="room-report-table-wrap">
+                <table class="room-report-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Status</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in data["items"] %}
+                        <tr>
+                            <td>{{ s.item_name }}</td>
+                            <td>{{ s.quantity }}</td>
+                            <td>{{ s.status }}</td>
+                            <td>{{ s.remarks or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>No items found</h3>
+                <p>No room stock records are available for this room.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

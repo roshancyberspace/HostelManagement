@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>📜 Haircut History: {{ ledger_no }}</h3>
+
+<table class="table table-bordered table-sm">
+    <thead class="table-warning">
+        <tr>
+            <th>Month</th>
+            <th>Date</th>
+            <th>Barber</th>
+            <th>Before</th>
+            <th>After</th>
+            <th>Remark</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for r in history %}
+        <tr>
+            <td>{{ r["haircut_month"] }}</td>
+            <td>{{ r["haircut_date"] }}</td>
+            <td>{{ r["barber_name"] }}</td>
+
+            <td>
+                {% if r["before_photo_path"] %}
+                    <a target="_blank" href="{% if r['before_photo_path'].startswith('instance_uploads/') %}{{ url_for('barber_haircut.barber_media', filename=r['before_photo_path'].replace('instance_uploads/haircuts/', '', 1)) }}{% else %}/{{ r['before_photo_path'] }}{% endif %}">View</a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>
+                {% if r["after_photo_path"] %}
+                    <a target="_blank" href="{% if r['after_photo_path'].startswith('instance_uploads/') %}{{ url_for('barber_haircut.barber_media', filename=r['after_photo_path'].replace('instance_uploads/haircuts/', '', 1)) }}{% else %}/{{ r['after_photo_path'] }}{% endif %}">View</a>
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+
+            <td>{{ r["remark"] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

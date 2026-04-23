@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="laundry-shell">
+    <div class="laundry-hero">
+        <div>
+            <p class="laundry-kicker">Laundry</p>
+            <h1>Routine chart</h1>
+            <p class="laundry-subtitle">Weekly deposit aur delivery pattern ko ek clean chart me maintain karo, so hostel laundry cycle clear rahe.</p>
+        </div>
+        {% if header %}
+        <span class="laundry-chip">{{ header["title"] }}</span>
+        {% endif %}
+    </div>
+
+    {% if not header %}
+    <div class="laundry-panel laundry-create-panel">
+        <div class="laundry-panel-head">
+            <div>
+                <h2>Create laundry routine</h2>
+                <p>Weekly chart start karne ke liye ek active routine title create karo.</p>
+            </div>
+        </div>
+        <form method="post" class="laundry-create-form">
+            <input type="hidden" name="create_new" value="1">
+            <label class="laundry-field">
+                <span>Routine Title</span>
+                <input name="title" placeholder="Standard Laundry Routine" required>
+            </label>
+            <button class="laundry-primary-btn" type="submit">Create routine</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="laundry-panel">
+        <div class="laundry-panel-head">
+            <div>
+                <h2>Weekly routine board</h2>
+                <p>Har din ke liye deposit aur delivery plan update karo.</p>
+            </div>
+            <span class="laundry-chip">{{ rows|length }} days</span>
+        </div>
+
+        <form method="post" class="laundry-routine-grid">
+            {% for row in rows %}
+            <article class="laundry-day-card">
+                <div class="laundry-day-head">
+                    <div>
+                        <strong>{{ days[loop.index0][0] }}</strong>
+                        <span>{{ days[loop.index0][1] }}</span>
+                    </div>
+                </div>
+                <label class="laundry-field">
+                    <span>Deposit</span>
+                    <textarea name="{{ row.day_name }}_deposit" rows="4" placeholder="Uniforms, bedsheets, towels">{{ row.deposit }}</textarea>
+                </label>
+                <label class="laundry-field">
+                    <span>Deliver</span>
+                    <textarea name="{{ row.day_name }}_deliver" rows="4" placeholder="Clean clothes return plan">{{ row.deliver }}</textarea>
+                </label>
+            </article>
+            {% endfor %}
+            <div class="laundry-form-actions">
+                <button class="laundry-primary-btn" type="submit">Save routine</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

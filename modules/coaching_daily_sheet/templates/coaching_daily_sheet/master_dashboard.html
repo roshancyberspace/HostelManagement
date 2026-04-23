@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="coaching-shell">
+    <div class="coaching-hero">
+        <div>
+            <span class="section-kicker">Coaching Control</span>
+            <h1>Coaching and Self Study Master</h1>
+            <p>Manage weekly master routines, suspend schedules by day, and upload bulk setup data from one control panel.</p>
+        </div>
+        <div class="coaching-hero-card">
+            <span class="status-chip">Master setup</span>
+            <strong>4 control areas</strong>
+            <p>These settings shape the daily coaching and self study sheets automatically.</p>
+        </div>
+    </div>
+
+    <div class="coaching-summary">
+        <div class="summary-pill">
+            <span class="summary-label">Mode</span>
+            <strong>Weekly Master</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Output</span>
+            <strong>Daily Sheets</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Scope</span>
+            <strong>Coaching + Study</strong>
+        </div>
+        <div class="summary-pill">
+            <span class="summary-label">Actions</span>
+            <strong>Update + Upload</strong>
+        </div>
+    </div>
+
+    <div class="coaching-grid">
+        <section class="coaching-card">
+            <h3>Weekly Master Controls</h3>
+            <p>Open the master routine pages to maintain the weekly schedule for coaching and self study.</p>
+            <div class="coaching-actions">
+                <a href="/coaching/master/coaching" class="btn">Coaching Weekly Master</a>
+                <a href="/coaching/master/study" class="ghost-btn btn">Self Study Weekly Master</a>
+            </div>
+        </section>
+
+        <section class="coaching-card">
+            <h3>Exception and Import Tools</h3>
+            <p>Use suspension and CSV upload tools when the routine needs a wider update or one-day override.</p>
+            <div class="coaching-actions">
+                <a href="/coaching/master/suspend" class="btn danger">Suspend Master by Day</a>
+                <a href="/coaching/master/upload" class="ghost-btn btn">Upload Master CSV</a>
+            </div>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

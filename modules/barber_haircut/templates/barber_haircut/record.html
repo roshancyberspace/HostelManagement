@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="grooming-shell">
+    <div class="grooming-hero">
+        <div>
+            <p class="grooming-kicker">Barber and Grooming</p>
+            <h1>New haircut entry</h1>
+            <p class="grooming-subtitle">Create a haircut record with student lookup, live photo capture, and professional before and after documentation.</p>
+        </div>
+        <a class="grooming-chip-link" href="{{ url_for('barber_haircut.barber_dashboard') }}">Back to dashboard</a>
+    </div>
+
+    <div class="grooming-panel">
+        <div class="grooming-panel-head">
+            <div>
+                <h2>Record haircut</h2>
+                <p>Student details are loaded automatically. Only one haircut entry is allowed per active student in a month.</p>
+            </div>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="grooming-form-grid">
+            <input type="hidden" name="captured_before_photo" id="captured_before_photo">
+            <input type="hidden" name="captured_after_photo" id="captured_after_photo">
+
+            <label class="grooming-field">
+                <span>Ledger Number</span>
+                <input type="text" name="ledger_no" id="ledger_no" value="{{ prefill_ledger }}" placeholder="Enter ledger number" required>
+            </label>
+            <label class="grooming-field">
+                <span>Haircut Date</span>
+                <input type="date" name="haircut_date" required>
+            </label>
+            <label class="grooming-field">
+                <span>Barber Name</span>
+                <input type="text" name="barber_name" placeholder="Barber or staff name">
+            </label>
+
+            <div class="grooming-student-box" id="studentInfoBox" style="display:none;">
+                <div><span>Student</span><strong id="student_name"></strong></div>
+                <div><span>Class</span><strong><span id="student_class"></span> <span id="student_section"></span></strong></div>
+                <div><span>Status</span><strong id="student_status"></strong></div>
+            </div>
+
+            <section class="grooming-camera-panel camera-panel-shell camera-theme-grooming">
+                <div class="grooming-camera-head camera-headline-row">
+                    <div>
+                        <h3>Haircut Photo Capture</h3>
+                        <p>Capture clean before and after photos. Only one face should be visible in the frame.</p>
+                    </div>
+                    <div class="grooming-camera-targets">
+                        <button type="button" class="grooming-target-btn active" data-target="before">Before Photo</button>
+                        <button type="button" class="grooming-target-btn" data-target="after">After Photo</button>
+                    </div>
+                </div>
+                <div class="camera-guidance-strip">
+                    <span>One face only</span>
+                    <span>Use clear lighting</span>
+                    <span>Keep the face centered</span>
+                </div>
+                <div class="grooming-camera-stage camera-stage-grid">
+                    <div class="camera-frame-card camera-frame-live">
+                        <div class="camera-frame-label">Live Camera</div>
+                        <video id="grooming-camera" autoplay muted playsinline></video>
+                    </div>
+                    <canvas id="grooming-camera-canvas" class="hidden-photo-canvas"></canvas>
+                    <div class="grooming-photo-stack">
+                        <div class="grooming-photo-card camera-frame-card">
+                            <div class="camera-frame-label">Before Photo</div>
+                            <strong>Before Preview</strong>
+                            <img id="before_preview_image" src="" alt="Before photo preview" hidden>
+                            <div class="grooming-photo-placeholder" id="before_placeholder">Captured before photo will appear here</div>
+                            <label class="grooming-field">
+                                <span>Upload Before Photo</span>
+                                <input type="file" name="before_photo" accept="image/*" capture="user">
+                            </label>
+                        </div>
+                        <div class="grooming-photo-card camera-frame-card">
+                            <div class="camera-frame-label">After Photo</div>
+                            <strong>After Preview</strong>
+                            <img id="after_preview_image" src="" alt="After photo preview" hidden>
+                            <div class="grooming-photo-placeholder" id="after_placeholder">Captured after photo will appear here</div>
+                            <label class="grooming-field">
+                                <span>Upload After Photo</span>
+                                <input type="file" name="after_photo" accept="image/*" capture="user">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="grooming-camera-actions camera-actions-bar">
+                    <button type="button" class="grooming-chip-link" id="grooming_start_camera">Start Camera</button>
+                    <button type="button" class="grooming-chip-link" id="grooming_capture_photo">Capture Selected</button>
+                    <button type="button" class="grooming-chip-link" id="grooming_clear_photo">Clear Selected</button>
+                </div>
+                <div id="grooming_camera_status" class="camera-status-note status-idle">Camera is not active yet.</div>
+            </section>
+
+            <label class="grooming-field grooming-field-wide">
+                <span>Remark</span>
+                <input type="text" name="remark" placeholder="Optional remark">
+            </label>
+
+            <div class="grooming-form-actions">
+                <button class="grooming-primary-btn" type="submit">Save haircut entry</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script>
+let timer = null;
+const ledgerInput = document.getElementById("ledger_no");
+const cameraVideo = document.getElementById("grooming-camera");
+const cameraCanvas = document.getElementById("grooming-camera-canvas");
+const statusBox = document.getElementById("grooming_camera_status");
+const targetButtons = document.querySelectorAll(".grooming-target-btn");
+const hiddenBefore = document.getElementById("captured_before_photo");
+const hiddenAfter = document.getElementById("captured_after_photo");
+const beforeImage = document.getElementById("before_preview_image");
+const afterImage = document.getElementById("after_preview_image");
+const beforePlaceholder = document.getElementById("before_placeholder");
+const afterPlaceholder = document.getElementById("after_placeholder");
+let groomingStream = null;
+let faceModelReady = false;
+let activeTarget = "before";
+
+function resetStudentBox() {
+    document.getElementById("studentInfoBox").style.display = "none";
+    document.getElementById("student_name").innerText = "";
+    document.getElementById("student_class").innerText = "";
+    document.getElementById("student_section").innerText = "";
+    document.getElementById("student_status").innerText = "";
+}
+
+function setGroomingStatus(message, variant = "idle") {
+    statusBox.textContent = message;
+    statusBox.className = `camera-status-note status-${variant}`;
+}
+
+function setTarget(target) {
+    activeTarget = target;
+    targetButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.target === target);
+    });
+}
+
+function assignCapturedImage(target, imageData) {
+    if (target === "before") {
+        hiddenBefore.value = imageData;
+        beforeImage.src = imageData;
+        beforeImage.hidden = false;
+        beforePlaceholder.hidden = true;
+    } else {
+        hiddenAfter.value = imageData;
+        afterImage.src = imageData;
+        afterImage.hidden = false;
+        afterPlaceholder.hidden = true;
+    }
+}
+
+function clearCapturedImage(target) {
+    if (target === "before") {
+        hiddenBefore.value = "";
+        beforeImage.src = "";
+        beforeImage.hidden = true;
+        beforePlaceholder.hidden = false;
+    } else {
+        hiddenAfter.value = "";
+        afterImage.src = "";
+        afterImage.hidden = true;
+        afterPlaceholder.hidden = false;
+    }
+}
+
+async function loadFaceModel() {
+    if (!window.faceapi) {
+        setGroomingStatus("Face detection is unavailable. You may continue using manual upload.", "warning");
+        return;
+    }
+    try {
+        await faceapi.nets.tinyFaceDetector.loadFromUri("https://justadudewhohacks.github.io/face-api.js/models");
+        faceModelReady = true;
+        setGroomingStatus("Face detection is ready. Start the camera and capture the selected photo.", "success");
+    } catch (error) {
+        setGroomingStatus("Face detection could not be initialized. Please continue with manual upload if needed.", "warning");
+    }
+}
+
+async function startGroomingCamera() {
+    try {
+        if (groomingStream) {
+            groomingStream.getTracks().forEach((track) => track.stop());
+        }
+        groomingStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: false
+        });
+        cameraVideo.srcObject = groomingStream;
+        await cameraVideo.play();
+        setGroomingStatus("Camera started. Keep one clear face in frame and capture the selected photo.", "idle");
+    } catch (error) {
+        setGroomingStatus("Camera access was denied. Please allow permission or use manual photo upload.", "error");
+    }
+}
+
+async function captureGroomingPhoto() {
+    if (!cameraVideo.videoWidth || !cameraVideo.videoHeight) {
+        setGroomingStatus("Camera preview is still loading. Please wait and try again.", "warning");
+        return;
+    }
+    if (faceModelReady) {
+        const detections = await faceapi.detectAllFaces(
+            cameraVideo,
+            new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 })
+        );
+        if (!detections.length) {
+            setGroomingStatus("No face was detected. Please ensure the student's face is clearly visible.", "error");
+            return;
+        }
+        if (detections.length > 1) {
+            setGroomingStatus("Multiple faces were detected. Please keep only one face in the frame.", "error");
+            return;
+        }
+    }
+
+    cameraCanvas.width = cameraVideo.videoWidth;
+    cameraCanvas.height = cameraVideo.videoHeight;
+    const ctx = cameraCanvas.getContext("2d");
+    ctx.drawImage(cameraVideo, 0, 0, cameraCanvas.width, cameraCanvas.height);
+    const imageData = cameraCanvas.toDataURL("image/jpeg", 0.92);
+    assignCapturedImage(activeTarget, imageData);
+    setGroomingStatus(`${activeTarget === "before" ? "Before" : "After"} photo captured successfully.`, "success");
+}
+
+function loadStudent() {
+    const ledger = ledgerInput.value.trim();
+    if (ledger.length < 1) {
+        resetStudentBox();
+        return;
+    }
+
+    fetch("/barber/api/student/" + ledger)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.ok) {
+                resetStudentBox();
+                return;
+            }
+            document.getElementById("studentInfoBox").style.display = "grid";
+            document.getElementById("student_name").innerText = data.student_name || "";
+            document.getElementById("student_class").innerText = data.class_name || "";
+            document.getElementById("student_section").innerText = data.section || "";
+            document.getElementById("student_status").innerText = data.status || "";
+        })
+        .catch(() => resetStudentBox());
+}
+
+ledgerInput.addEventListener("input", function() {
+    clearTimeout(timer);
+    timer = setTimeout(loadStudent, 250);
+});
+
+if (ledgerInput.value.trim()) {
+    loadStudent();
+}
+
+targetButtons.forEach((button) => {
+    button.addEventListener("click", () => setTarget(button.dataset.target));
+});
+
+document.getElementById("grooming_start_camera").addEventListener("click", startGroomingCamera);
+document.getElementById("grooming_capture_photo").addEventListener("click", captureGroomingPhoto);
+document.getElementById("grooming_clear_photo").addEventListener("click", () => {
+    clearCapturedImage(activeTarget);
+    setGroomingStatus(`${activeTarget === "before" ? "Before" : "After"} photo cleared.`, "idle");
+});
+
+window.addEventListener("beforeunload", () => {
+    if (groomingStream) {
+        groomingStream.getTracks().forEach((track) => track.stop());
+    }
+});
+
+setTarget("before");
+loadFaceModel();
+</script>
+{% endblock %}

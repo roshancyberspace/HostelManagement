@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Decision Register</h3>
+
+<form method="post">
+  <input name="ledger_no" placeholder="Ledger No" required>
+  <input name="decision" placeholder="Decision" required>
+  <input name="reference" placeholder="Reference (optional)">
+  <button type="submit">Record</button>
+</form>
+
+<table border="1">
+<tr>
+  <th>ID</th><th>Ledger</th><th>Decision</th><th>By</th><th>Date</th>
+</tr>
+{% for d in decisions %}
+<tr>
+  <td>{{ d.id }}</td>
+  <td>{{ d.ledger_no }}</td>
+  <td>{{ d.decision }}</td>
+  <td>{{ d.decided_by }}</td>
+  <td>{{ d.created_at }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

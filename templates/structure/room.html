@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="room-admin-shell">
+    <div class="room-admin-top">
+        <div>
+            <p class="room-admin-kicker">Structure</p>
+            <h1>Room Management</h1>
+            <p class="room-admin-subtitle">Add rooms, check occupancy, switch AC type, and open room actions from one clean page.</p>
+        </div>
+        <div class="room-admin-stats">
+            <div class="room-admin-stat">
+                <span>Total Rooms</span>
+                <strong>{{ rooms|length }}</strong>
+            </div>
+            <div class="room-admin-stat">
+                <span>Floors</span>
+                <strong>{{ floors|length }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <section class="room-admin-card">
+        <div class="room-admin-card-head">
+            <div>
+                <h2>Add Room</h2>
+                <p>Create a new room inside a selected floor.</p>
+            </div>
+        </div>
+
+        <form method="post" class="room-admin-form">
+            <label class="room-admin-field">
+                <span>Floor</span>
+                <select name="floor_id" required>
+                    <option value="">Select floor</option>
+                    {% for f in floors %}
+                    <option value="{{ f.id }}">
+                        {{ f.hostel_name }} - {{ f.block_name }} -
+                        {% if 'floor' in (f.floor_no|string|lower) %}{{ f.floor_no }}{% else %}Floor {{ f.floor_no }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </label>
+
+            <label class="room-admin-field">
+                <span>Room Number</span>
+                <input name="room_no" placeholder="101, A-12" required>
+            </label>
+
+            <label class="room-admin-field">
+                <span>Room Type</span>
+                <select name="ac_type">
+                    <option value="NON_AC">Non-AC</option>
+                    <option value="AC">AC</option>
+                </select>
+            </label>
+
+            <div class="room-admin-submit">
+                <button type="submit" class="room-admin-primary">Add Room</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="room-admin-card">
+        <div class="room-admin-card-head">
+            <div>
+                <h2>Room Registry</h2>
+                <p>Student count is linked from bed allotment records.</p>
+            </div>
+        </div>
+
+        {% if rooms %}
+        <div class="room-admin-table-wrap">
+            <table class="room-admin-table">
+                <thead>
+                    <tr>
+                        <th>Room</th>
+                        <th>Location</th>
+                        <th>Type</th>
+                        <th>Students</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rooms %}
+                    <tr>
+                        <td class="room-admin-room-cell">
+                            <strong>{{ r.room_no }}</strong>
+                        </td>
+                        <td>
+                            {{ r.hostel_name }} - {{ r.block_name }} -
+                            {% if 'floor' in (r.floor_no|string|lower) %}{{ r.floor_no }}{% else %}Floor {{ r.floor_no }}{% endif %}
+                        </td>
+                        <td>
+                            <div class="room-admin-type-cell">
+                                <span>{{ 'AC' if r.ac_type == 'AC' else 'Non-AC' }}</span>
+                                <form method="post" action="/structure/room/toggle-ac/{{ r.id }}">
+                                    <button class="room-admin-link subtle" type="submit">
+                                        {% if r.ac_type == "AC" %}Make Non-AC{% else %}Make AC{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                        <td>{{ r.allotted_students or 0 }}</td>
+                        <td>
+                            <span class="room-admin-badge {{ r.status|lower }}">{{ r.status }}</span>
+                        </td>
+                        <td>
+                            <div class="room-admin-actions">
+                                <a href="/structure/room-items/{{ r.id }}" class="room-admin-link">Items</a>
+                                <a href="/inspection/room?room_id={{ r.id }}" class="room-admin-link">Inspect</a>
+                                <a href="/reports/room/{{ r.id }}" class="room-admin-link">Details</a>
+                                <a href="/inspection/compare/ROOM/{{ r.id }}" class="room-admin-link">Pre/Post</a>
+                                <form method="post" action="/structure/room/delete/{{ r.id }}" onsubmit="return confirm('Delete this room?');">
+                                    <button class="room-admin-link danger" type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No rooms created yet</h3>
+            <p>Add the first room to start the room registry.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

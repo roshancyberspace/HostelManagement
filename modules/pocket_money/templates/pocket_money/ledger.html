@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="wallet-shell">
+    <section class="wallet-hero">
+        <div class="wallet-hero-card">
+            <span class="section-kicker">Pocket Money</span>
+            <h1>Wallet Ledger</h1>
+            <p>Review wallet balance, filter transaction dates, and track every collect or expense entry for this student.</p>
+        </div>
+        <div class="wallet-summary-grid">
+            <div class="metric-pill">
+                <span>Ledger</span>
+                <strong>{{ ledger_no }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Student</span>
+                <strong>{{ student.student_name if student else 'Not found' }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Current Balance</span>
+                <strong>Rs. {{ wallet.current_balance if wallet else 0 }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="intake-card wallet-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Ledger Actions</h2>
+                <p>Jump directly into collection, expense, or statement review.</p>
+            </div>
+        </div>
+        <div class="wallet-student-actions">
+            <a href="{{ url_for('pocket_money.collect', ledger_no=ledger_no) }}" class="btn btn-primary">Collect Money</a>
+            <a href="{{ url_for('pocket_money.expense', ledger_no=ledger_no) }}" class="btn btn-outline-primary">Record Expense</a>
+            <button onclick="window.print()" class="btn btn-outline-primary">Print Statement</button>
+        </div>
+    </section>
+
+    <section class="intake-card wallet-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Date Filter</h2>
+                <p>Filter ledger entries by transaction date.</p>
+            </div>
+        </div>
+        <form method="get" class="wallet-inline-form">
+            <div class="compact-field">
+                <label>From</label>
+                <input type="date" name="from" class="form-control" value="{{ date_from }}">
+            </div>
+            <div class="compact-field">
+                <label>To</label>
+                <input type="date" name="to" class="form-control" value="{{ date_to }}">
+            </div>
+            <button class="btn btn-outline-primary">Apply Filter</button>
+        </form>
+    </section>
+
+    <section class="intake-card wallet-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Transactions</h2>
+                <p>Complete history of collections and expenses for this wallet.</p>
+            </div>
+            <span class="soft-badge">{{ txns|length }} entries</span>
+        </div>
+        {% if txns %}
+        <div class="table-wrap">
+            <table class="table">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Bill</th>
+                    <th>View</th>
+                </tr>
+                {% for t in txns %}
+                <tr>
+                    <td>{{ t.created_at }}</td>
+                    <td>{{ t.txn_type }}</td>
+                    <td>{{ t.category or '-' }}</td>
+                    <td>{{ t.description or '-' }}</td>
+                    <td>Rs. {{ t.amount }}</td>
+                    <td>{% if t.bill_path %}<a href="/{{ t.bill_path }}" target="_blank">Open</a>{% else %}-{% endif %}</td>
+                    <td><a href="{{ url_for('pocket_money.view_transaction', txn_id=t.id) }}">Details</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No transactions found</h3>
+            <p>Try another date range or start with a collection entry.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

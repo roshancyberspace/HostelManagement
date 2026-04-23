@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="rbac-roles-shell">
+    <section class="rbac-users-hero">
+        <div class="rbac-users-hero-copy">
+            <span class="section-kicker">RBAC</span>
+            <h1>Roles and Permissions</h1>
+            <p>Build access roles, assign sidebar menus, and maintain the permission list from one organized screen.</p>
+        </div>
+        <div class="rbac-users-actions">
+            <a href="#create-role" class="btn">Add Role</a>
+            <a href="#permissions" class="ghost-btn btn">Assign Permissions</a>
+            <a href="{{ url_for('rbac.users') }}" class="ghost-btn btn">Manage Users</a>
+        </div>
+    </section>
+
+    <section class="rbac-flow-guide">
+        <article>
+            <span>1</span>
+            <strong>Select a Role</strong>
+            <p>Open the role you want to configure from the left panel.</p>
+        </article>
+        <article>
+            <span>2</span>
+            <strong>Tick Permissions</strong>
+            <p>Checked items are already assigned to the selected role.</p>
+        </article>
+        <article>
+            <span>3</span>
+            <strong>Save Access</strong>
+            <p>Changes apply immediately on the next page load or login refresh.</p>
+        </article>
+    </section>
+
+    <section class="rbac-users-stats">
+        <article>
+            <span>Total Roles</span>
+            <strong>{{ roles|length }}</strong>
+        </article>
+        <article>
+            <span>Permissions</span>
+            <strong>{{ permissions|length }}</strong>
+        </article>
+        <article>
+            <span>Selected Role</span>
+            <strong>{{ role_map[selected_role] }}</strong>
+        </article>
+        <article>
+            <span>Allowed Menus</span>
+            <strong>{{ selected_permissions|length }}</strong>
+        </article>
+    </section>
+
+    <section class="rbac-roles-layout">
+        <section class="rbac-role-panel">
+            <div class="rbac-card-head" id="create-role">
+                <div>
+                    <span class="section-kicker">Role Master</span>
+                    <h2>Create Role</h2>
+                    <p>Add a new role first, then open it below to assign permissions.</p>
+                </div>
+            </div>
+
+            <form method="post" action="{{ url_for('rbac.create_role_route') }}" class="rbac-role-create-form">
+                <div class="rbac-field">
+                    <label>Role Name</label>
+                    <input name="role_label" placeholder="Example: Warden" required>
+                </div>
+                <div class="rbac-field">
+                    <label>Role Key</label>
+                    <input name="role_key" placeholder="WARDEN">
+                </div>
+                <button type="submit">Add Role</button>
+            </form>
+
+            <div class="rbac-role-list">
+                {% for role in roles %}
+                <article class="rbac-role-card {% if selected_role == role.role_key %}selected{% endif %}">
+                    <div class="rbac-role-card-top">
+                        <div>
+                            <strong>{{ role.role_label }}</strong>
+                            <span>{{ role.role_key }}</span>
+                        </div>
+                        <a href="{{ url_for('rbac.roles', role=role.role_key) }}" class="btn small">{{ 'Selected' if selected_role == role.role_key else 'Open' }}</a>
+                    </div>
+                    {% if selected_role == role.role_key %}
+                    <form method="post" action="{{ url_for('rbac.update_role_route', role_key=role.role_key) }}" class="rbac-role-edit-form">
+                        <label>Rename Selected Role</label>
+                        <div>
+                            <input name="role_label" value="{{ role.role_label }}" required>
+                            <button type="submit" class="btn small">Update</button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="rbac-permission-panel" id="permissions">
+            <div class="rbac-card-head">
+                <div>
+                    <span class="section-kicker">Step 2: Assign Permissions</span>
+                    <h2>{{ role_map[selected_role] }} Access</h2>
+                    <p>Green checked tiles are currently assigned. Unchecked tiles are not assigned to this role.</p>
+                </div>
+                <span class="status-chip">{{ selected_permissions|length }} selected</span>
+            </div>
+
+            <div class="rbac-selected-role-summary">
+                <div>
+                    <span>Selected Role</span>
+                    <strong>{{ role_map[selected_role] }}</strong>
+                    <small>{{ selected_role }}</small>
+                </div>
+                <div>
+                    <span>Assigned</span>
+                    <strong>{{ selected_permissions|length }}</strong>
+                    <small>of {{ permissions|length }} permissions</small>
+                </div>
+                <div>
+                    <span>Status</span>
+                    <strong>Ready</strong>
+                    <small>Tick permissions and save</small>
+                </div>
+            </div>
+
+            <form method="post" class="rbac-permission-form">
+                <input type="hidden" name="role_key" value="{{ selected_role }}">
+                <div class="rbac-permission-actions-bar">
+                    <button type="button" class="ghost-btn btn small" onclick="setRolePermissions(true)">Select All</button>
+                    <button type="button" class="ghost-btn btn small" onclick="setRolePermissions(false)">Clear All</button>
+                </div>
+                <div class="rbac-permission-grid">
+                    {% for permission in permissions %}
+                    <label class="rbac-permission-tile {% if permission.key in selected_permissions %}checked{% endif %}">
+                        <input type="checkbox" name="permission_keys" value="{{ permission.key }}" {% if permission.key in selected_permissions %}checked{% endif %}>
+                        <span>
+                            <strong>{{ permission.label }}</strong>
+                            <small>{{ permission.key }}</small>
+                        </span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="rbac-sticky-actions">
+                    <button type="submit">Save Permissions</button>
+                    <span>{{ role_map[selected_role] }} will use these permissions immediately after save.</span>
+                </div>
+            </form>
+        </section>
+    </section>
+
+    <section class="rbac-permission-master" id="permission-master">
+        <div class="rbac-card-head">
+            <div>
+                <span class="section-kicker">Advanced</span>
+                <h2>Permission Master</h2>
+                <p>Use this only when adding a new module permission or renaming an existing permission label.</p>
+            </div>
+            <span class="status-chip">{{ permissions|length }} permissions</span>
+        </div>
+
+        <form method="post" action="{{ url_for('rbac.create_permission_route') }}" class="rbac-permission-create-form">
+            <input type="hidden" name="selected_role" value="{{ selected_role }}">
+            <div class="rbac-field">
+                <label>Permission Label</label>
+                <input name="permission_label" placeholder="Example: Fees Management" required>
+            </div>
+            <div class="rbac-field">
+                <label>Permission Key</label>
+                <input name="permission_key" placeholder="fees.manage" required>
+            </div>
+            <button type="submit">Add Permission</button>
+        </form>
+
+        <div class="rbac-permission-master-list">
+            {% for permission in permissions %}
+            <article>
+                <form method="post" action="{{ url_for('rbac.update_permission_route', permission_key=permission.key) }}">
+                    <input type="hidden" name="selected_role" value="{{ selected_role }}">
+                    <label>{{ permission.key }}</label>
+                    <div>
+                        <input name="permission_label" value="{{ permission.label }}" required>
+                        <button type="submit" class="btn small">Update</button>
+                    </div>
+                </form>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+</section>
+<script>
+function setRolePermissions(checked) {
+    document.querySelectorAll(".rbac-permission-form input[type='checkbox']").forEach((box) => {
+        box.checked = checked;
+        box.closest(".rbac-permission-tile").classList.toggle("checked", checked);
+    });
+}
+
+document.querySelectorAll(".rbac-permission-form input[type='checkbox']").forEach((box) => {
+    box.addEventListener("change", () => {
+        box.closest(".rbac-permission-tile").classList.toggle("checked", box.checked);
+    });
+});
+</script>
+{% endblock %}

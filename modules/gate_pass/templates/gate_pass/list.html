@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="gatepass-shell">
+    <div class="gatepass-hero">
+        <div>
+            <p class="gatepass-kicker">Gate Pass</p>
+            <h1>Gate pass register</h1>
+            <p class="gatepass-subtitle">All gate pass requests, wallet status, and print actions ek clean register me.</p>
+        </div>
+        <div class="gatepass-hero-actions">
+            <a class="gatepass-pill-link" href="{{ url_for('gate_pass.create') }}">New gate pass</a>
+        </div>
+    </div>
+
+    <div class="gatepass-panel">
+        <div class="gatepass-panel-head">
+            <div>
+                <h2>Register records</h2>
+                <p>Pending, approved, returned, aur violation entries ko yahin review karo.</p>
+            </div>
+            <span class="gatepass-chip">{{ passes|length }} records</span>
+        </div>
+
+        {% if passes %}
+        <div class="gatepass-table-wrap">
+            <table class="gatepass-table">
+                <thead>
+                    <tr>
+                        <th>Pass No</th>
+                        <th>Student</th>
+                        <th>Purpose</th>
+                        <th>Wallet</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in passes %}
+                    <tr>
+                        <td><strong>{{ item.gate_pass_no }}</strong></td>
+                        <td>
+                            <strong>{{ item.student_name or item.ledger_no }}</strong><br>
+                            <span class="gatepass-muted">{{ item.ledger_no }}{% if item.student_class %} · Class {{ item.student_class }}{% endif %}</span>
+                        </td>
+                        <td>{{ item.purpose }}</td>
+                        <td>
+                            <span class="gatepass-badge {% if item.wallet.low %}danger{% else %}success{% endif %}">
+                                Rs. {{ item.wallet.balance }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="gatepass-badge {% if item.status == 'VIOLATION' %}danger{% elif item.status == 'APPROVED' or item.status == 'RETURNED' %}success{% else %}neutral{% endif %}">
+                                {{ item.status }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="gatepass-action-row">
+                                <a class="gatepass-secondary-btn" href="{{ url_for('gate_pass.view', gp_id=item.id) }}">View</a>
+                                <a class="gatepass-secondary-btn" href="{{ url_for('gate_pass.print_view', gp_id=item.id) }}" target="_blank">Print</a>
+                                {% if not item.wallet.low %}
+                                <a class="gatepass-secondary-btn" href="{{ url_for('gate_pass.print_with_pocket', gp_id=item.id) }}" target="_blank">Print + Pocket</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="gatepass-empty">
+            <h3>No gate passes found</h3>
+            <p>Abhi tak koi gate pass create nahi hua. New Gate Pass se first request banao.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

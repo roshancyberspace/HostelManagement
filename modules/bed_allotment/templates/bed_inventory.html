@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="bed-shell">
+    <div class="bed-hero">
+        <div>
+            <p class="bed-kicker">Bed Allotment</p>
+            <h1>Bed inventory</h1>
+            <p class="bed-subtitle">AC bed stock ka clean inventory view, floor aur room order ke saath.</p>
+        </div>
+        <div class="bed-chip-row">
+            <span class="bed-chip">{{ beds|length }} beds</span>
+        </div>
+    </div>
+
+    <section class="bed-panel">
+        <div class="bed-panel-head">
+            <div>
+                <h2>Inventory register</h2>
+                <p>Available structure beds with live status.</p>
+            </div>
+        </div>
+
+        {% if beds %}
+        <div class="bed-table-wrap">
+            <table class="bed-table">
+                <thead>
+                    <tr>
+                        <th>Floor</th>
+                        <th>Room</th>
+                        <th>Bed</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in beds %}
+                    <tr>
+                        <td>{{ b.floor_name or b.floor_no }}</td>
+                        <td>{{ b.room_no }}</td>
+                        <td>{{ b.bed_no }}</td>
+                        <td><span class="bed-badge {{ (b.status or '')|lower }}">{{ b.status }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No beds found</h3>
+            <p>No AC bed inventory is available right now.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

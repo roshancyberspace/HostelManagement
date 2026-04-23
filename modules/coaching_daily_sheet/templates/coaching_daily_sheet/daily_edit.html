@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>📄 Daily Sheet: {{ date_str }} ({{ day_name }})</h3>
+
+<div class="mb-3" style="display:flex; gap:10px; flex-wrap:wrap;">
+    <a href="{{ url_for('coaching_daily_sheet.print_coaching', date_str=date_str) }}" class="btn btn-success">
+        🖨️ Print Coaching PDF
+    </a>
+
+    <a href="{{ url_for('coaching_daily_sheet.print_study', date_str=date_str) }}" class="btn btn-primary">
+        🖨️ Print Self Study PDF
+    </a>
+</div>
+
+<hr>
+
+<h4>✅ COACHING (Mandatory Daily)</h4>
+<p class="text-muted">
+If coaching is suspended / time changed / teacher changed → status change + remark mandatory.
+</p>
+
+<table class="table table-bordered table-sm">
+    <thead class="table-warning">
+        <tr>
+            <th>Class</th>
+            <th>Subject</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Teacher</th>
+            <th>Status</th>
+            <th>Remark</th>
+            <th>Save</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for r in coaching_rows %}
+        <tr>
+            <form method="post">
+                <input type="hidden" name="update_type" value="coaching">
+                <input type="hidden" name="row_id" value="{{ r['id'] }}">
+
+                <td><b>{{ r['class_name'] }}</b></td>
+
+                <td><input name="subject" value="{{ r['subject'] }}" class="form-control form-control-sm"></td>
+                <td><input name="start_time" value="{{ r['start_time'] }}" class="form-control form-control-sm"></td>
+                <td><input name="end_time" value="{{ r['end_time'] }}" class="form-control form-control-sm"></td>
+                <td><input name="teacher_name" value="{{ r['teacher_name'] }}" class="form-control form-control-sm"></td>
+
+                <td>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="ACTIVE" {% if r['status']=='ACTIVE' %}selected{% endif %}>ACTIVE</option>
+                        <option value="SUSPENDED" {% if r['status']=='SUSPENDED' %}selected{% endif %}>SUSPENDED</option>
+                        <option value="TIME_CHANGED" {% if r['status']=='TIME_CHANGED' %}selected{% endif %}>TIME_CHANGED</option>
+                        <option value="TEACHER_CHANGED" {% if r['status']=='TEACHER_CHANGED' %}selected{% endif %}>TEACHER_CHANGED</option>
+                        <option value="UPDATED" {% if r['status']=='UPDATED' %}selected{% endif %}>UPDATED</option>
+                    </select>
+                </td>
+
+                <td><input name="remark" value="{{ r['remark'] }}" class="form-control form-control-sm" placeholder="Mandatory if changed/suspended"></td>
+
+                <td><button class="btn btn-sm btn-primary">Save</button></td>
+            </form>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<h4>✅ SELF STUDY DUTY (Mandatory Daily)</h4>
+<p class="text-muted">
+Fixed timing: 07:00 PM – 08:30 PM. If changed/suspended → remark mandatory.
+</p>
+
+<table class="table table-bordered table-sm">
+    <thead class="table-warning">
+        <tr>
+            <th>Class Group</th>
+            <th>Floor / Place</th>
+            <th>Teacher</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Status</th>
+            <th>Remark</th>
+            <th>Save</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for r in study_rows %}
+        <tr>
+            <form method="post">
+                <input type="hidden" name="update_type" value="study">
+                <input type="hidden" name="row_id" value="{{ r['id'] }}">
+
+                <td><b>{{ r['class_group'] }}</b></td>
+
+                <td><input name="floor_place" value="{{ r['floor_place'] }}" class="form-control form-control-sm"></td>
+                <td><input name="teacher_name" value="{{ r['teacher_name'] }}" class="form-control form-control-sm"></td>
+                <td><input name="start_time" value="{{ r['start_time'] }}" class="form-control form-control-sm"></td>
+                <td><input name="end_time" value="{{ r['end_time'] }}" class="form-control form-control-sm"></td>
+
+                <td>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="ACTIVE" {% if r['status']=='ACTIVE' %}selected{% endif %}>ACTIVE</option>
+                        <option value="SUSPENDED" {% if r['status']=='SUSPENDED' %}selected{% endif %}>SUSPENDED</option>
+                        <option value="CHANGED" {% if r['status']=='CHANGED' %}selected{% endif %}>CHANGED</option>
+                    </select>
+                </td>
+
+                <td><input name="remark" value="{{ r['remark'] }}" class="form-control form-control-sm" placeholder="Mandatory if changed/suspended"></td>
+
+                <td><button class="btn btn-sm btn-primary">Save</button></td>
+            </form>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="gatepass-shell">
+    <div class="gatepass-hero">
+        <div>
+            <p class="gatepass-kicker">Gate Pass</p>
+            <h1>{{ gp.gate_pass_no }}</h1>
+            <p class="gatepass-subtitle">Student outing details, approval controls, and wallet summary ek hi view me.</p>
+        </div>
+        <div class="gatepass-hero-actions">
+            <a class="gatepass-pill-link" href="{{ url_for('gate_pass.list_gate_pass') }}">Back to register</a>
+            <a class="gatepass-pill-link" href="{{ url_for('gate_pass.print_view', gp_id=gp.id) }}" target="_blank">Print</a>
+            {% if not wallet.low %}
+            <a class="gatepass-pill-link" href="{{ url_for('gate_pass.print_with_pocket', gp_id=gp.id) }}" target="_blank">Print + Pocket</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="gatepass-stat-grid">
+        <article class="gatepass-stat-card">
+            <span>Status</span>
+            <strong>{{ gp.status }}</strong>
+        </article>
+        <article class="gatepass-stat-card">
+            <span>Wallet balance</span>
+            <strong>Rs. {{ wallet.balance }}</strong>
+        </article>
+        <article class="gatepass-stat-card">
+            <span>Out time</span>
+            <strong>{{ gp.out_datetime }}</strong>
+        </article>
+        <article class="gatepass-stat-card">
+            <span>Expected return</span>
+            <strong>{{ gp.expected_return_datetime }}</strong>
+        </article>
+    </div>
+
+    <div class="gatepass-grid gatepass-grid-2">
+        <div class="gatepass-panel">
+            <div class="gatepass-panel-head">
+                <div>
+                    <h2>Gate pass details</h2>
+                    <p>Student, purpose, and travel context.</p>
+                </div>
+                <span class="gatepass-chip">{{ gp.status }}</span>
+            </div>
+            <div class="gatepass-card-list">
+                <article class="gatepass-mini-card">
+                    <strong>Student</strong>
+                    <p>{{ student.full_name if student else gp.ledger_no }}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Ledger</strong>
+                    <p>{{ gp.ledger_no }}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Class</strong>
+                    <p>{% if student %}{{ student.class }}{% if student.section %} {{ student.section }}{% endif %}{% else %}-{% endif %}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Purpose</strong>
+                    <p>{{ gp.purpose }}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Relation / Escort</strong>
+                    <p>{{ gp.relation or 'Not specified' }}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Guardian Contact</strong>
+                    <p>{{ student.guardian_contact if student else 'Not available' }}</p>
+                </article>
+            </div>
+        </div>
+
+        <div class="gatepass-panel">
+            <div class="gatepass-panel-head">
+                <div>
+                    <h2>Actions</h2>
+                    <p>Approval, return, violation, aur print controls.</p>
+                </div>
+                <span class="gatepass-chip {% if wallet.low %}danger{% endif %}">
+                    {% if wallet.low %}Wallet low{% else %}Wallet clear{% endif %}
+                </span>
+            </div>
+
+            {% if gp.status == 'PENDING' %}
+                {% if wallet.low %}
+                <form method="post" action="{{ url_for('gate_pass.approve', gp_id=gp.id) }}" class="gatepass-override-form">
+                    <label class="gatepass-field gatepass-field-full">
+                        <span>Superintendent override reason</span>
+                        <textarea name="override_reason" rows="4" placeholder="Mandatory reason for approving gate pass with low wallet balance" required></textarea>
+                    </label>
+                    <button class="gatepass-primary-btn" type="submit">Approve with override</button>
+                </form>
+                {% else %}
+                <a class="gatepass-primary-btn" href="{{ url_for('gate_pass.approve', gp_id=gp.id) }}">Approve gate pass</a>
+                {% endif %}
+            {% endif %}
+
+            {% if gp.status == 'APPROVED' %}
+            <div class="gatepass-action-row">
+                <a class="gatepass-primary-btn" href="{{ url_for('gate_pass.returned', gp_id=gp.id) }}">Mark returned</a>
+                <a class="gatepass-danger-btn" href="{{ url_for('gate_pass.violation', gp_id=gp.id) }}">Mark violation</a>
+            </div>
+            {% endif %}
+
+            {% if gp.actual_return_datetime %}
+            <div class="gatepass-highlight-card">
+                <strong>Actual return time</strong>
+                <p>{{ gp.actual_return_datetime }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

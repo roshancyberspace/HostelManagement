@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📊 Overall Student Summary</h2>
+
+<h3>{{ student.full_name }}</h3>
+
+<div class="cards">
+    <div class="card"><h3>👍 Good</h3><h1>{{ summary.good }}</h1></div>
+    <div class="card"><h3>👎 Bad</h3><h1>{{ summary.bad }}</h1></div>
+    <div class="card"><h3>⭐ Rating</h3><h2>{{ summary.rating }}</h2></div>
+</div>
+
+{% endblock %}

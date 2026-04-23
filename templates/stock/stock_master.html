@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Stock Master</h1>
+
+<form method="post">
+    <input name="name" placeholder="Item name" required>
+    <select name="category">
+        <option value="ROOM">ROOM</option>
+        <option value="COMMON">COMMON</option>
+    </select>
+    <input name="unit" placeholder="Unit (pcs)">
+    <button>Add Item</button>
+</form>
+
+<hr>
+
+<ul>
+{% for i in items %}
+    <li>{{ i.item_name }} ({{ i.category }})</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

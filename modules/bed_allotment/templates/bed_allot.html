@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="bed-shell">
+    <div class="bed-hero">
+        <div>
+            <p class="bed-kicker">Bed Allotment</p>
+            <h1>Allot and vacate beds</h1>
+            <p class="bed-subtitle">Student ledger ke basis par beds allot ya vacate karo, with clear AC room restriction and vacancy tracking.</p>
+        </div>
+        <div class="bed-chip-row">
+            <span class="bed-chip">{{ beds|length }} vacant beds</span>
+        </div>
+    </div>
+
+    <div class="bed-grid bed-grid-2">
+        <section class="bed-panel">
+            <div class="bed-panel-head">
+                <div>
+                    <h2>Allot bed</h2>
+                    <p>Active student ko available AC bed assign karo.</p>
+                </div>
+            </div>
+            <form method="post" class="bed-form-grid">
+                <label class="bed-field">
+                    <span>Ledger Number</span>
+                    <input type="text" name="ledger" placeholder="Enter ledger number" required>
+                </label>
+                <label class="bed-field bed-field-wide">
+                    <span>Select Vacant Bed</span>
+                    <select name="bed_id" required>
+                        <option value="">Select bed</option>
+                        {% for b in beds %}
+                        <option value="{{ b.bed_id }}">
+                            {{ b.floor_name or b.floor_no }} - Room {{ b.room_no }} - Bed {{ b.bed_no }} ({{ b.status }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <input type="hidden" name="action" value="ALLOT">
+                <div class="bed-form-actions">
+                    <button type="submit" class="bed-primary-btn">Allot bed</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="bed-panel">
+            <div class="bed-panel-head">
+                <div>
+                    <h2>Vacate bed</h2>
+                    <p>Ledger number ke through active allotment vacate karo.</p>
+                </div>
+            </div>
+            <form method="post" class="bed-form-grid">
+                <label class="bed-field">
+                    <span>Ledger Number</span>
+                    <input type="text" name="ledger" placeholder="Enter ledger number" required>
+                </label>
+                <label class="bed-field">
+                    <span>Vacate Reason</span>
+                    <input type="text" name="vacate_reason" placeholder="Shifted / Left Hostel" value="VACATED">
+                </label>
+                <input type="hidden" name="action" value="VACATE">
+                <div class="bed-form-actions">
+                    <button type="submit" class="bed-danger-btn">Vacate bed</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</section>
+{% endblock %}

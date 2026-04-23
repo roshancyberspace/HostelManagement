@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="calendar-shell">
+    <div class="calendar-hero">
+        <div>
+            <p class="calendar-kicker">Calendar Rules</p>
+            <h1>Monthly holiday calendar</h1>
+            <p class="calendar-subtitle">Selected month ka planner yahin dikhega. Sirf usi month ke holidays highlight honge, aur Sunday off auto-managed rahega.</p>
+        </div>
+        <div class="calendar-month-nav">
+            <a class="calendar-secondary-link" href="{{ url_for('calendar_rules.index', month=dashboard.prev_month) }}">Previous month</a>
+            <form method="get" class="calendar-month-form">
+                <input type="month" name="month" value="{{ dashboard.month_value }}">
+                <button class="calendar-primary-btn" type="submit">Open month</button>
+            </form>
+            <a class="calendar-secondary-link" href="{{ url_for('calendar_rules.index', month=dashboard.next_month) }}">Next month</a>
+        </div>
+    </div>
+
+    {% if not active_session %}
+    <div class="calendar-empty">
+        <h3>No active academic session found</h3>
+        <p>Calendar rules use karne ke liye pehle active academic session set hona chahiye.</p>
+    </div>
+    {% else %}
+    <div class="calendar-stat-grid">
+        <article class="calendar-stat-card">
+            <span>Session</span>
+            <strong>{{ active_session["name"] }}</strong>
+        </article>
+        <article class="calendar-stat-card">
+            <span>Month</span>
+            <strong>{{ dashboard.selected_month_label }}</strong>
+        </article>
+        <article class="calendar-stat-card">
+            <span>Sunday off</span>
+            <strong>{{ dashboard.summary.sundays }}</strong>
+        </article>
+        <article class="calendar-stat-card">
+            <span>Total rules</span>
+            <strong>{{ dashboard.summary.total }}</strong>
+        </article>
+    </div>
+
+    <div class="calendar-grid calendar-grid-2">
+        <div class="calendar-panel calendar-month-panel">
+            <div class="calendar-panel-head">
+                <div>
+                    <h2>{{ dashboard.selected_month_label }}</h2>
+                    <p>Month view me holiday dates color ke saath highlight ho rahi hain.</p>
+                </div>
+                <span class="calendar-chip">Planner</span>
+            </div>
+            <div class="calendar-board">
+                <div class="calendar-weekday">Mon</div>
+                <div class="calendar-weekday">Tue</div>
+                <div class="calendar-weekday">Wed</div>
+                <div class="calendar-weekday">Thu</div>
+                <div class="calendar-weekday">Fri</div>
+                <div class="calendar-weekday">Sat</div>
+                <div class="calendar-weekday">Sun</div>
+                {% for day in dashboard.calendar_days %}
+                <article class="calendar-day-card {% if not day.in_month %}muted{% endif %} {{ day.primary_type|lower|replace('_', '-') }}">
+                    <strong>{{ day.day }}</strong>
+                    {% if day.rules %}
+                        {% for rule in day.rules[:2] %}
+                            {% if rule["day_type"] != "SUNDAY" %}
+                        <span class="calendar-day-tag {{ rule['day_type']|lower|replace('_', '-') }}">{{ rule["title"] }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="calendar-panel">
+            <div class="calendar-panel-head">
+                <div>
+                    <h2>Month highlights</h2>
+                    <p>Sirf selected month ke govt aur festival holidays.</p>
+                </div>
+                <span class="calendar-chip">{{ (monthly_focus.govt|length) + (monthly_focus.festival|length) }} holidays</span>
+            </div>
+
+            <div class="calendar-highlight-group">
+                <h3>Government holidays</h3>
+                {% if monthly_focus.govt %}
+                <div class="calendar-suggestion-list">
+                    {% for item in monthly_focus.govt %}
+                    <article class="calendar-suggestion-card">
+                        <div>
+                            <strong>{{ item.title }}</strong>
+                            <p>{{ item.date }}</p>
+                        </div>
+                        {% if item.exists %}
+                        <span class="calendar-rule-badge govt-holiday">Added</span>
+                        {% else %}
+                        <form method="post" action="{{ url_for('calendar_rules.add_suggested', slug=item.slug) }}">
+                            <button class="calendar-primary-btn small" type="submit">Add</button>
+                        </form>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="calendar-empty compact">
+                    <h3>No govt holiday this month</h3>
+                    <p>Selected month me suggested government holiday nahi hai.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="calendar-highlight-group">
+                <h3>Festival holidays</h3>
+                {% if monthly_focus.festival %}
+                <div class="calendar-suggestion-list">
+                    {% for item in monthly_focus.festival %}
+                    <article class="calendar-suggestion-card">
+                        <div>
+                            <strong>{{ item.title }}</strong>
+                            <p>{{ item.date }}</p>
+                        </div>
+                        {% if item.exists %}
+                        <span class="calendar-rule-badge festival-holiday">Added</span>
+                        {% else %}
+                        <form method="post" action="{{ url_for('calendar_rules.add_suggested', slug=item.slug) }}">
+                            <button class="calendar-primary-btn small" type="submit">Add</button>
+                        </form>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="calendar-empty compact">
+                    <h3>No festival holiday this month</h3>
+                    <p>Selected month me suggested festival holiday nahi hai.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="calendar-grid calendar-grid-2">
+        <div class="calendar-panel">
+            <div class="calendar-panel-head">
+                <div>
+                    <h2>Holiday sync and custom rule</h2>
+                    <p>Public iCal feed se import karo ya apna rule khud banao.</p>
+                </div>
+                <span class="calendar-chip">Actions</span>
+            </div>
+
+            <form method="post" action="{{ url_for('calendar_rules.sync_holidays') }}" class="calendar-form-grid calendar-block">
+                <label class="calendar-field calendar-field-full">
+                    <span>Holiday feed URL</span>
+                    <input type="url" name="feed_url" value="{{ default_feed_url }}" required>
+                </label>
+                <div class="calendar-form-actions">
+                    <button class="calendar-primary-btn" type="submit">Sync India holidays</button>
+                </div>
+            </form>
+
+            <div class="calendar-manual-card">
+                <div class="calendar-manual-head">
+                    <strong>Custom rule</strong>
+                    <span>Manual override</span>
+                </div>
+                <form method="post" action="{{ url_for('calendar_rules.create') }}" class="calendar-form-grid">
+                    <label class="calendar-field">
+                        <span>From Date</span>
+                        <input type="date" name="from_date" required>
+                    </label>
+                    <label class="calendar-field">
+                        <span>To Date</span>
+                        <input type="date" name="to_date" required>
+                    </label>
+                    <label class="calendar-field">
+                        <span>Day Type</span>
+                        <select name="day_type" required>
+                            <option value="HOLIDAY">Holiday</option>
+                            <option value="FESTIVAL_HOLIDAY">Festival Holiday</option>
+                            <option value="GOVT_HOLIDAY">Government Holiday</option>
+                            <option value="WORKING">Working Day</option>
+                            <option value="EXAM">Exam</option>
+                            <option value="SPECIAL">Special</option>
+                        </select>
+                    </label>
+                    <label class="calendar-field">
+                        <span>Title</span>
+                        <input type="text" name="title" placeholder="Holiday / Event title" required>
+                    </label>
+                    <label class="calendar-field calendar-field-full">
+                        <span>Description</span>
+                        <input type="text" name="description" placeholder="Optional note">
+                    </label>
+                    <div class="calendar-form-actions">
+                        <button class="calendar-primary-btn" type="submit">Add custom rule</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

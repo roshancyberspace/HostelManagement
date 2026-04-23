@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Dashboard</p>
+            <h1>Vacant rooms</h1>
+            <p class="report-hub-subtitle">Rooms jahan abhi koi bed allotted nahi hai, unka quick list view.</p>
+        </div>
+        <div class="report-hub-badges">
+            <span class="report-hub-badge">{{ rooms|length }} rooms</span>
+        </div>
+    </div>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Vacant room register</h2>
+                <p>0 allotment wale rooms ke direct bed detail links.</p>
+            </div>
+        </div>
+
+        {% if rooms %}
+        <div class="report-hub-table-wrap">
+            <table class="report-hub-table">
+                <thead>
+                    <tr>
+                        <th>Floor</th>
+                        <th>Room</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Total Beds</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rooms %}
+                    <tr>
+                        <td>{{ r.floor_no }}</td>
+                        <td><strong>{{ r.room_no }}</strong></td>
+                        <td>{{ r.room_type }}</td>
+                        <td><span class="report-hub-badge {{ (r.status or '')|lower }}">{{ r.status }}</span></td>
+                        <td>{{ r.total_beds_in_room }}</td>
+                        <td><a href="/vacant-room/{{ r.room_id }}" class="report-hub-link-btn">View beds</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No vacant rooms found</h3>
+            <p>Current structure me koi fully vacant room available nahi hai.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="master-feed-shell">
+  <div class="master-feed-hero">
+    <div>
+      <span class="section-kicker">Activity Audit</span>
+      <h1>Routine Logs</h1>
+      <p>Review recent routine execution records and verify daily operational movement across the hostel.</p>
+    </div>
+    <div class="master-feed-hero-card">
+      <span class="status-chip">Execution history</span>
+      <strong>{{ logs|length }}</strong>
+      <p>Latest routine log entries currently visible in this register.</p>
+    </div>
+  </div>
+
+  <div class="master-feed-summary">
+    <div class="summary-pill">
+      <span class="summary-label">Module</span>
+      <strong>Routine Logs</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Entries</span>
+      <strong>{{ logs|length }}</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Order</span>
+      <strong>Latest First</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">View</span>
+      <strong>Audit Table</strong>
+    </div>
+  </div>
+
+  <section class="master-feed-card">
+    <div class="master-feed-card-head">
+      <h3>Execution Register</h3>
+      <span class="status-chip">Audit</span>
+    </div>
+    <p>Track who executed each routine, when it happened, and what status was recorded.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Routine</th>
+            <th>Executed By</th>
+            <th>Date and Time</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if logs %}
+            {% for log in logs %}
+            <tr>
+              <td><strong>{{ log["routine_title"] }}</strong></td>
+              <td>{{ log["executed_by"] or "System" }}</td>
+              <td>{{ log["executed_at"] }}</td>
+              <td><span class="status-chip">{{ log["status"] or "Recorded" }}</span></td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4" class="empty-state-cell">No routine logs available right now.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="master-feed-actions">
+      <a href="{{ url_for('master_feed.routines') }}" class="ghost-btn btn">Back to Routines</a>
+    </div>
+  </section>
+</section>
+
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>📘 Coaching Weekly Master Routine</h3>
+<p class="text-muted">Edit subject/teacher/time or suspend rows. No delete.</p>
+
+<table class="table table-bordered table-sm">
+    <thead class="table-warning">
+        <tr>
+            <th>Day</th>
+            <th>Class</th>
+            <th>Subject</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Teacher</th>
+            <th>Status</th>
+            <th>Save</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in rows %}
+        <tr>
+            <form method="post">
+                <input type="hidden" name="row_id" value="{{ r['id'] }}">
+
+                <td><b>{{ r['day_name'] }}</b></td>
+                <td><b>{{ r['class_name'] }}</b></td>
+
+                <td><input name="subject" value="{{ r['subject'] }}" class="form-control form-control-sm"></td>
+                <td><input name="start_time" value="{{ r['start_time'] }}" class="form-control form-control-sm"></td>
+                <td><input name="end_time" value="{{ r['end_time'] }}" class="form-control form-control-sm"></td>
+                <td><input name="teacher_name" value="{{ r['teacher_name'] }}" class="form-control form-control-sm"></td>
+
+                <td>
+                    <select name="status" class="form-select form-select-sm">
+                        <option value="ACTIVE" {% if r['status']=='ACTIVE' %}selected{% endif %}>ACTIVE</option>
+                        <option value="SUSPENDED" {% if r['status']=='SUSPENDED' %}selected{% endif %}>SUSPENDED</option>
+                    </select>
+                </td>
+
+                <td><button class="btn btn-sm btn-primary">Save</button></td>
+            </form>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

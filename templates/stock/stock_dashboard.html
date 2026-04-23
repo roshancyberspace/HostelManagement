@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Stock Dashboard</h1>
+
+<div class="card">
+    <h3>Total Stock Items</h3>
+    <ul>
+        {% for i in items %}
+            <li>{{ i.item_name }} ({{ i.category }})</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<a href="/stock/master">➕ Manage Stock Master</a>
+
+{% endblock %}

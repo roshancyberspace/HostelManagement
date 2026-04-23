@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="attendance-shell">
+    <div class="attendance-hero">
+        <div>
+            <p class="attendance-kicker">Monthly Report</p>
+            <h1>Monthly attendance review</h1>
+            <p class="attendance-subtitle">Selected month ke totals, attendance percentage, gatepass count, aur chronic absentees ko one view me dekho.</p>
+        </div>
+        <form method="get" class="attendance-filter-bar">
+            <input type="month" name="month" value="{{ month_value }}" required>
+            <button class="attendance-primary-btn" type="submit">Load month</button>
+            <a class="attendance-secondary-btn" href="{{ url_for('student_attendance.export_monthly_pdf', start=start_date.isoformat(), end=end_date.isoformat()) }}">Download monthly PDF</a>
+            <a class="attendance-secondary-btn" href="{{ url_for('student_attendance.export_yearly_pdf', year=end_date.year) }}">Yearly PDF</a>
+        </form>
+    </div>
+
+    <div class="attendance-stat-grid">
+        <article class="attendance-stat-card">
+            <span>Period start</span>
+            <strong>{{ start_date }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Period end</span>
+            <strong>{{ end_date }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Summary rows</span>
+            <strong>{{ summary|length }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Chronic alerts</span>
+            <strong>{{ chronic|length }}</strong>
+        </article>
+    </div>
+
+    <div class="attendance-grid attendance-grid-2">
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Class and block summary</h2>
+                    <p>Monthly attendance percentage and gatepass totals.</p>
+                </div>
+                <span class="attendance-chip">{{ month_value }}</span>
+            </div>
+            {% if summary %}
+            <div class="attendance-table-wrap">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Block</th>
+                            <th>Total Records</th>
+                            <th>Present</th>
+                            <th>Attendance %</th>
+                            <th>Gatepass</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in summary %}
+                        {% set percent = (item["present"] / item["total"] * 100) if item["total"] else 0 %}
+                        <tr>
+                            <td>{{ item["class"] }}</td>
+                            <td>{{ item["block"] }}</td>
+                            <td>{{ item["total"] }}</td>
+                            <td>{{ item["present"] }}</td>
+                            <td>{{ percent | round(2) }}%</td>
+                            <td>{{ item["gatepass"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="attendance-empty">
+                <h3>No monthly records found</h3>
+                <p>Selected month me attendance save hone ke baad yahan summary dikhegi.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Chronic absentees</h2>
+                    <p>Threshold cross karne wale students yahan flag honge.</p>
+                </div>
+                <span class="attendance-chip">{{ chronic|length }} students</span>
+            </div>
+            {% if chronic %}
+            <div class="attendance-card-list">
+                {% for student in chronic %}
+                <article class="attendance-mini-card">
+                    <div>
+                        <strong>{{ student["student_name"] }}</strong>
+                        <p>{{ student["ledger_no"] }} · Class {{ student["class"] }}</p>
+                    </div>
+                    <span class="attendance-badge warning">{{ student["absents"] }} absents</span>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="attendance-empty">
+                <h3>No chronic absentee alerts</h3>
+                <p>Monthly threshold ke hisaab se koi student abhi flag nahi hua.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

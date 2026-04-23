@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HostelERP - Enterprise Hostel Management Platform</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="landing-enterprise">
+<header class="enterprise-nav">
+    <a class="enterprise-brand" href="/" aria-label="HostelERP home">
+        <span>H</span>
+        <strong>HostelERP</strong>
+    </a>
+    <nav aria-label="Landing navigation">
+        <a href="#platform">Platform</a>
+        <a href="#modules">Modules</a>
+        <a href="#onboarding">Onboarding</a>
+    </nav>
+    <a class="enterprise-login" href="{{ url_for('auth.login') }}">Secure Login</a>
+</header>
+
+<main>
+    <section class="enterprise-hero-wrap">
+        <div class="enterprise-bg-card bg-one">Attendance Analytics</div>
+        <div class="enterprise-bg-card bg-two">Gate Pass Control</div>
+        <div class="enterprise-bg-card bg-three">Room Health</div>
+        <div class="enterprise-hero reveal-up" id="platform">
+            <div class="enterprise-copy">
+                <span class="enterprise-kicker">Enterprise hostel operations suite</span>
+                <h1>Run every hostel desk from one intelligent command center.</h1>
+                <p>
+                    HostelERP connects student intake, bed allotment, attendance, gate pass,
+                    pocket money, laundry, mess, inspections, governance and reports in one
+                    secure role-based platform.
+                </p>
+                <div class="enterprise-actions">
+                    <a class="enterprise-primary" href="{{ url_for('auth.login') }}">Open Dashboard</a>
+                    <a class="enterprise-secondary" href="#onboarding">Request Onboarding</a>
+                </div>
+                <div class="enterprise-trust">
+                    <span><b>20+</b> operational modules</span>
+                    <span><b>Role-based</b> access control</span>
+                    <span><b>PDF + Excel</b> workflows</span>
+                </div>
+            </div>
+
+            <div class="enterprise-product" aria-label="HostelERP enterprise product preview">
+                <div class="product-shell">
+                    <div class="product-toolbar">
+                        <span></span><span></span><span></span>
+                        <strong>Superintendent Overview</strong>
+                    </div>
+                    <div class="product-grid">
+                        <aside class="product-sidebar">
+                            <b>Command</b>
+                            <a class="active">Overview</a>
+                            <a>Students</a>
+                            <a>Beds</a>
+                            <a>Attendance</a>
+                            <a>Reports</a>
+                        </aside>
+                        <section class="product-canvas">
+                            <div class="canvas-head">
+                                <div>
+                                    <small>Today overview</small>
+                                    <h2>Operations Health</h2>
+                                </div>
+                                <button type="button">Live</button>
+                            </div>
+                            <div class="enterprise-metrics">
+                                <article class="metric-large">
+                                    <small>Hostel Occupancy</small>
+                                    <strong>86%</strong>
+                                    <div><span style="width:86%"></span></div>
+                                </article>
+                                <article>
+                                    <small>Present</small>
+                                    <strong>94%</strong>
+                                </article>
+                                <article>
+                                    <small>Gate Pass</small>
+                                    <strong>12</strong>
+                                </article>
+                            </div>
+                            <div class="ops-board">
+                                <div class="ops-chart">
+                                    <span></span>
+                                    <b>Room Health</b>
+                                </div>
+                                <div class="ops-feed">
+                                    <p><i></i> Attendance report generated</p>
+                                    <p><i></i> Bed mismatch queue reviewed</p>
+                                    <p><i></i> Laundry issue-return pending</p>
+                                    <p><i></i> Inspection alerts prioritized</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div class="product-chip chip-one">Student Master</div>
+                <div class="product-chip chip-two">Pocket Money</div>
+                <div class="product-chip chip-three">Governance</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="enterprise-band reveal-up" aria-label="Platform capabilities">
+        <article><span>01</span><b>Admissions</b><small>Student biodata, status, documents and Excel imports.</small></article>
+        <article><span>02</span><b>Residential Ops</b><small>Rooms, beds, attendance, gate pass and daily routines.</small></article>
+        <article><span>03</span><b>Compliance</b><small>Inspections, notices, permissions, reports and audit trails.</small></article>
+        <article><span>04</span><b>Finance Touchpoints</b><small>Pocket money, ledgers, expenses and parent wallet view.</small></article>
+    </section>
+
+    <section class="enterprise-section reveal-up" id="modules">
+        <div class="enterprise-section-head">
+            <span class="enterprise-kicker">Built around actual hostel workflows</span>
+            <h2>A premium interface for serious campus administration.</h2>
+            <p>Every module is designed as part of the same operational loop, so data moves naturally between teams.</p>
+        </div>
+        <div class="enterprise-module-grid">
+            <article><b>Student Intake</b><small>New admission, bulk upload, biodata master, registry and status changes.</small></article>
+            <article><b>Bed Allotment</b><small>Inventory, occupancy, history, vacant rooms and mismatch resolution.</small></article>
+            <article><b>Attendance Analytics</b><small>Daily sessions, management reports, monthly and yearly PDF exports.</small></article>
+            <article><b>Gate Pass Control</b><small>Approval, print, return, violation tracking and permission history.</small></article>
+            <article><b>Routine Management</b><small>Mess menu, laundry routine, issue-return register, grooming and schedules.</small></article>
+            <article><b>Inspection and Recovery</b><small>Room/common-area audits, damaged items, alerts and recovery ledger.</small></article>
+            <article><b>Governance Layer</b><small>Notices, acknowledgements, decision register, staff and members.</small></article>
+            <article><b>Parent and Wallet View</b><small>Student ledger, collection, expenses and parent-facing wallet access.</small></article>
+        </div>
+    </section>
+
+    <section class="enterprise-flow reveal-up">
+        <div>
+            <span class="enterprise-kicker">Management visibility</span>
+            <h2>From morning attendance to night audit, leadership gets one source of truth.</h2>
+        </div>
+        <div class="flow-steps">
+            <article class="active"><span>06:30</span><b>Attendance and routine readiness</b></article>
+            <article><span>10:00</span><b>Student movement and gate approvals</b></article>
+            <article><span>17:30</span><b>Coaching, mess, laundry and wallet updates</b></article>
+            <article><span>21:30</span><b>Inspection, reports and final roll call</b></article>
+        </div>
+    </section>
+
+    <section class="enterprise-cta reveal-up">
+        <div>
+            <span class="enterprise-kicker">Ready for campus scale</span>
+            <h2>Deploy HostelERP as your operational backbone.</h2>
+            <p>Move from scattered registers and disconnected spreadsheets to a premium command layer for administrators, wardens and management teams.</p>
+        </div>
+        <div class="cta-actions">
+            <a class="enterprise-primary" href="#onboarding">Start Onboarding</a>
+            <a class="enterprise-secondary" href="{{ url_for('auth.login') }}">Login to Demo</a>
+        </div>
+    </section>
+
+    <section class="onboarding-section reveal-up" id="onboarding">
+        <div class="onboarding-copy">
+            <span class="enterprise-kicker">Start onboarding</span>
+            <h2>Bring your hostel operations online with a guided setup.</h2>
+            <p>
+                Share your campus details and implementation requirements. The onboarding
+                team can map student intake, room structure, user roles and reporting needs.
+            </p>
+            <ul>
+                <li>Role and permission planning</li>
+                <li>Student, room and bed data migration</li>
+                <li>Report and PDF workflow configuration</li>
+            </ul>
+        </div>
+        <form class="onboarding-form" method="post" action="{{ url_for('auth.login') }}">
+            <div class="form-row">
+                <label for="school_name">Institute / Hostel Name</label>
+                <input id="school_name" name="school_name" type="text" placeholder="Example: Sunrise Residential Campus">
+            </div>
+            <div class="form-row two">
+                <div>
+                    <label for="contact_name">Contact Person</label>
+                    <input id="contact_name" name="contact_name" type="text" placeholder="Full name">
+                </div>
+                <div>
+                    <label for="phone">Phone</label>
+                    <input id="phone" name="phone" type="tel" placeholder="+91 98765 43210">
+                </div>
+            </div>
+            <div class="form-row two">
+                <div>
+                    <label for="students">Approx. Students</label>
+                    <select id="students" name="students">
+                        <option>Up to 100</option>
+                        <option>100 - 300</option>
+                        <option>300 - 700</option>
+                        <option>700+</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="priority">Primary Need</label>
+                    <select id="priority" name="priority">
+                        <option>Complete HostelERP setup</option>
+                        <option>Student and bed management</option>
+                        <option>Attendance and reports</option>
+                        <option>Gate pass and permissions</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <label for="message">Requirements</label>
+                <textarea id="message" name="message" rows="4" placeholder="Tell us about branches, hostels, users, reports or migration needs."></textarea>
+            </div>
+            <button type="submit">Submit Onboarding Request</button>
+            <small>Submitting will take you to the secure login area in this local build.</small>
+        </form>
+    </section>
+</main>
+
+<footer class="enterprise-footer">
+    <div>
+        <a class="enterprise-brand footer-brand" href="/">
+            <span>H</span>
+            <strong>HostelERP</strong>
+        </a>
+        <p>Enterprise hostel management for residential schools, colleges and campus operations.</p>
+    </div>
+    <div class="footer-links">
+        <a href="#platform">Platform</a>
+        <a href="#modules">Modules</a>
+        <a href="#onboarding">Onboarding</a>
+        <a href="{{ url_for('auth.login') }}">Login</a>
+    </div>
+    <div class="footer-powered">Powered By Braintech Info Solutions</div>
+</footer>
+
+<script>
+    const flowItems = Array.from(document.querySelectorAll('.flow-steps article'));
+    let flowIndex = 0;
+    setInterval(() => {
+        flowItems[flowIndex]?.classList.remove('active');
+        flowIndex = (flowIndex + 1) % flowItems.length;
+        flowItems[flowIndex]?.classList.add('active');
+    }, 1800);
+
+    const product = document.querySelector('.enterprise-product');
+    document.addEventListener('pointermove', (event) => {
+        if (!product || window.matchMedia('(max-width: 900px)').matches) return;
+        const x = (event.clientX / window.innerWidth - 0.5) * 7;
+        const y = (event.clientY / window.innerHeight - 0.5) * -7;
+        product.style.transform = `perspective(1400px) rotateX(${y}deg) rotateY(${x}deg)`;
+    });
+
+    const revealItems = Array.from(document.querySelectorAll('.reveal-up'));
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            }
+        });
+    }, { threshold: 0.16 });
+    revealItems.forEach((item) => revealObserver.observe(item));
+</script>
+</body>
+</html>

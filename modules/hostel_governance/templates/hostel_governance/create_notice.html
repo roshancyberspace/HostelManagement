@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Create Notice</h3>
+<form method="post">
+  <input name="title" placeholder="Title" required><br>
+  <textarea name="content" placeholder="Content" required></textarea><br>
+  <input name="scope" placeholder="Target (All / Block / Ledger)"><br>
+  <button type="submit">Issue</button>
+</form>
+{% endblock %}

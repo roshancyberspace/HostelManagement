@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="profile-shell">
+    <section class="profile-hero">
+        <div class="profile-hero-card">
+            <span class="section-kicker">Student Profile</span>
+            <h1>Student Records Directory</h1>
+            <p>This registry now reads directly from Student Records, so names, classes, status, and parent details stay in sync.</p>
+        </div>
+        <div class="profile-summary">
+            <div class="metric-pill">
+                <span>Total Listed</span>
+                <strong>{{ students|length }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Status View</span>
+                <strong>{{ status|title }}</strong>
+            </div>
+            <a href="/student-profile/create" class="btn btn-primary">Add Student</a>
+        </div>
+    </section>
+
+    <section class="intake-card profile-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Search Students</h2>
+                <p>Search by ledger number, name, class, section, or parent details.</p>
+            </div>
+            <span class="soft-badge">Student Records</span>
+        </div>
+        <form method="get" class="profile-filter-grid">
+            <div class="compact-field">
+                <label>Search</label>
+                <input type="text" name="search" class="form-control" value="{{ search }}" placeholder="Ledger, name, class, section, parent">
+            </div>
+            <div class="compact-field">
+                <label>Status</label>
+                <select name="status" class="form-control">
+                    <option value="ALL" {% if status == 'ALL' %}selected{% endif %}>All Students</option>
+                    <option value="ACTIVE" {% if status == 'ACTIVE' %}selected{% endif %}>Active</option>
+                    <option value="INACTIVE" {% if status == 'INACTIVE' %}selected{% endif %}>Inactive</option>
+                    <option value="LEFT" {% if status == 'LEFT' %}selected{% endif %}>Left</option>
+                </select>
+            </div>
+            <div class="profile-filter-actions">
+                <button class="btn btn-primary" type="submit">Apply Filters</button>
+                <a href="/student-profile" class="btn btn-outline-primary">Reset</a>
+            </div>
+        </form>
+    </section>
+
+    <section class="intake-card profile-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Student Profiles</h2>
+                <p>Each card uses the same source as Student Records and Biodata.</p>
+            </div>
+            <span class="soft-badge">{{ students|length }} listed</span>
+        </div>
+        {% if students %}
+        <div class="profile-card-grid">
+            {% for s in students %}
+            <article class="profile-student-card">
+                <div class="profile-student-top">
+                    <div>
+                        <span class="soft-badge">{{ s["ledger_no"] }}</span>
+                        <h3>{{ s["full_name"] }}</h3>
+                    </div>
+                    <span class="status-badge {% if s['status'] == 'ACTIVE' %}status-good{% else %}status-neutral{% endif %}">
+                        {{ s["status"] }}
+                    </span>
+                </div>
+                <div class="profile-student-meta">
+                    <span><strong>Class:</strong> {{ s["class"] or "-" }}</span>
+                    <span><strong>Section:</strong> {{ s["section"] or "-" }}</span>
+                    <span><strong>Parent:</strong> {{ s["father_name"] or s["mother_name"] or "Not added" }}</span>
+                    <span><strong>Contact:</strong> {{ s["guardian_contact"] or "Not added" }}</span>
+                </div>
+                <div class="profile-student-actions">
+                    <a href="/student-profile/{{ s['ledger_no'] }}" class="btn btn-primary">View Profile</a>
+                    <a href="/student-profile/{{ s['ledger_no'] }}/edit" class="btn btn-outline-primary">Edit Record</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No student records found</h3>
+            <p>Try another search or add a student from the intake workflow.</p>
+            <a href="/students/intake" class="btn btn-primary">Open Student Intake</a>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

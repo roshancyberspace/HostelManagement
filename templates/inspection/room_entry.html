@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="inspect-shell">
+    <div class="inspect-hero">
+        <div>
+            <p class="inspect-kicker">Inspection</p>
+            <h1>Room inspection entry</h1>
+            <p class="inspect-subtitle">AC student room select karke checklist save karo.</p>
+        </div>
+        <div class="inspect-chip-row">
+            <span class="inspect-chip">{{ rooms|length }} rooms</span>
+            <span class="inspect-chip">{{ items|length }} checklist items</span>
+        </div>
+    </div>
+
+    <section class="inspect-panel">
+        <div class="inspect-panel-head">
+            <div>
+                <h2>Select room</h2>
+                <p>Room choose karte hi expected inventory visible ho jayegi.</p>
+            </div>
+        </div>
+        <form method="get" class="inspect-toolbar">
+            <select name="room_id" onchange="this.form.submit()">
+                <option value="">Select room</option>
+                {% for r in rooms %}
+                <option value="{{ r.id }}" {% if selected_room_id and selected_room_id|string == r.id|string %}selected{% endif %}>
+                    {{ r.floor_name }} - Room {{ r.room_no }}
+                </option>
+                {% endfor %}
+            </select>
+            <noscript><button type="submit" class="inspect-primary-btn">Load</button></noscript>
+        </form>
+    </section>
+
+    <form method="post" class="inspect-form-stack">
+        <input type="hidden" name="room_id" value="{{ selected_room_id or '' }}">
+
+        <div class="inspect-grid inspect-grid-2">
+            <section class="inspect-panel">
+                <div class="inspect-panel-head">
+                    <div>
+                        <h2>Inspection details</h2>
+                        <p>Inspector aur overall room remarks yahan save honge.</p>
+                    </div>
+                </div>
+                <div class="inspect-form-grid">
+                    <label class="inspect-field">
+                        <span>Selected Room</span>
+                        <input type="text" value="{% if selected_room %}{{ selected_room.floor_name }} - Room {{ selected_room.room_no }}{% else %}No room selected{% endif %}" readonly>
+                    </label>
+                    <label class="inspect-field">
+                        <span>Inspector Name</span>
+                        <input type="text" name="inspector_name" placeholder="Enter inspector name">
+                    </label>
+                    <label class="inspect-field inspect-field-wide">
+                        <span>Overall Remarks</span>
+                        <textarea name="remarks" placeholder="Overall inspection notes"></textarea>
+                    </label>
+                </div>
+            </section>
+
+            <section class="inspect-panel">
+                <div class="inspect-panel-head">
+                    <div>
+                        <h2>Quick summary</h2>
+                        <p>Selected room ke expected items ka quick count.</p>
+                    </div>
+                </div>
+                <div class="inspect-stat-grid">
+                    <div class="inspect-stat-card">
+                        <span>Items in checklist</span>
+                        <strong>{{ items|length }}</strong>
+                    </div>
+                    <div class="inspect-stat-card">
+                        <span>Expected inventory lines</span>
+                        <strong>{{ expected_map|length }}</strong>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="inspect-panel">
+            <div class="inspect-panel-head">
+                <div>
+                    <h2>Inspection checklist</h2>
+                    <p>Har item ki condition aur remark record karo.</p>
+                </div>
+            </div>
+
+            {% if selected_room_id %}
+            <div class="inspect-table-wrap">
+                <table class="inspect-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Expected Qty</th>
+                            <th>Condition</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for it in items %}
+                        <tr>
+                            <td>{{ it.item_name }}</td>
+                            <td>{{ expected_map.get(it.item_name, 0) }}</td>
+                            <td>
+                                <select name="condition_{{ it.id }}">
+                                    <option value="GOOD">GOOD</option>
+                                    <option value="DAMAGED">DAMAGED</option>
+                                    <option value="MISSING">MISSING</option>
+                                </select>
+                            </td>
+                            <td><input type="text" name="remarks_{{ it.id }}" placeholder="Optional remark"></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="inspect-actions">
+                <button type="submit" class="inspect-primary-btn">Save inspection</button>
+            </div>
+            {% else %}
+            <div class="schedule-empty compact">
+                <h3>Select a room first</h3>
+                <p>Checklist load karne ke liye upar se room choose karo.</p>
+            </div>
+            {% endif %}
+        </section>
+    </form>
+</section>
+{% endblock %}

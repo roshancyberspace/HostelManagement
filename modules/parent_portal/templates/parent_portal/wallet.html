@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="parent-shell">
+    <section class="parent-hero">
+        <div class="parent-hero-card">
+            <span class="section-kicker">Parent Portal</span>
+            <h1>Parent Wallet View</h1>
+            <p>Track wallet balance and recent transaction flow for the selected student record.</p>
+        </div>
+        <div class="parent-summary">
+            <div class="metric-pill">
+                <span>Ledger</span>
+                <strong>{{ ledger_no }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Current Balance</span>
+                <strong>Rs. {{ wallet.current_balance if wallet else 0 }}</strong>
+            </div>
+            <a href="/parent-portal/wallet" class="btn btn-outline-primary">New Lookup</a>
+        </div>
+    </section>
+
+    <section class="parent-wallet-grid">
+        <article class="parent-card parent-profile-card">
+            <div class="staff-card-head">
+                <div>
+                    <h2>Student Snapshot</h2>
+                    <p>Basic student identity linked with this wallet.</p>
+                </div>
+                <span class="soft-badge">{{ ledger_no }}</span>
+            </div>
+            <div class="profile-detail-list">
+                <div class="profile-detail-item">
+                    <span>Student Name</span>
+                    <strong>{{ student.student_name if student else "Not found" }}</strong>
+                </div>
+                <div class="profile-detail-item">
+                    <span>Class</span>
+                    <strong>{% if student %}{{ student["class"] or "-" }} / {{ student.section or "-" }}{% else %}-{% endif %}</strong>
+                </div>
+                <div class="profile-detail-item">
+                    <span>Status</span>
+                    <strong>{{ student.status if student else "Unknown" }}</strong>
+                </div>
+            </div>
+        </article>
+
+        <article class="parent-card parent-profile-card">
+            <div class="staff-card-head">
+                <div>
+                    <h2>Wallet Overview</h2>
+                    <p>Read-only balance details for parent visibility.</p>
+                </div>
+            </div>
+            <div class="parent-balance-card">
+                <span>Available Balance</span>
+                <strong>Rs. {{ wallet.current_balance if wallet else 0 }}</strong>
+            </div>
+        </article>
+    </section>
+
+    <section class="intake-card parent-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Recent Transactions</h2>
+                <p>Latest pocket money activity for this ledger number.</p>
+            </div>
+            <span class="soft-badge">{{ txns|length }} entries</span>
+        </div>
+
+        {% if txns %}
+        <div class="table-wrap">
+            <table class="table">
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                </tr>
+                {% for t in txns %}
+                <tr>
+                    <td>{{ t.created_at }}</td>
+                    <td>{{ t.txn_type }}</td>
+                    <td>Rs. {{ t.amount }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No wallet transactions found</h3>
+            <p>This ledger does not have transaction history yet.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

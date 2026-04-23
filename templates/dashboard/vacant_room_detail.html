@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Dashboard</p>
+            <h1>Room {{ room.room_no }}</h1>
+            <p class="report-hub-subtitle">Room occupancy, bed structure, aur superintendent controls ka detailed view.</p>
+        </div>
+        <div class="report-hub-badges">
+            <span class="report-hub-badge">{{ room.floor_no }}</span>
+            <span class="report-hub-badge {{ (room.status or '')|lower }}">{{ room.status }}</span>
+        </div>
+    </div>
+
+    <section class="report-hub-stat-grid short wide-stats">
+        <article class="report-hub-stat-card">
+            <span>Total Beds</span>
+            <strong>{{ total_beds }}</strong>
+        </article>
+        <article class="report-hub-stat-card success">
+            <span>Engaged Beds</span>
+            <strong>{{ engaged_beds }}</strong>
+        </article>
+        <article class="report-hub-stat-card warning">
+            <span>Vacant Beds</span>
+            <strong>{{ vacant_beds }}</strong>
+        </article>
+        <article class="report-hub-stat-card">
+            <span>Occupancy</span>
+            <strong>{{ occupancy_percent }}%</strong>
+        </article>
+    </section>
+
+    <div class="report-hub-grid dashboard-room-grid">
+        <section class="report-hub-panel">
+            <div class="report-hub-panel-head">
+                <div>
+                    <h2>Room snapshot</h2>
+                    <p>Basic room metadata aur current state.</p>
+                </div>
+            </div>
+            <div class="student-view-detail-list">
+                <div><span>Floor</span><strong>{{ room.floor_no }}</strong></div>
+                <div><span>Room No</span><strong>{{ room.room_no }}</strong></div>
+                <div><span>Type</span><strong>{{ room.room_type }}</strong></div>
+                <div><span>Status</span><strong>{{ room.status }}</strong></div>
+            </div>
+        </section>
+
+        <section class="report-hub-panel">
+            <div class="report-hub-panel-head">
+                <div>
+                    <h2>Bed structure notes</h2>
+                    <p>Standard B1-B3 validation for this room.</p>
+                </div>
+            </div>
+            <div class="student-view-detail-list">
+                <div><span>Missing Beds</span><strong>{% if missing_beds %}{{ missing_beds | join(", ") }}{% else %}None{% endif %}</strong></div>
+                <div><span>Extra Beds</span><strong>{% if extra_beds %}{% for b in extra_beds %}{{ b.bed_no }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}None{% endif %}</strong></div>
+            </div>
+        </section>
+    </div>
+
+    {% if is_superintendent %}
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Superintendent controls</h2>
+                <p>Create missing beds or normalize room bed numbering.</p>
+            </div>
+        </div>
+        <div class="vacant-room-controls">
+            <form method="post" action="/vacant-room/{{ room.id }}/create-beds-custom" class="vacant-room-inline-form">
+                <select name="bed_count" required>
+                    <option value="2">2 Beds (B1-B2)</option>
+                    <option value="3" selected>3 Beds (B1-B3)</option>
+                    <option value="4">4 Beds (B1-B4)</option>
+                </select>
+                <button type="submit" class="report-hub-primary-btn">Create Missing Beds</button>
+            </form>
+
+            <form method="post" action="/vacant-room/{{ room.id }}/create-beds-custom">
+                <input type="hidden" name="bed_count" value="3">
+                <button type="submit" class="report-hub-secondary-btn">Auto Create B1 B2 B3</button>
+            </form>
+
+            <form method="post" action="/vacant-room/{{ room.id }}/renumber-beds" onsubmit="return confirm('Renumber beds to B1,B2,B3 and delete extras. Allowed only if no bed is ALLOTTED. Continue?');">
+                <button type="submit" class="report-hub-link-btn subtle">Renumber to B1 B2 B3</button>
+            </form>
+        </div>
+    </section>
+    {% endif %}
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Bed list</h2>
+                <p>Per-bed occupancy and allotment visibility.</p>
+            </div>
+        </div>
+        {% if beds %}
+        <div class="report-hub-table-wrap">
+            <table class="report-hub-table">
+                <thead>
+                    <tr>
+                        <th>Bed No</th>
+                        <th>Status</th>
+                        <th>Ledger</th>
+                        <th>Student</th>
+                        <th>Class</th>
+                        <th>Allot Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in beds %}
+                    <tr>
+                        <td><strong>{{ b.bed_no }}</strong></td>
+                        <td>
+                            {% if b.bed_status == "VACANT" %}
+                            <span class="report-hub-badge good">VACANT</span>
+                            {% else %}
+                            <span class="report-hub-badge damaged">ALLOTTED</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ b.ledger_number or "-" }}</td>
+                        <td>{{ b.student_name or "-" }}</td>
+                        <td>{% if b.class %}{{ b.class }} {{ b.section }}{% else %}-{% endif %}</td>
+                        <td>{{ b.allot_date or "-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No beds found</h3>
+            <p>This room currently has no bed records.</p>
+        </div>
+        {% endif %}
+    </section>
+
+    <div class="student-view-actions">
+        <a href="/vacant-rooms" class="student-view-secondary-btn">Back to Vacant Rooms</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="parent-shell">
+    <section class="parent-hero">
+        <div class="parent-hero-card">
+            <span class="section-kicker">Parent Portal</span>
+            <h1>Parent Wallet View</h1>
+            <p>Quickly check student pocket wallet balance, recent activity, and submitted entries using a ledger number.</p>
+        </div>
+        <div class="parent-summary">
+            <div class="metric-pill">
+                <span>Access Type</span>
+                <strong>Read Only</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Lookup</span>
+                <strong>Ledger Based</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="intake-card parent-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Wallet Lookup</h2>
+                <p>Enter the student ledger number to open the parent wallet snapshot.</p>
+            </div>
+            <span class="soft-badge">Pocket Money</span>
+        </div>
+
+        <form method="POST" class="parent-search-form">
+            <div class="compact-field">
+                <label>Ledger Number</label>
+                <input type="text" name="ledger_no" class="form-control" placeholder="Enter ledger number" required>
+            </div>
+            <div class="parent-search-actions">
+                <button type="submit" class="btn btn-primary">View Wallet</button>
+            </div>
+        </form>
+    </section>
+</section>
+{% endblock %}

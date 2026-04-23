@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Common Area Stock – Area {{ area_id }}</h1>
+
+<form method="post">
+    <select name="item_id">
+        {% for i in items %}
+            <option value="{{ i.id }}">{{ i.item_name }}</option>
+        {% endfor %}
+    </select>
+    <input type="number" name="qty" value="1">
+    <button>Assign</button>
+</form>
+
+<table>
+<tr><th>Item</th><th>Qty</th><th>Status</th><th>Action</th></tr>
+{% for s in stock %}
+<tr>
+    <td>{{ s.item_name }}</td>
+    <td>{{ s.quantity }}</td>
+    <td>{{ s.status }}</td>
+    <td>
+        <a href="/stock/update/{{ s.id }}/DAMAGED">❌</a>
+        <a href="/stock/update/{{ s.id }}/REPAIRED">🔧</a>
+        <a href="/stock/update/{{ s.id }}/REPLACED">♻️</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

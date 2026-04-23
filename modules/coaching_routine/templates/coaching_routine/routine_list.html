@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>📘 Coaching Routines</h3>
+<a href="{{ url_for('coaching_routine.routine_create') }}" class="btn btn-primary mb-2">
+➕ New Routine
+</a>
+
+<table class="table table-bordered">
+<tr>
+    <th>Name</th><th>Subject</th><th>Coach</th><th>Days</th><th>Time</th><th>Status</th>
+</tr>
+{% for r in routines %}
+<tr>
+    <td>{{ r.routine_name }}</td>
+    <td>{{ r.subject }}</td>
+    <td>{{ r.coach_name }}</td>
+    <td>{{ r.days }}</td>
+    <td>{{ r.start_time }} - {{ r.end_time }}</td>
+    <td>{{ r.status }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

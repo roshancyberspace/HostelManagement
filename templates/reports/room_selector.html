@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="report-hub-shell">
+    <div class="report-hub-hero">
+        <div>
+            <p class="report-hub-kicker">Reports</p>
+            <h1>Room reports</h1>
+            <p class="report-hub-subtitle">Room-wise report entry points with quick filters and occupancy context.</p>
+        </div>
+        <div class="report-hub-badges">
+            <span class="report-hub-badge">{{ rooms|length }} rooms</span>
+        </div>
+    </div>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Filter rooms</h2>
+                <p>Search, status, aur AC type ke saath room report list narrow karo.</p>
+            </div>
+        </div>
+        <form method="get" class="report-hub-toolbar">
+            <input type="text" name="search" value="{{ search }}" placeholder="Search room, floor, block or hostel">
+            <select name="status">
+                <option value="">All statuses</option>
+                <option value="GOOD" {% if status == 'GOOD' %}selected{% endif %}>Good</option>
+                <option value="DAMAGED" {% if status == 'DAMAGED' %}selected{% endif %}>Damaged</option>
+                <option value="MAINTENANCE" {% if status == 'MAINTENANCE' %}selected{% endif %}>Maintenance</option>
+            </select>
+            <select name="ac_type">
+                <option value="">All room types</option>
+                <option value="AC" {% if ac_type == 'AC' %}selected{% endif %}>AC</option>
+                <option value="NON_AC" {% if ac_type == 'NON_AC' %}selected{% endif %}>Non-AC</option>
+            </select>
+            <button type="submit" class="report-hub-primary-btn">Apply</button>
+            <a href="{{ url_for('reports.room_selector') }}" class="report-hub-secondary-btn">Reset</a>
+        </form>
+    </section>
+
+    <section class="report-hub-panel">
+        <div class="report-hub-panel-head">
+            <div>
+                <h2>Room register</h2>
+                <p>Report, inspection, aur occupancy-aware room listing.</p>
+            </div>
+        </div>
+
+        {% if rooms %}
+        <div class="report-hub-table-wrap">
+            <table class="report-hub-table">
+                <thead>
+                    <tr>
+                        <th>Room</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Type</th>
+                        <th>Beds</th>
+                        <th>Students</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in rooms %}
+                    <tr>
+                        <td><strong>{{ r.room_no }}</strong></td>
+                        <td>{{ r.hostel_name }} - {{ r.block_name }} - {{ r.floor_no }}</td>
+                        <td><span class="report-hub-badge {{ (r.status or '')|lower }}">{{ r.status }}</span></td>
+                        <td>{{ r.ac_type }}</td>
+                        <td>{{ r.occupied_beds }}/{{ r.total_beds }}</td>
+                        <td>{{ r.allotted_students }}</td>
+                        <td>
+                            <div class="report-hub-actions">
+                                <a href="{{ url_for('reports.room_report', room_id=r.id) }}" class="report-hub-link-btn">View report</a>
+                                <a href="/inspection/compare/ROOM/{{ r.id }}" class="report-hub-link-btn subtle">Pre/Post</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No rooms found</h3>
+            <p>Current filters ke saath koi room match nahi hua.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="bed-shell">
+    <div class="bed-hero">
+        <div>
+            <p class="bed-kicker">Structure</p>
+            <h1>Room items</h1>
+            <p class="bed-subtitle">Room {{ room_id }} ki asset inventory aur inspection-linked item status yahan manage karo.</p>
+        </div>
+        <div class="bed-chip-row">
+            <span class="bed-chip">{{ items|length }} items</span>
+        </div>
+    </div>
+
+    <div class="bed-grid bed-grid-2">
+        <section class="bed-panel">
+            <div class="bed-panel-head">
+                <div>
+                    <h2>Add new item</h2>
+                    <p>Inventory item name aur quantity save karo.</p>
+                </div>
+            </div>
+            <form method="post" class="bed-form-grid">
+                <label class="bed-field">
+                    <span>Item Name</span>
+                    <input name="item_name" required placeholder="e.g. Bed / Fan / Table">
+                </label>
+                <label class="bed-field">
+                    <span>Quantity</span>
+                    <input type="number" name="quantity" value="1" min="1">
+                </label>
+                <div class="bed-form-actions">
+                    <button type="submit" class="bed-primary-btn">Add item</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="bed-panel">
+            <div class="bed-panel-head">
+                <div>
+                    <h2>Inspection notes</h2>
+                    <p>Item condition inspection ke time update hoti hai.</p>
+                </div>
+            </div>
+            <div class="inspect-detail-list">
+                <div><span>Status values</span><strong>PRESENT / DAMAGED / MISSING / NEEDS_REPAIR</strong></div>
+                <div><span>Use case</span><strong>Recovery and maintenance tracking support</strong></div>
+            </div>
+        </section>
+    </div>
+
+    <section class="bed-panel">
+        <div class="bed-panel-head">
+            <div>
+                <h2>Item register</h2>
+                <p>Room asset list with current quantity and condition.</p>
+            </div>
+        </div>
+
+        {% if items %}
+        <div class="bed-table-wrap">
+            <table class="bed-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in items %}
+                    <tr>
+                        <td>{{ i.item_name }}</td>
+                        <td>{{ i.quantity }}</td>
+                        <td><span class="bed-badge {{ (i.status or '')|lower }}">{{ i.status }}</span></td>
+                        <td>{{ i.remarks or '-' }}</td>
+                        <td>
+                            <form method="post" action="/structure/room-items/delete/{{ i.id }}" onsubmit="return confirm('Delete this item?');">
+                                <button type="submit" class="bed-danger-btn">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No items added</h3>
+            <p>Is room ke liye abhi koi asset item available nahi hai.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

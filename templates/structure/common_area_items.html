@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Common Area Items</h1>
+
+<form method="post">
+    <input name="item_name" placeholder="Item name" required>
+    <input type="number" name="quantity" value="1" min="1">
+    <button>➕ Add Item</button>
+</form>
+
+<table>
+    <tr>
+        <th>Item</th>
+        <th>Qty</th>
+        <th>Status</th>
+        <th>Remarks</th>
+    </tr>
+
+    {% for i in items %}
+    <tr>
+        <td>{{ i.item_name }}</td>
+        <td>{{ i.quantity }}</td>
+        <td>
+            <span class="badge {{ i.status|lower }}">{{ i.status }}</span>
+        </td>
+        <td>{{ i.remarks or "-" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

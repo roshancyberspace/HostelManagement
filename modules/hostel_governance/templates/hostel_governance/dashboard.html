@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>🏛️ Hostel Governance</h2>
+<ul>
+  <li><a href="{{ url_for('hostel_governance.notice_list') }}">Notices & Circulars</a></li>
+  <li><a href="{{ url_for('hostel_governance.decision_register') }}">Decision Register</a></li>
+</ul>
+{% endblock %}

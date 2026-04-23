@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="master-feed-shell">
+  <div class="master-feed-hero">
+    <div>
+      <span class="section-kicker">Routine Control</span>
+      <h1>System Routines</h1>
+      <p>Create and manage operational routines that guide daily hostel workflow.</p>
+    </div>
+    <div class="master-feed-hero-card">
+      <span class="status-chip">Routine registry</span>
+      <strong>{{ routines|length }}</strong>
+      <p>Active routine records currently available in the system.</p>
+    </div>
+  </div>
+
+  <div class="master-feed-summary">
+    <div class="summary-pill">
+      <span class="summary-label">Module</span>
+      <strong>Routine Master</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Records</span>
+      <strong>{{ routines|length }}</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Status</span>
+      <strong>Live</strong>
+    </div>
+    <div class="summary-pill">
+      <span class="summary-label">Action</span>
+      <strong>Create + Review</strong>
+    </div>
+  </div>
+
+  <div class="routine-layout">
+    <section class="master-feed-card">
+      <div class="master-feed-card-head">
+        <h3>Add New Routine</h3>
+        <span class="status-chip">Create</span>
+      </div>
+      <p>Register a routine title and optional description for everyday operational use.</p>
+
+      <form method="post" class="admin-form-grid routine-form-card">
+        <div>
+          <label for="routine-title">Routine Title</label>
+          <input id="routine-title" type="text" name="title" placeholder="Enter routine title" required>
+        </div>
+
+        <div class="routine-form-full">
+          <label for="routine-description">Routine Description</label>
+          <textarea id="routine-description" name="description" placeholder="Add short details for staff guidance"></textarea>
+        </div>
+
+        <div class="form-action-row">
+          <button type="submit">Add Routine</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="master-feed-card">
+      <div class="master-feed-card-head">
+        <h3>Routine Registry</h3>
+        <span class="status-chip">Manage</span>
+      </div>
+      <p>Review all saved routines and remove obsolete entries when needed.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 24%;">Title</th>
+              <th>Description</th>
+              <th style="width: 14%;">Status</th>
+              <th style="width: 16%;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if routines %}
+              {% for r in routines %}
+              <tr>
+                <td><strong>{{ r["title"] }}</strong></td>
+                <td>{{ r["description"] or "No description added yet." }}</td>
+                <td>
+                  {% if r["is_active"] %}
+                    <span class="status-chip">Active</span>
+                  {% else %}
+                    <span class="status-chip">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a
+                    href="/master-feed/routines/delete/{{ r['id'] }}"
+                    onclick="return confirm('Delete this routine?')"
+                    class="btn danger small">
+                    Delete
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="4" class="empty-state-cell">No routines defined yet.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>
+
+{% endblock %}

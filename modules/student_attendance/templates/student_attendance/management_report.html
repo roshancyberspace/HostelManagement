@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="attendance-shell">
+    <div class="attendance-hero">
+        <div>
+            <p class="attendance-kicker">Management Report</p>
+            <h1>Daily reconciliation report</h1>
+            <p class="attendance-subtitle">Class-block summary aur morning-night strength match ko leadership view me review karo.</p>
+        </div>
+        <form method="post" class="attendance-filter-bar">
+            <input type="date" name="attendance_date" value="{{ attendance_date }}" required>
+            <button class="attendance-primary-btn" type="submit">Load report</button>
+            <a class="attendance-secondary-btn" href="{{ url_for('student_attendance.export_daily_pdf', date=attendance_date.isoformat()) }}">Download daily PDF</a>
+        </form>
+    </div>
+
+    <div class="attendance-stat-grid">
+        <article class="attendance-stat-card">
+            <span>Morning strength</span>
+            <strong>{{ morning_total }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Night strength</span>
+            <strong>{{ night_total }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Variance</span>
+            <strong>{{ (morning_total - night_total) | abs }}</strong>
+        </article>
+        <article class="attendance-stat-card">
+            <span>Status</span>
+            <strong>{% if mismatch %}Mismatch{% else %}Matched{% endif %}</strong>
+        </article>
+    </div>
+
+    <div class="attendance-grid attendance-grid-2">
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Class and block report</h2>
+                    <p>Slot-wise attendance summary ready for management review.</p>
+                </div>
+                <span class="attendance-chip">{{ attendance_date }}</span>
+            </div>
+            {% if report %}
+            <div class="attendance-table-wrap">
+                <table class="attendance-table">
+                    <thead>
+                        <tr>
+                            <th>Class</th>
+                            <th>Block</th>
+                            <th>Slot</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in report %}
+                        <tr>
+                            <td>{{ row["class"] }}</td>
+                            <td>{{ row["block"] }}</td>
+                            <td>{{ row["slot"] }}</td>
+                            <td>{{ row["status"] }}</td>
+                            <td>{{ row["total"] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="attendance-empty">
+                <h3>No records for this date</h3>
+                <p>Attendance abhi mark nahi hui hai, isliye management report blank hai.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="attendance-panel">
+            <div class="attendance-panel-head">
+                <div>
+                    <h2>Strength reconciliation</h2>
+                    <p>Morning aur night hostel strength ka quick verdict.</p>
+                </div>
+                <span class="attendance-chip {% if mismatch %}danger{% endif %}">
+                    {% if mismatch %}Attention{% else %}OK{% endif %}
+                </span>
+            </div>
+            {% if mismatch %}
+            <div class="attendance-alert danger">
+                Strength mismatch detected. Superintendent ko corrective note review karna chahiye.
+            </div>
+            {% else %}
+            <div class="attendance-alert success">
+                Morning aur night strength aligned hai. Reconciliation clean hai.
+            </div>
+            {% endif %}
+            <div class="attendance-note-card">
+                <h3>Suggested review points</h3>
+                <ul class="attendance-note-list">
+                    <li>Leave aur medical approvals verify karo.</li>
+                    <li>Gatepass exits ko attendance exceptions se compare karo.</li>
+                    <li>Late reporting ya bed-shift cases par remarks add karo.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

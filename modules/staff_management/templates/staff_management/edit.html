@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="staff-shell">
+    <section class="staff-hero">
+        <div class="staff-hero-card">
+            <span class="section-kicker">Staff and Members</span>
+            <h1>Edit Staff</h1>
+            <p>Update staff identity, contact details, employment status, and notes without leaving the workflow.</p>
+        </div>
+        <div class="staff-summary">
+            <div class="metric-pill">
+                <span>Staff Code</span>
+                <strong>{{ staff["staff_code"] }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Current Status</span>
+                <strong>{{ staff["status"] }}</strong>
+            </div>
+            <a href="/staff/{{ staff['id'] }}/view" class="btn btn-outline-primary">View Profile</a>
+        </div>
+    </section>
+
+    <form method="post" class="intake-card staff-form-card">
+        <div class="staff-card-head">
+            <div>
+                <h2>Update Staff Record</h2>
+                <p>Keep details accurate for daily hostel operations and reporting.</p>
+            </div>
+            <span class="soft-badge">Member ID {{ staff["id"] }}</span>
+        </div>
+
+        <section class="biodata-section">
+            <h3>Basic Information</h3>
+            <div class="biodata-grid">
+                <div>
+                    <label><b>Full Name *</b></label>
+                    <input type="text" name="full_name" class="form-control" value="{{ staff['full_name'] }}" required>
+                </div>
+                <div>
+                    <label><b>Designation *</b></label>
+                    <input type="text" name="designation" class="form-control" value="{{ staff['designation'] }}" required>
+                </div>
+                <div>
+                    <label><b>Department</b></label>
+                    <input type="text" name="department" class="form-control" value="{{ staff['department'] }}">
+                </div>
+                <div>
+                    <label><b>Status</b></label>
+                    <select name="status" class="form-control">
+                        <option value="ACTIVE" {% if staff['status']=='ACTIVE' %}selected{% endif %}>ACTIVE</option>
+                        <option value="INACTIVE" {% if staff['status']=='INACTIVE' %}selected{% endif %}>INACTIVE</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <section class="biodata-section">
+            <h3>Contact and Employment</h3>
+            <div class="biodata-grid">
+                <div>
+                    <label><b>Phone</b></label>
+                    <input type="text" name="phone" class="form-control" value="{{ staff['phone'] }}">
+                </div>
+                <div>
+                    <label><b>Alternate Phone</b></label>
+                    <input type="text" name="alternate_phone" class="form-control" value="{{ staff['alternate_phone'] }}">
+                </div>
+                <div>
+                    <label><b>Email</b></label>
+                    <input type="email" name="email" class="form-control" value="{{ staff['email'] }}">
+                </div>
+                <div>
+                    <label><b>Joining Date</b></label>
+                    <input type="date" name="joining_date" class="form-control" value="{{ staff['joining_date'] }}">
+                </div>
+                <div>
+                    <label><b>Monthly Salary</b></label>
+                    <input type="number" name="salary_monthly" class="form-control" value="{{ staff['salary_monthly'] }}">
+                </div>
+                <div class="biodata-grid-span">
+                    <label><b>Address</b></label>
+                    <textarea name="address" class="form-control" rows="4">{{ staff['address'] }}</textarea>
+                </div>
+                <div class="biodata-grid-span">
+                    <label><b>Remarks</b></label>
+                    <input type="text" name="remarks" class="form-control" value="{{ staff['remarks'] }}">
+                </div>
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button class="btn btn-primary">Update Staff</button>
+            <a href="/staff/{{ staff['id'] }}/view" class="btn btn-outline-primary">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

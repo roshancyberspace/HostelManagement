@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>🧾 Student Biodata</h2>
+
+<form method="get" class="mb-3">
+    <input name="ledger_no" placeholder="Ledger Number" value="{{ ledger or '' }}" required>
+    <button class="btn btn-primary">Load</button>
+</form>
+
+{% if not data %}
+<p class="alert info">Enter Ledger Number to load student.</p>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+{% if data %}
+<input type="hidden" name="student_id" value="{{ data.student.id }}">
+{% endif %}
+
+<h4>Student</h4>
+<input value="{{ data.student.student_name if data else '' }}" readonly>
+<input value="{{ data.student.class ~ '-' ~ data.student.section if data else '' }}" readonly>
+
+<label>Student Photo</label>
+<input type="file" name="student_photo">
+
+<h4>Father</h4>
+<input name="father_name" placeholder="Father Name">
+<input name="father_mobile_1" placeholder="Mobile">
+<input type="file" name="father_photo">
+
+<h4>Mother</h4>
+<input name="mother_name" placeholder="Mother Name">
+<input name="mother_mobile_1" placeholder="Mobile">
+<input type="file" name="mother_photo">
+
+<h4>Guardians</h4>
+<div id="guardians"></div>
+<button type="button" onclick="addGuardian()">+ Add Guardian</button>
+
+<br><br>
+<button class="btn btn-success" {% if not data %}disabled{% endif %}>Save</button>
+</form>
+
+<script>
+function addGuardian() {
+    const g = document.createElement("div");
+    g.innerHTML = `
+        <input name="guardian_name[]" placeholder="Name">
+        <input name="guardian_relation[]" placeholder="Relation">
+        <input name="guardian_mobile[]" placeholder="Mobile">
+        <input name="guardian_address[]" placeholder="Address">
+        <input type="file" name="guardian_photo[]">
+        <hr>
+    `;
+    document.getElementById("guardians").appendChild(g);
+}
+</script>
+
+{% endblock %}

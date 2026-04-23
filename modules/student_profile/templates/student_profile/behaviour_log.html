@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>📘 Behaviour Log – {{ ledger_no }}</h2>
+
+<form method="post">
+    <select name="behaviour_type" required>
+        <option value="GOOD">GOOD</option>
+        <option value="BAD">BAD</option>
+    </select>
+
+    <select name="severity" required>
+        <option value="LOW">LOW</option>
+        <option value="MEDIUM">MEDIUM</option>
+        <option value="HIGH">HIGH</option>
+        <option value="CRITICAL">CRITICAL</option>
+    </select>
+
+    <input name="title" placeholder="Title" required>
+    <textarea name="description" placeholder="Details"></textarea>
+
+    <button class="btn">Add</button>
+</form>
+
+<hr>
+
+<table>
+<tr><th>Type</th><th>Severity</th><th>Title</th><th>Date</th></tr>
+{% for l in logs %}
+<tr>
+    <td>{{ l.behaviour_type }}</td>
+    <td>{{ l.severity }}</td>
+    <td>{{ l.title }}</td>
+    <td>{{ l.recorded_at }}</td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gate Pass + Pocket Summary</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        h2 { border-bottom: 2px solid #000; padding-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 6px; }
+        .right { text-align: right; }
+        .warning { color: red; font-weight: bold; }
+        @media print {
+            button { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<button onclick="window.print()">🖨 Print</button>
+
+<h2>🚪 Gate Pass Details</h2>
+
+<table>
+<tr><th>Gate Pass No</th><td>{{ gp.gate_pass_no }}</td></tr>
+<tr><th>Student Name</th><td>{{ student.full_name if student else '-' }}</td></tr>
+<tr><th>Ledger No</th><td>{{ gp.ledger_no }}</td></tr>
+<tr><th>Purpose</th><td>{{ gp.purpose }}</td></tr>
+<tr><th>Out Date & Time</th><td>{{ gp.out_datetime }}</td></tr>
+<tr><th>Expected Return</th><td>{{ gp.expected_return_datetime }}</td></tr>
+<tr><th>Status</th><td>{{ gp.status }}</td></tr>
+</table>
+
+<h2>💰 Pocket Money Summary</h2>
+
+<p>
+<b>Current Balance:</b>
+{% if wallet and wallet.current_balance < 200 %}
+    <span class="warning">₹ {{ wallet.current_balance }} (LOW)</span>
+{% else %}
+    ₹ {{ wallet.current_balance if wallet else 0 }}
+{% endif %}
+</p>
+
+<table>
+<tr>
+    <th>Total Collected</th>
+    <th>Total Spent</th>
+</tr>
+<tr>
+    <td class="right">₹ {{ total_collected }}</td>
+    <td class="right">₹ {{ total_spent }}</td>
+</tr>
+</table>
+
+<h3>Last 5 Pocket Transactions</h3>
+
+<table>
+<tr>
+    <th>Date</th>
+    <th>Type</th>
+    <th>Category</th>
+    <th>Amount</th>
+</tr>
+{% for t in txns %}
+<tr>
+    <td>{{ t.created_at }}</td>
+    <td>{{ t.txn_type }}</td>
+    <td>{{ t.category or '-' }}</td>
+    <td class="right">₹ {{ t.amount }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<p style="margin-top:40px;">
+<b>Parent Signature:</b> _______________________
+&nbsp;&nbsp;&nbsp;
+<b>Warden Signature:</b> _______________________
+</p>
+
+</body>
+</html>

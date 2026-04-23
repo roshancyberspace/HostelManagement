@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>📤 Upload Weekly Master Routine (CSV)</h3>
+
+<div class="alert info">
+<b>CSV Format:</b><br><br>
+
+<b>For Coaching:</b><br>
+day_name,class_name,subject,start_time,end_time,teacher_name,status<br><br>
+
+<b>For Self Study:</b><br>
+day_name,class_group,floor_place,teacher_name,start_time,end_time,status
+</div>
+
+<form method="post" enctype="multipart/form-data" class="card p-3" style="max-width:600px;">
+    <label><b>Routine Type</b></label>
+    <select name="routine_type" class="form-select mb-3" required>
+        <option value="COACHING">COACHING</option>
+        <option value="STUDY">SELF STUDY</option>
+    </select>
+
+    <label><b>Select CSV File</b></label>
+    <input type="file" name="file" class="form-control mb-3" required>
+
+    <button class="btn btn-success">Upload & Add to Master</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="staff-shell">
+    <section class="staff-hero">
+        <div class="staff-hero-card">
+            <span class="section-kicker">Staff and Members</span>
+            <h1>Staff Profile</h1>
+            <p>View identity, contact information, employment details, and current status in one clean profile.</p>
+        </div>
+        <div class="staff-summary">
+            <div class="metric-pill">
+                <span>Staff Code</span>
+                <strong>{{ staff["staff_code"] }}</strong>
+            </div>
+            <div class="metric-pill">
+                <span>Status</span>
+                <strong>{{ staff["status"] }}</strong>
+            </div>
+            <a href="/staff/{{ staff['id'] }}/edit" class="btn btn-primary">Edit Staff</a>
+        </div>
+    </section>
+
+    <section class="staff-profile-grid">
+        <article class="staff-card staff-profile-card staff-profile-card--feature">
+            <div class="staff-record-top">
+                <div>
+                    <span class="soft-badge">{{ staff["staff_code"] }}</span>
+                    <h2 class="staff-record-name">{{ staff["full_name"] }}</h2>
+                </div>
+                <span class="status-badge {% if staff['status'] == 'ACTIVE' %}status-good{% else %}status-neutral{% endif %}">
+                    {{ staff["status"] }}
+                </span>
+            </div>
+            <div class="staff-profile-meta">
+                <span><strong>ID:</strong> {{ staff["id"] }}</span>
+                <span><strong>Role:</strong> {{ staff["designation"] or "Not set" }}</span>
+                <span><strong>Department:</strong> {{ staff["department"] or "Hostel" }}</span>
+                <span><strong>Joining:</strong> {{ staff["joining_date"] or "Not added" }}</span>
+            </div>
+            <div class="staff-record-actions">
+                <a href="/staff/{{ staff['id'] }}/edit" class="btn btn-primary">Edit Profile</a>
+                <a href="/staff" class="btn btn-outline-primary">Back to Registry</a>
+            </div>
+        </article>
+
+        <article class="staff-card staff-profile-card">
+            <div class="staff-card-head">
+                <div>
+                    <h2>Contact Details</h2>
+                    <p>Direct communication information for hostel operations.</p>
+                </div>
+            </div>
+            <div class="staff-detail-list">
+                <div class="staff-detail-item">
+                    <span>Phone</span>
+                    <strong>{{ staff["phone"] or "Not added" }}</strong>
+                </div>
+                <div class="staff-detail-item">
+                    <span>Alternate Phone</span>
+                    <strong>{{ staff["alternate_phone"] or "Not added" }}</strong>
+                </div>
+                <div class="staff-detail-item">
+                    <span>Email</span>
+                    <strong>{{ staff["email"] or "Not added" }}</strong>
+                </div>
+                <div class="staff-detail-item">
+                    <span>Address</span>
+                    <strong>{{ staff["address"] or "Not added" }}</strong>
+                </div>
+            </div>
+        </article>
+
+        <article class="staff-card staff-profile-card">
+            <div class="staff-card-head">
+                <div>
+                    <h2>Employment Notes</h2>
+                    <p>Compensation, remarks, and operational notes.</p>
+                </div>
+            </div>
+            <div class="staff-detail-list">
+                <div class="staff-detail-item">
+                    <span>Monthly Salary</span>
+                    <strong>Rs. {{ staff["salary_monthly"] or 0 }}</strong>
+                </div>
+                <div class="staff-detail-item">
+                    <span>Remarks</span>
+                    <strong>{{ staff["remarks"] or "No remarks added" }}</strong>
+                </div>
+            </div>
+        </article>
+    </section>
+</section>
+{% endblock %}

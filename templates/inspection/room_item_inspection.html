@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Room Item Inspection</h2>
+
+<form method="post">
+
+<select id="hostel">
+    <option>Select Hostel</option>
+    {% for h in hostels %}
+    <option value="{{ h.id }}">{{ h.name }}</option>
+    {% endfor %}
+</select>
+
+<select id="block"></select>
+<select id="floor"></select>
+
+<select name="room_id" id="room" required></select>
+
+<label>Inspection Type</label>
+<select name="inspection_type">
+    <option value="PRE">PRE</option>
+    <option value="POST">POST</option>
+</select>
+
+<hr>
+
+<div id="items"></div>
+
+<textarea name="remarks" placeholder="Overall Remarks"></textarea>
+
+<button>Save Inspection</button>
+</form>
+
+<script>
+const hostel=document.getElementById("hostel");
+const block=document.getElementById("block");
+const floor=document.getElementById("floor");
+const room=document.getElementById("room");
+const itemsDiv=document.getElementById("items");
+
+hostel.onchange=()=>fetch(`/structure/api/blocks/${hostel.value}`)
+.then(r=>r.json()).then(d=>{
+block.innerHTML='<option>Select Block</option>';
+d.forEach(x=>block.innerHTML+=`<option value="${x.id}">${x.name}</option>`);
+});
+
+block.onchange=()=>fetch(`/structure/api/floors/${block.value}`)
+.then(r=>r.json()).then(d=>{
+floor.innerHTML='<option>Select Floor</option>';
+d.forEach(x=>floor.innerHTML+=`<option value="${x.id}">Floor ${x.floor_no}</option>`);
+});
+
+floor.onchange=()=>fetch(`/structure/api/rooms/${floor.value}`)
+.then(r=>r.json()).then(d=>{
+room.innerHTML='<option>Select Room</option>';
+d.forEach(x=>room.innerHTML+=`<option value="${x.id}">Room ${x.room_no}</option>`);
+});
+
+room.onchange=()=>{
+fetch(`/inspection/api/room-items/${room.value}`)
+.then(r=>r.json()).then(d=>{
+itemsDiv.innerHTML='';
+d.forEach(i=>{
+itemsDiv.innerHTML+=`
+<div>
+<b>${i.item_name}</b>
+<select name="item_${i.id}">
+<option>GOOD</option>
+<option>REPAIR</option>
+<option>DAMAGED</option>
+<option>MISSING</option>
+</select>
+<input name="remark_${i.id}" placeholder="Remark">
+</div>`;
+});
+});
+};
+</script>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: serif; }
+.box { border:1px solid #000; padding:15px; width:600px; }
+</style>
+</head>
+<body onload="window.print()">
+
+<div class="box">
+<h2>PATNA CENTRAL SCHOOL</h2>
+<h3>GATE PASS</h3>
+
+<p>
+<b>No:</b> {{ gp.gate_pass_no }}<br>
+<b>Student:</b> {{ student.full_name }}<br>
+<b>Class:</b> {{ student.class }} {{ student.section }}<br>
+<b>Ledger:</b> {{ gp.ledger_no }}<br>
+</p>
+
+<p>
+<b>Purpose:</b> {{ gp.purpose }}<br>
+<b>Out:</b> {{ gp.out_datetime }}<br>
+<b>Expected Return:</b> {{ gp.expected_return_datetime }}
+</p>
+
+<p>
+<b>Status:</b> {{ gp.status }}<br>
+<b>Approved By:</b> {{ gp.approved_by or "-" }}
+</p>
+
+</div>
+
+</body>
+</html>

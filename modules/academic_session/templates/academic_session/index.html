@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="session-admin-shell">
+    <div class="session-admin-hero">
+        <div>
+            <p class="session-admin-kicker">Academic Session</p>
+            <h1>Academic sessions</h1>
+            <p class="session-admin-subtitle">Current active session ko track karo aur new session safe way me start karo.</p>
+        </div>
+        <div class="session-admin-badges">
+            <span class="session-admin-badge">{{ sessions|length }} sessions</span>
+            {% if active_session %}
+            <span class="session-admin-badge active">{{ active_session["name"] }}</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if active_session %}
+    <section class="session-admin-panel active-banner">
+        <div class="session-admin-panel-head">
+            <div>
+                <h2>Current active session</h2>
+                <p>{{ active_session["name"] }} is currently in use across the system.</p>
+            </div>
+        </div>
+        <div class="session-admin-active-grid">
+            <div><span>Session</span><strong>{{ active_session["name"] }}</strong></div>
+            <div><span>Start Date</span><strong>{{ active_session["start_date"] }}</strong></div>
+            <div><span>End Date</span><strong>{{ active_session["end_date"] }}</strong></div>
+        </div>
+    </section>
+    {% endif %}
+
+    <div class="session-admin-grid">
+        <section class="session-admin-panel">
+            <div class="session-admin-panel-head">
+                <div>
+                    <h2>Start new session</h2>
+                    <p>New academic window create karte hi wo active ho jayega.</p>
+                </div>
+            </div>
+            <form method="post" action="{{ url_for('academic_session.create') }}" class="session-admin-form">
+                <label class="session-admin-field">
+                    <span>Session Name</span>
+                    <input type="text" name="name" placeholder="e.g. 2026-27" required>
+                </label>
+                <label class="session-admin-field">
+                    <span>Start Date</span>
+                    <input type="date" name="start_date" required>
+                </label>
+                <label class="session-admin-field">
+                    <span>End Date</span>
+                    <input type="date" name="end_date" required>
+                </label>
+                <div class="session-admin-actions">
+                    <button type="submit" class="session-admin-primary-btn">Start Session</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="session-admin-panel">
+            <div class="session-admin-panel-head">
+                <div>
+                    <h2>Session guidance</h2>
+                    <p>Safe management ke liye quick reference.</p>
+                </div>
+            </div>
+            <div class="session-admin-note-list">
+                <div><span>Active Rule</span><strong>System always uses only one active session.</strong></div>
+                <div><span>Delete Rule</span><strong>Only non-active sessions with no dependency can be removed.</strong></div>
+                <div><span>Best Practice</span><strong>Start new session only after current year closure is confirmed.</strong></div>
+            </div>
+        </section>
+    </div>
+
+    <section class="session-admin-panel">
+        <div class="session-admin-panel-head">
+            <div>
+                <h2>Session register</h2>
+                <p>All created sessions with current status and action control.</p>
+            </div>
+        </div>
+        {% if sessions %}
+        <div class="session-admin-table-wrap">
+            <table class="session-admin-table">
+                <thead>
+                    <tr>
+                        <th>Session</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sessions %}
+                    <tr>
+                        <td><strong>{{ s["name"] }}</strong></td>
+                        <td>{{ s["start_date"] }}</td>
+                        <td>{{ s["end_date"] }}</td>
+                        <td>
+                            {% if s["is_active"] %}
+                            <span class="session-admin-badge active">Active</span>
+                            {% else %}
+                            <span class="session-admin-badge">Closed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not s["is_active"] %}
+                            <a href="/academic-session/delete/{{ s['id'] }}" onclick="return confirm('Delete this session?')" class="session-admin-link-btn danger">Delete</a>
+                            {% else %}
+                            <span class="session-admin-badge muted">In Use</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="schedule-empty compact">
+            <h3>No academic sessions found</h3>
+            <p>Current system me abhi koi session create nahi hua hai.</p>
+        </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

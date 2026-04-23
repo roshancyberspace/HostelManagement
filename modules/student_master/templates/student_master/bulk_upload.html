@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="intake-shell">
+    <div class="intake-hero">
+        <div>
+            <span class="section-kicker">CSV Upload</span>
+            <h1>Bulk Student Upload</h1>
+            <p>Upload a CSV file to quickly create the initial student strength for hostel intake.</p>
+        </div>
+        <div class="intake-hero-card">
+            <span class="status-chip">Legacy import</span>
+            <strong>CSV based</strong>
+            <p>Use this only when you are working with the older basic upload format.</p>
+        </div>
+    </div>
+    <div class="intake-grid single">
+        <section class="intake-card">
+            <div class="intake-card-head"><h3>Upload CSV File</h3><span class="status-chip">Phase 1</span></div>
+            <p>Expected format: ledger number, student name, class, and section.</p>
+            <form method="post" enctype="multipart/form-data" class="admin-form-grid intake-form">
+                <div class="full-span"><label for="bulk-file">Student CSV File</label><input id="bulk-file" type="file" name="file" required></div>
+                <div class="form-action-row"><button type="submit">Upload CSV</button></div>
+            </form>
+        </section>
+        <section class="intake-card">
+            <h3>Quick Notes</h3>
+            <ul class="focus-list compact">
+                <li><strong>Recommended columns</strong>Ledger Number, Student Name, Class, and Section.</li>
+                <li><strong>Use case</strong>Best for initial student strength creation before full biodata.</li>
+                <li><strong>Better option</strong>Use the Excel bulk upload when you want a cleaner guided template.</li>
+            </ul>
+        </section>
+    </div>
+</section>
+
+{% endblock %}

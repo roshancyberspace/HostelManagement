@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="gatepass-shell">
+    <div class="gatepass-hero">
+        <div>
+            <p class="gatepass-kicker">Gate Pass</p>
+            <h1>New gate pass</h1>
+            <p class="gatepass-subtitle">Student lookup, pocket balance check, and outing schedule ek hi screen par manage karo.</p>
+        </div>
+        <form method="get" class="gatepass-search-form">
+            <input name="ledger_no" placeholder="Enter ledger number" value="{{ request.args.get('ledger_no', form_data.get('ledger_no', '')) if form_data else request.args.get('ledger_no', '') }}" required>
+            <button class="gatepass-primary-btn" type="submit">Load student</button>
+        </form>
+    </div>
+
+    <div class="gatepass-grid gatepass-grid-2">
+        <div class="gatepass-panel">
+            <div class="gatepass-panel-head">
+                <div>
+                    <h2>Create request</h2>
+                    <p>Student load hone ke baad outing purpose aur timings fill karo.</p>
+                </div>
+                <span class="gatepass-chip">Request</span>
+            </div>
+
+            {% if student %}
+            <div class="gatepass-student-card">
+                <div>
+                    <strong>{{ student.full_name }}</strong>
+                    <p>{{ student.ledger_no }} · Class {{ student.class }}{% if student.section %} {{ student.section }}{% endif %}</p>
+                </div>
+                <span class="gatepass-badge neutral">Ready to issue</span>
+            </div>
+
+            <form method="post" class="gatepass-form-grid">
+                <input type="hidden" name="ledger_no" value="{{ student.ledger_no }}">
+
+                <label class="gatepass-field gatepass-field-full">
+                    <span>Purpose</span>
+                    <input name="purpose" value="{{ form_data.get('purpose', '') if form_data else '' }}" placeholder="Family visit, medical visit, exam travel, outing reason" required>
+                </label>
+
+                <label class="gatepass-field">
+                    <span>Relation / Escort</span>
+                    <input name="relation" value="{{ form_data.get('relation', '') if form_data else '' }}" placeholder="Father, mother, guardian, self">
+                </label>
+
+                <label class="gatepass-field">
+                    <span>Out Date and Time</span>
+                    <input type="datetime-local" name="out_datetime" value="{{ form_data.get('out_datetime', '') if form_data else '' }}" required>
+                </label>
+
+                <label class="gatepass-field">
+                    <span>Expected Return</span>
+                    <input type="datetime-local" name="expected_return_datetime" value="{{ form_data.get('expected_return_datetime', '') if form_data else '' }}" required>
+                </label>
+
+                <div class="gatepass-form-actions">
+                    <button class="gatepass-primary-btn" type="submit">Create gate pass</button>
+                    <a class="gatepass-secondary-btn" href="{{ url_for('gate_pass.list_gate_pass') }}">Open register</a>
+                </div>
+            </form>
+            {% else %}
+            <div class="gatepass-empty">
+                <h3>Load a student first</h3>
+                <p>Ledger number enter karke student profile load karo, phir gate pass form active ho jayega.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="gatepass-panel">
+            <div class="gatepass-panel-head">
+                <div>
+                    <h2>Student snapshot</h2>
+                    <p>Gate pass create karne se pehle quick details confirm karo.</p>
+                </div>
+                <span class="gatepass-chip">Preview</span>
+            </div>
+
+            {% if student %}
+            <div class="gatepass-card-list">
+                <article class="gatepass-mini-card">
+                    <strong>Student</strong>
+                    <p>{{ student.full_name }}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Class</strong>
+                    <p>{{ student.class }}{% if student.section %} {{ student.section }}{% endif %}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Guardian Contact</strong>
+                    <p>{{ student.guardian_contact or 'Not available' }}</p>
+                </article>
+                <article class="gatepass-mini-card">
+                    <strong>Portal Status</strong>
+                    <p>{{ student.status or 'ACTIVE' }}</p>
+                </article>
+            </div>
+            {% else %}
+            <div class="gatepass-empty">
+                <h3>No student loaded</h3>
+                <p>Student details yahan preview me dikhengi once ledger lookup complete ho jayega.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
